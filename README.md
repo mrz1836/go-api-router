@@ -1,5 +1,5 @@
 # go-api-router
-**go-api-router** is a lightweight API middleware for cors, logging, and standardized error handling. This package is intended to be used with Julien Schmidt's [httprouter](https://github.com/julienschmidt/httprouter) and uses an extendable logging package [go-logger](https://github.com/mrz1836/go-logger).
+**go-api-router** is a lightweight API router middleware: cors, logging, and standardized error handling. This package is intended to be used with Julien Schmidt's [httprouter](https://github.com/julienschmidt/httprouter) and uses MrZ's [go-logger](https://github.com/mrz1836/go-logger).
 
 | | | | | | | |
 |-|-|-|-|-|-|-|
