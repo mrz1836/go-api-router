@@ -1,4 +1,4 @@
-package apiMiddleware
+package apiRouter
 
 import (
 	"net/http"

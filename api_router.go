@@ -1,8 +1,8 @@
 /*
-Package apiMiddleware is a lightweight middleware for cors, logging, and standardized error handling.
-  This package is intended to be used with Julien Schmidt's httprouter and uses an extendable logging package go-logger.
+Package apiRouter is a lightweight API router middleware for cors, logging, and standardized error handling.
+  This package is intended to be used with Julien Schmidt's httprouter and uses MrZ's go-logger package.
 */
-package apiMiddleware
+package apiRouter
 
 import (
 	"context"
@@ -21,19 +21,22 @@ const (
 	logTimeFormat   = "request_id=\"%s\" method=%s path=\"%s\" ip_address=\"%s\" user_agent=\"%s\" service=%dms status=%d\n"
 )
 
-// MiddlewareConfig is the configuration for the middleware service
-type MiddlewareConfig struct {
-	CorsEnabled          bool   `json:"cors_enabled" url:"cors_enabled"`                     // Enable or Disable Cors
-	CorsAllowOriginAll   bool   `json:"cors_allow_origin_all" url:"cors_allow_origin_all"`   // Allow all origins
-	CorsAllowOrigin      string `json:"cors_allow_origin" url:"cors_allow_origin"`           // Custom value for allow origin
-	CorsAllowCredentials bool   `json:"cors_allow_credentials" url:"cors_allow_credentials"` // Allow credentials for BasicAuth()
-	CorsAllowMethods     string `json:"cors_allow_methods" url:"cors_allow_methods"`         // Allowed methods
-	CorsAllowHeaders     string `json:"cors_allow_headers" url:"cors_allow_headers"`         // Allowed headers
+// RouterConfig is the configuration for the middleware service
+type RouterConfig struct {
+	CorsAllowCredentials bool               `json:"cors_allow_credentials" url:"cors_allow_credentials"` // Allow credentials for BasicAuth()
+	CorsAllowHeaders     string             `json:"cors_allow_headers" url:"cors_allow_headers"`         // Allowed headers
+	CorsAllowMethods     string             `json:"cors_allow_methods" url:"cors_allow_methods"`         // Allowed methods
+	CorsAllowOrigin      string             `json:"cors_allow_origin" url:"cors_allow_origin"`           // Custom value for allow origin
+	CorsAllowOriginAll   bool               `json:"cors_allow_origin_all" url:"cors_allow_origin_all"`   // Allow all origins
+	CorsEnabled          bool               `json:"cors_enabled" url:"cors_enabled"`                     // Enable or Disable Cors
+	Router               *httprouter.Router `json:"-" url:"-"`                                           // Router
 }
 
-// New returns a middleware configuration to use for all future requests
-func New() *MiddlewareConfig {
-	config := new(MiddlewareConfig)
+// New returns a router middleware configuration to use for all future requests
+func New() *RouterConfig {
+
+	// Create new configuration
+	config := new(RouterConfig)
 
 	// Default is to allow credentials for BasicAuth()
 	config.CorsAllowCredentials = true
@@ -50,12 +53,15 @@ func New() *MiddlewareConfig {
 	// Default is cors = enabled
 	config.CorsEnabled = true
 
+	// Create the router
+	config.Router = new(httprouter.Router)
+
 	// return the default configuration
 	return config
 }
 
 // Request will write the request to the logs before and after calling the handler
-func (m *MiddlewareConfig) Request(h httprouter.Handle) httprouter.Handle {
+func (m *RouterConfig) Request(h httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 
 		// Parse the params (once here, then store in the request)
@@ -92,7 +98,7 @@ func (m *MiddlewareConfig) Request(h httprouter.Handle) httprouter.Handle {
 
 // RequestNoLogging will just call the handler without any logging
 // Used for API calls that do not require any logging overhead
-func (m *MiddlewareConfig) RequestNoLogging(h httprouter.Handle) httprouter.Handle {
+func (m *RouterConfig) RequestNoLogging(h httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 
 		// Parse the params (once here, then store in the request)
@@ -120,7 +126,7 @@ func (m *MiddlewareConfig) RequestNoLogging(h httprouter.Handle) httprouter.Hand
 }
 
 // BasicAuth wraps a request for Basic Authentication (RFC 2617)
-func (m *MiddlewareConfig) BasicAuth(h httprouter.Handle, requiredUser, requiredPassword string, errorMessage string) httprouter.Handle {
+func (m *RouterConfig) BasicAuth(h httprouter.Handle, requiredUser, requiredPassword string, errorMessage string) httprouter.Handle {
 
 	// Return the function up the chain
 	return func(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
@@ -139,7 +145,7 @@ func (m *MiddlewareConfig) BasicAuth(h httprouter.Handle, requiredUser, required
 }
 
 // SetupCrossOrigin sets the cross-origin headers if enabled
-func (m *MiddlewareConfig) SetupCrossOrigin(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+func (m *RouterConfig) SetupCrossOrigin(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 
 	// Turned cors off? Just return
 	if !m.CorsEnabled {
@@ -167,7 +173,7 @@ func (m *MiddlewareConfig) SetupCrossOrigin(w http.ResponseWriter, req *http.Req
 }
 
 // ReturnResponse helps return a status code and message to the end user
-func (m *MiddlewareConfig) ReturnResponse(w http.ResponseWriter, code int, message string, json bool) {
+func (m *RouterConfig) ReturnResponse(w http.ResponseWriter, code int, message string, json bool) {
 
 	// Set the header status code
 	w.WriteHeader(code)
