@@ -38,7 +38,13 @@ $ dep ensure -update -v
 You can view the generated [documentation here](https://godoc.org/github.com/mrz1836/go-api-router).
 
 ### Features
-
+- Uses the fastest router: Julien Schmidt's [httprouter](https://github.com/julienschmidt/httprouter)
+- Added Additional CORS Functionality
+- Standardized Error Responses
+- Centralized Logging on Requests (requesting user info & request time)
+- Custom Response Writer for Etag and Cache Support
+- GetClientIPAddress() safely detects IP addresses behind load balancers
+- GetParams() parses parameters only once
 
 ## Examples & Tests
 All unit tests and [examples](example/example.go) run via [Travis CI](https://travis-ci.com/mrz1836/go-api-router) and uses [Go version 1.12.x](https://golang.org/doc/go1.12). View the [deployment configuration file](.travis.yml).
