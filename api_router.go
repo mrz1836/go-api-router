@@ -21,6 +21,7 @@ const (
 	logTimeFormat   string = "request_id=\"%s\" method=%s path=\"%s\" ip_address=\"%s\" user_agent=\"%s\" service=%dms status=%d\n"
 )
 
+// Package variables
 var (
 	paramKey paramRequestKey = "params"
 )
