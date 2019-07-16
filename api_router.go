@@ -69,7 +69,7 @@ func New() *Router {
 }
 
 // Request will write the request to the logs before and after calling the handler
-func (m *Router) Request(h httprouter.Handle) httprouter.Handle {
+func (r *Router) Request(h httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 
 		// Parse the params (once here, then store in the request)
@@ -89,7 +89,7 @@ func (m *Router) Request(h httprouter.Handle) httprouter.Handle {
 		}
 
 		// Set cross origin on each request that goes through logging
-		m.SetupCrossOrigin(writer, req, ps)
+		r.SetupCrossOrigin(writer, req, ps)
 
 		// Start the log (timer)
 		logger.Printf(logParamsFormat, writer.RequestID, writer.Method, writer.URL, writer.IPAddress, writer.UserAgent, GetParams(req))
@@ -106,7 +106,7 @@ func (m *Router) Request(h httprouter.Handle) httprouter.Handle {
 
 // RequestNoLogging will just call the handler without any logging
 // Used for API calls that do not require any logging overhead
-func (m *Router) RequestNoLogging(h httprouter.Handle) httprouter.Handle {
+func (r *Router) RequestNoLogging(h httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 
 		// Parse the params (once here, then store in the request)
@@ -126,7 +126,7 @@ func (m *Router) RequestNoLogging(h httprouter.Handle) httprouter.Handle {
 		}
 
 		// Set cross origin on each request that goes through logging
-		m.SetupCrossOrigin(writer, req, ps)
+		r.SetupCrossOrigin(writer, req, ps)
 
 		// Fire the request
 		h(writer, req, ps)
@@ -134,7 +134,7 @@ func (m *Router) RequestNoLogging(h httprouter.Handle) httprouter.Handle {
 }
 
 // BasicAuth wraps a request for Basic Authentication (RFC 2617)
-func (m *Router) BasicAuth(h httprouter.Handle, requiredUser, requiredPassword string, errorMessage string) httprouter.Handle {
+func (r *Router) BasicAuth(h httprouter.Handle, requiredUser, requiredPassword string, errorMessage string) httprouter.Handle {
 
 	// Return the function up the chain
 	return func(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
@@ -147,41 +147,41 @@ func (m *Router) BasicAuth(h httprouter.Handle, requiredUser, requiredPassword s
 		} else {
 			// Request Basic Authentication otherwise
 			w.Header().Set("WWW-Authenticate", "Basic realm=Restricted")
-			m.ReturnResponse(w, http.StatusUnauthorized, errorMessage, false)
+			ReturnResponse(w, http.StatusUnauthorized, errorMessage, false)
 		}
 	}
 }
 
 // SetupCrossOrigin sets the cross-origin headers if enabled
-func (m *Router) SetupCrossOrigin(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+func (r *Router) SetupCrossOrigin(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 
 	// Turned cors off? Just return
-	if !m.CorsEnabled {
+	if !r.CorsEnabled {
 		return
 	}
 
 	// On for all origins?
-	if m.CorsAllowOriginAll {
+	if r.CorsAllowOriginAll {
 		w.Header().Set("Access-Control-Allow-Origin", req.Header.Get("Origin"))
 		w.Header().Set("Vary", "Origin")
 	} else { //Only the origin set by config
-		w.Header().Set("Access-Control-Allow-Origin", m.CorsAllowOrigin)
+		w.Header().Set("Access-Control-Allow-Origin", r.CorsAllowOrigin)
 	}
 
 	// Allow credentials (used for BasicAuth)
-	if m.CorsAllowCredentials {
+	if r.CorsAllowCredentials {
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
 	}
 
 	// Allowed methods to accept
-	w.Header().Set("Access-Control-Allow-Methods", m.CorsAllowMethods)
+	w.Header().Set("Access-Control-Allow-Methods", r.CorsAllowMethods)
 
 	// Allowed headers to accept
-	w.Header().Set("Access-Control-Allow-Headers", m.CorsAllowHeaders)
+	w.Header().Set("Access-Control-Allow-Headers", r.CorsAllowHeaders)
 }
 
 // ReturnResponse helps return a status code and message to the end user
-func (m *Router) ReturnResponse(w http.ResponseWriter, code int, message string, json bool) {
+func ReturnResponse(w http.ResponseWriter, code int, message string, json bool) {
 
 	// Set the header status code
 	w.WriteHeader(code)
