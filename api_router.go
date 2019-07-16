@@ -29,22 +29,22 @@ var (
 // paramRequestKey for context key
 type paramRequestKey string
 
-// RouterConfig is the configuration for the middleware service
-type RouterConfig struct {
+// Router is the configuration for the middleware service
+type Router struct {
 	CorsAllowCredentials bool               `json:"cors_allow_credentials" url:"cors_allow_credentials"` // Allow credentials for BasicAuth()
 	CorsAllowHeaders     string             `json:"cors_allow_headers" url:"cors_allow_headers"`         // Allowed headers
 	CorsAllowMethods     string             `json:"cors_allow_methods" url:"cors_allow_methods"`         // Allowed methods
 	CorsAllowOrigin      string             `json:"cors_allow_origin" url:"cors_allow_origin"`           // Custom value for allow origin
 	CorsAllowOriginAll   bool               `json:"cors_allow_origin_all" url:"cors_allow_origin_all"`   // Allow all origins
 	CorsEnabled          bool               `json:"cors_enabled" url:"cors_enabled"`                     // Enable or Disable Cors
-	Router               *httprouter.Router `json:"-" url:"-"`                                           // Router
+	HTTPRouter           *httprouter.Router `json:"-" url:"-"`                                           // J Schmidt httprouter
 }
 
 // New returns a router middleware configuration to use for all future requests
-func New() *RouterConfig {
+func New() *Router {
 
 	// Create new configuration
-	config := new(RouterConfig)
+	config := new(Router)
 
 	// Default is to allow credentials for BasicAuth()
 	config.CorsAllowCredentials = true
@@ -62,14 +62,14 @@ func New() *RouterConfig {
 	config.CorsEnabled = true
 
 	// Create the router
-	config.Router = new(httprouter.Router)
+	config.HTTPRouter = new(httprouter.Router)
 
 	// return the default configuration
 	return config
 }
 
 // Request will write the request to the logs before and after calling the handler
-func (m *RouterConfig) Request(h httprouter.Handle) httprouter.Handle {
+func (m *Router) Request(h httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 
 		// Parse the params (once here, then store in the request)
@@ -106,7 +106,7 @@ func (m *RouterConfig) Request(h httprouter.Handle) httprouter.Handle {
 
 // RequestNoLogging will just call the handler without any logging
 // Used for API calls that do not require any logging overhead
-func (m *RouterConfig) RequestNoLogging(h httprouter.Handle) httprouter.Handle {
+func (m *Router) RequestNoLogging(h httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 
 		// Parse the params (once here, then store in the request)
@@ -134,7 +134,7 @@ func (m *RouterConfig) RequestNoLogging(h httprouter.Handle) httprouter.Handle {
 }
 
 // BasicAuth wraps a request for Basic Authentication (RFC 2617)
-func (m *RouterConfig) BasicAuth(h httprouter.Handle, requiredUser, requiredPassword string, errorMessage string) httprouter.Handle {
+func (m *Router) BasicAuth(h httprouter.Handle, requiredUser, requiredPassword string, errorMessage string) httprouter.Handle {
 
 	// Return the function up the chain
 	return func(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
@@ -153,7 +153,7 @@ func (m *RouterConfig) BasicAuth(h httprouter.Handle, requiredUser, requiredPass
 }
 
 // SetupCrossOrigin sets the cross-origin headers if enabled
-func (m *RouterConfig) SetupCrossOrigin(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+func (m *Router) SetupCrossOrigin(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 
 	// Turned cors off? Just return
 	if !m.CorsEnabled {
@@ -181,7 +181,7 @@ func (m *RouterConfig) SetupCrossOrigin(w http.ResponseWriter, req *http.Request
 }
 
 // ReturnResponse helps return a status code and message to the end user
-func (m *RouterConfig) ReturnResponse(w http.ResponseWriter, code int, message string, json bool) {
+func (m *Router) ReturnResponse(w http.ResponseWriter, code int, message string, json bool) {
 
 	// Set the header status code
 	w.WriteHeader(code)
