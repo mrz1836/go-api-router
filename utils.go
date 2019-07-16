@@ -8,7 +8,7 @@ import (
 
 // GetParams gets the params from the http request (parsed once on log request)
 func GetParams(req *http.Request) url.Values {
-	params := req.Context().Value("params").(url.Values)
+	params := req.Context().Value(paramKey).(url.Values)
 	return params
 }
 
