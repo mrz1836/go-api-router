@@ -12,7 +12,7 @@ func GetParams(req *http.Request) url.Values {
 	return params
 }
 
-// Gets the client ip address
+// GetClientIPAddress gets the client ip address
 func GetClientIPAddress(req *http.Request) string {
 	//The ip address
 	var ip string

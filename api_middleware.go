@@ -14,8 +14,6 @@ import (
 	"github.com/satori/go.uuid"
 )
 
-//----------------------------------------------------------------------------------------------------------------------
-
 // Log formats for the request
 const (
 	logParamsFormat = "request_id=\"%s\" method=%s path=\"%s\" ip_address=\"%s\" user_agent=\"%s\" params=%v\n"
@@ -32,8 +30,8 @@ type MiddlewareConfig struct {
 	CorsAllowHeaders     string `json:"cors_allow_headers" url:"cors_allow_headers"`         // Allowed headers
 }
 
-// NewMiddleware returns a middleware configuration to use for all future requests
-func NewMiddleware() *MiddlewareConfig {
+// New returns a middleware configuration to use for all future requests
+func New() *MiddlewareConfig {
 	config := new(MiddlewareConfig)
 
 	// Default is to allow credentials for BasicAuth()
@@ -183,5 +181,3 @@ func (m *MiddlewareConfig) ReturnResponse(w http.ResponseWriter, code int, messa
 		logger.Data(2, logger.WARN, err.Error())
 	}
 }
-
-//----------------------------------------------------------------------------------------------------------------------
