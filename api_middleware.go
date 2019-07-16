@@ -1,5 +1,6 @@
 /*
 Package apiMiddleware is a lightweight middleware for cors, logging, and standardized error handling.
+  This package is intended to be used with Julien Schmidt's httprouter and uses an extendable logging package go-logger.
 */
 package apiMiddleware
 
