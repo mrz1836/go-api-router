@@ -17,10 +17,16 @@ import (
 
 // Log formats for the request
 const (
-	paramRequestKey string = "params"
 	logParamsFormat string = "request_id=\"%s\" method=%s path=\"%s\" ip_address=\"%s\" user_agent=\"%s\" params=%v\n"
 	logTimeFormat   string = "request_id=\"%s\" method=%s path=\"%s\" ip_address=\"%s\" user_agent=\"%s\" service=%dms status=%d\n"
 )
+
+var (
+	paramKey paramRequestKey = "params"
+)
+
+// paramRequestKey for context key
+type paramRequestKey string
 
 // RouterConfig is the configuration for the middleware service
 type RouterConfig struct {
@@ -67,7 +73,7 @@ func (m *RouterConfig) Request(h httprouter.Handle) httprouter.Handle {
 
 		// Parse the params (once here, then store in the request)
 		params := req.URL.Query()
-		req = req.WithContext(context.WithValue(req.Context(), paramRequestKey, params))
+		req = req.WithContext(context.WithValue(req.Context(), paramKey, params))
 
 		// Start the custom response writer
 		var writer *APIResponseWriter
@@ -104,7 +110,7 @@ func (m *RouterConfig) RequestNoLogging(h httprouter.Handle) httprouter.Handle {
 
 		// Parse the params (once here, then store in the request)
 		params := req.URL.Query()
-		req = req.WithContext(context.WithValue(req.Context(), "params", params))
+		req = req.WithContext(context.WithValue(req.Context(), paramKey, params))
 
 		// Start the custom response writer
 		var writer *APIResponseWriter
