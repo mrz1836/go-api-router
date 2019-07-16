@@ -1,8 +1,8 @@
 /*
-Package apiRouter is a lightweight API router middleware for cors, logging, and standardized error handling.
+Package apirouter is a lightweight API router middleware for cors, logging, and standardized error handling.
   This package is intended to be used with Julien Schmidt's httprouter and uses MrZ's go-logger package.
 */
-package apiRouter
+package apirouter
 
 import (
 	"context"

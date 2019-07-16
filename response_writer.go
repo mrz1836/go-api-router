@@ -1,4 +1,4 @@
-package apiRouter
+package apirouter
 
 import (
 	"bytes"
