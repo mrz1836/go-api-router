@@ -1,6 +1,7 @@
 package apirouter
 
 import (
+	"fmt"
 	"net/http"
 	"testing"
 )
@@ -46,8 +47,24 @@ func TestNewError(t *testing.T) {
 	}
 }
 
+//ExampleNewError example using NewError()
+func ExampleNewError() {
+	w := setupTest()
+	err := NewError(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
+	fmt.Println(err.Error())
+	// Output:public message
+}
+
+// BenchmarkNewError benchmarks the NewError() method
+func BenchmarkNewError(b *testing.B) {
+	w := setupTest()
+	for i := 0; i < b.N; i++ {
+		_ = NewError(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
+	}
+}
+
 // TestError_Error test the method Error()
-func TestError_Error(t *testing.T) {
+func TestAPIError_Error(t *testing.T) {
 
 	w := setupTest()
 
@@ -59,8 +76,25 @@ func TestError_Error(t *testing.T) {
 	}
 }
 
+//ExampleAPIError_Error example using Error()
+func ExampleAPIError_Error() {
+	w := setupTest()
+	err := NewError(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
+	fmt.Println(err.Error())
+	// Output:public message
+}
+
+// BenchmarkAPIError_Error benchmarks the Error() method
+func BenchmarkAPIError_Error(b *testing.B) {
+	w := setupTest()
+	err := NewError(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
+	for i := 0; i < b.N; i++ {
+		_ = err.Error()
+	}
+}
+
 // TestError_JSON test the method JSON()
-func TestError_JSON(t *testing.T) {
+func TestAPIError_JSON(t *testing.T) {
 
 	w := setupTest()
 
@@ -72,8 +106,26 @@ func TestError_JSON(t *testing.T) {
 	}
 }
 
+//ExampleAPIError_JSON example using JSON()
+func ExampleAPIError_JSON() {
+	w := setupTest()
+	err := NewError(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
+	str, _ := err.JSON()
+	fmt.Println(str)
+	// Output:{"code":600,"data":"{\"something\":\"else\"}","ip_address":"127.0.0.1","method":"GET","message":"public message","request_guid":"unique-guid-per-user","url":"/this/path"}
+}
+
+// BenchmarkAPIError_JSON benchmarks the NewError() method
+func BenchmarkAPIError_JSON(b *testing.B) {
+	w := setupTest()
+	err := NewError(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
+	for i := 0; i < b.N; i++ {
+		_, _ = err.JSON()
+	}
+}
+
 // TestError_Internal test the method Internal()
-func TestError_Internal(t *testing.T) {
+func TestAPIError_Internal(t *testing.T) {
 
 	w := setupTest()
 
@@ -85,8 +137,25 @@ func TestError_Internal(t *testing.T) {
 	}
 }
 
+//ExampleAPIError_Internal example using Internal()
+func ExampleAPIError_Internal() {
+	w := setupTest()
+	err := NewError(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
+	fmt.Println(err.Internal())
+	// Output:internal message
+}
+
+// BenchmarkAPIError_Internal benchmarks the Internal() method
+func BenchmarkAPIError_Internal(b *testing.B) {
+	w := setupTest()
+	err := NewError(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
+	for i := 0; i < b.N; i++ {
+		_ = err.Internal()
+	}
+}
+
 // TestError_ErrorCode test the method ErrorCode()
-func TestError_ErrorCode(t *testing.T) {
+func TestAPIError_ErrorCode(t *testing.T) {
 
 	w := setupTest()
 
@@ -95,5 +164,22 @@ func TestError_ErrorCode(t *testing.T) {
 	code := err.ErrorCode()
 	if code != err.Code {
 		t.Fatal("error response is not correct", code)
+	}
+}
+
+//ExampleAPIError_ErrorCode example using ErrorCode()
+func ExampleAPIError_ErrorCode() {
+	w := setupTest()
+	err := NewError(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
+	fmt.Println(err.ErrorCode())
+	// Output:600
+}
+
+// BenchmarkAPIError_ErrorCode benchmarks the ErrorCode() method
+func BenchmarkAPIError_ErrorCode(b *testing.B) {
+	w := setupTest()
+	err := NewError(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
+	for i := 0; i < b.N; i++ {
+		_ = err.ErrorCode()
 	}
 }

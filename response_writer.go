@@ -30,6 +30,11 @@ func (r *APIResponseWriter) AddCacheIdentifier(identifier string) {
 	r.CacheIdentifier = append(r.CacheIdentifier, identifier)
 }
 
+// StatusCode give a way to get the status code
+func (r *APIResponseWriter) StatusCode() int {
+	return r.Status
+}
+
 // Header returns the http.Header that will be written to the response
 func (r *APIResponseWriter) Header() http.Header {
 	return r.ResponseWriter.Header()

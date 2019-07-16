@@ -4,7 +4,6 @@ Package main shows examples using the API Router
 package main
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
@@ -31,5 +30,5 @@ func main() {
 
 // index basic request to /
 func index(w http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
-	_, _ = fmt.Fprint(w, "Welcome to this simple API example!")
+	apirouter.ReturnResponse(w, http.StatusOK, "Welcome to this simple API example!", false)
 }
