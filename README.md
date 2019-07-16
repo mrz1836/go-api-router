@@ -1,5 +1,5 @@
 # go-api-router
-**go-api-router** is a lightweight API router middleware: cors, logging, and standardized error handling. This package is intended to be used with Julien Schmidt's [httprouter](https://github.com/julienschmidt/httprouter) and uses MrZ's [go-logger](https://github.com/mrz1836/go-logger).
+**go-api-router** is a lightweight API [httprouter](https://github.com/julienschmidt/httprouter) middleware: cors, logging, and standardized error handling. Extends Julien Schmidt's [httprouter](https://github.com/julienschmidt/httprouter) package.
 
 | | | | | | | |
 |-|-|-|-|-|-|-|
@@ -39,8 +39,10 @@ You can view the generated [documentation here](https://godoc.org/github.com/mrz
 
 ### Features
 - Uses the fastest router: Julien Schmidt's [httprouter](https://github.com/julienschmidt/httprouter)
+- Uses Satori's [go.uuid](https://github.com/satori/go.uuid) package to guarantee unique request ids
+- Uses MrZ's [go-logger](https://github.com/mrz1836/go-logger) for either local or remote logging via [LogEntries](https://logentries.com/)
 - Added Additional CORS Functionality
-- Standardized Error Responses
+- Standardized Error Responses for API Requests
 - Centralized Logging on Requests (requesting user info & request time)
 - Custom Response Writer for Etag and Cache Support
 - GetClientIPAddress() safely detects IP addresses behind load balancers
