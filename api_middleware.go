@@ -22,16 +22,16 @@ import (
 // It is used by the LogRequest middleware
 type APIResponseWriter struct {
 	http.ResponseWriter
-	Buffer          bytes.Buffer
-	CacheIdentifier []string
-	CacheTTL        time.Duration
-	IPAddress       string
-	Method          string
-	NoWrite         bool
-	RequestID       string
-	Status          int
-	URL             string
-	UserAgent       string
+	Buffer          bytes.Buffer  `json:"-" url:"-"`
+	CacheIdentifier []string      `json:"cache_identifier" url:"cache_identifier"`
+	CacheTTL        time.Duration `json:"cache_ttl" url:"cache_ttl"`
+	IPAddress       string        `json:"ip_address" url:"ip_address"`
+	Method          string        `json:"method" url:"method"`
+	NoWrite         bool          `json:"no_write" url:"no_write"`
+	RequestID       string        `json:"request_id" url:"request_id"`
+	Status          int           `json:"status" url:"status"`
+	URL             string        `json:"url" url:"url"`
+	UserAgent       string        `json:"user_agent" url:"user_agent"`
 }
 
 // AddCacheIdentifier add cache identifier to the response writer
@@ -71,20 +71,20 @@ func (r *APIResponseWriter) Write(data []byte) (int, error) {
 //----------------------------------------------------------------------------------------------------------------------
 
 const (
-	// ErrCodeUnknown unknown error code
+	// ErrCodeUnknown unknown error code (example)
 	ErrCodeUnknown int = 600
 )
 
 // APIError is the enriched error message for API related errors
 type APIError struct {
-	Code            int         `json:"code" url:"code"`
-	Data            interface{} `json:"data" url:"data"`
-	InternalMessage string      `json:"-" url:"-"`
-	IPAddress       string      `json:"ip_address" url:"ip_address"`
-	Method          string      `json:"method" url:"method"`
-	PublicMessage   string      `json:"message" url:"message"`
-	RequestGUID     string      `json:"request_guid" url:"request_guid"`
-	URL             string      `json:"url" url:"url"`
+	Code            int         `json:"code" url:"code"`                 // Associated error code
+	Data            interface{} `json:"data" url:"data"`                 // Arbitrary data that is relevant
+	InternalMessage string      `json:"-" url:"-"`                       // Internal message for engineers
+	IPAddress       string      `json:"ip_address" url:"ip_address"`     // Current IP of user
+	Method          string      `json:"method" url:"method"`             // Method requested (IE: POST)
+	PublicMessage   string      `json:"message" url:"message"`           // Public error message
+	RequestGUID     string      `json:"request_guid" url:"request_guid"` // Unique Request ID for tracking
+	URL             string      `json:"url" url:"url"`                   // Requesting URL
 }
 
 // NewError generates a new error struct using CustomResponseWriter from LogRequest()
@@ -130,8 +130,41 @@ const (
 	logTimeFormat   = "request_id=\"%s\" method=%s path=\"%s\" ip_address=\"%s\" user_agent=\"%s\" service=%dms status=%d\n"
 )
 
+// MiddlewareConfig is the configuration for the middleware service
+type MiddlewareConfig struct {
+	CorsEnabled          bool   `json:"cors_enabled" url:"cors_enabled"`                     // Enable or Disable Cors
+	CorsAllowOriginAll   bool   `json:"cors_allow_origin_all" url:"cors_allow_origin_all"`   // Allow all origins
+	CorsAllowOrigin      string `json:"cors_allow_origin" url:"cors_allow_origin"`           // Custom value for allow origin
+	CorsAllowCredentials bool   `json:"cors_allow_credentials" url:"cors_allow_credentials"` // Allow credentials for BasicAuth()
+	CorsAllowMethods     string `json:"cors_allow_methods" url:"cors_allow_methods"`         // Allowed methods
+	CorsAllowHeaders     string `json:"cors_allow_headers" url:"cors_allow_headers"`         // Allowed headers
+}
+
+// NewMiddleware returns a middleware configuration to use for all future requests
+func NewMiddleware() *MiddlewareConfig {
+	config := new(MiddlewareConfig)
+
+	// Default is to allow credentials for BasicAuth()
+	config.CorsAllowCredentials = true
+
+	// Default is for Cors to be enabled and these are common headers
+	config.CorsAllowHeaders = "Accept, Content-Type, Content-Length, Cache-Control, Pragma, Accept-Encoding, X-CSRF-Token, Authorization, X-Auth-Cookie"
+
+	// Default is for the common request methods
+	config.CorsAllowMethods = "POST, GET, OPTIONS, PUT, DELETE, LINK, HEAD"
+
+	// Default is to allow all (easier to get started)
+	config.CorsAllowOriginAll = true
+
+	// Default is cors = enabled
+	config.CorsEnabled = true
+
+	// return the default configuration
+	return config
+}
+
 // LogRequest will write the request to the logs before calling the handler. The request parameters will be filtered.
-func LogRequest(h httprouter.Handle) httprouter.Handle {
+func (m *MiddlewareConfig) LogRequest(h httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 
 		// Parse the params (once here, then store in the request)
@@ -151,7 +184,7 @@ func LogRequest(h httprouter.Handle) httprouter.Handle {
 		}
 
 		// Set cross origin on each request that goes through logging
-		SetupCrossOrigin(writer, req, ps)
+		m.SetupCrossOrigin(writer, req, ps)
 
 		// Start the log (timer)
 		logger.Printf(logParamsFormat, writer.RequestID, writer.Method, writer.URL, writer.IPAddress, writer.UserAgent, GetParams(req))
@@ -164,17 +197,12 @@ func LogRequest(h httprouter.Handle) httprouter.Handle {
 		elapsed := time.Since(start)
 		logger.Printf(logTimeFormat, writer.RequestID, writer.Method, writer.URL, writer.IPAddress, writer.UserAgent, int64(elapsed/time.Millisecond), writer.Status)
 	}
-
-}
-
-// GetParams gets the params from the http request (parsed once on log request)
-func GetParams(req *http.Request) url.Values {
-	params := req.Context().Value("params").(url.Values)
-	return params
 }
 
 // BasicAuth wraps a request for Basic Authentication (RFC 2617)
-func BasicAuth(h httprouter.Handle, requiredUser, requiredPassword string) httprouter.Handle {
+func (m *MiddlewareConfig) BasicAuth(h httprouter.Handle, requiredUser, requiredPassword string, errorMessage string) httprouter.Handle {
+
+	// Return the function up the chain
 	return func(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 		// Get the Basic Authentication credentials
 		user, password, hasAuth := req.BasicAuth()
@@ -185,39 +213,63 @@ func BasicAuth(h httprouter.Handle, requiredUser, requiredPassword string) httpr
 		} else {
 			// Request Basic Authentication otherwise
 			w.Header().Set("WWW-Authenticate", "Basic realm=Restricted")
-			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+			m.ReturnResponse(w, http.StatusUnauthorized, errorMessage, false)
 		}
 	}
 }
 
-// SetupCrossOrigin sets the cross-origin headers
-//todo: configure cors based on init() ?
-func SetupCrossOrigin(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	//w.Header().Set("Access-Control-Allow-Origin", "*") // turn off if using BasicAuth
-	//w.Header().Set("Access-Control-Allow-Origin", strings.TrimRight(req.Header.Get("Referer"), "/"))
-	w.Header().Set("Access-Control-Allow-Origin", req.Header.Get("Origin"))
-	w.Header().Set("Access-Control-Allow-Credentials", "true")
-	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, LINK, HEAD")
-	w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Cache-Control, Pragma, Accept-Encoding, X-CSRF-Token, Authorization, X-Auth-Cookie")
-	w.Header().Set("Vary", "Origin")
+// SetupCrossOrigin sets the cross-origin headers if enabled
+func (m *MiddlewareConfig) SetupCrossOrigin(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+
+	// Turned cors off? Just return
+	if !m.CorsEnabled {
+		return
+	}
+
+	// On for all origins?
+	if m.CorsAllowOriginAll {
+		w.Header().Set("Access-Control-Allow-Origin", req.Header.Get("Origin"))
+		w.Header().Set("Vary", "Origin")
+	} else { //Only the origin set by config
+		w.Header().Set("Access-Control-Allow-Origin", m.CorsAllowOrigin)
+	}
+
+	// Allow credentials (used for BasicAuth)
+	if m.CorsAllowCredentials {
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
+	}
+
+	// Allowed methods to accept
+	w.Header().Set("Access-Control-Allow-Methods", m.CorsAllowMethods)
+
+	// Allowed headers to accept
+	w.Header().Set("Access-Control-Allow-Headers", m.CorsAllowHeaders)
 }
 
-// ReturnResponse helps return a status code and message to the user
-func ReturnResponse(w http.ResponseWriter, code int, message string) {
+// ReturnResponse helps return a status code and message to the end user
+func (m *MiddlewareConfig) ReturnResponse(w http.ResponseWriter, code int, message string, json bool) {
+
+	// Set the header status code
 	w.WriteHeader(code)
-	_, _ = w.Write([]byte(message)) // todo: catch this error - shoot to logs
-}
 
-// ReturnJSONResponse helps return a JSON response to the user
-func ReturnJSONResponse(w http.ResponseWriter, json string, statusCode int) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(statusCode)
-	if _, err := w.Write([]byte(json)); err != nil {
+	// Set the content if JSON
+	if json {
+		w.Header().Set("Content-Type", "application/json")
+	}
+
+	// Write the content, log error if occurs
+	if _, err := w.Write([]byte(message)); err != nil {
 		logger.Data(2, logger.WARN, err.Error())
 	}
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+
+// GetParams gets the params from the http request (parsed once on log request)
+func GetParams(req *http.Request) url.Values {
+	params := req.Context().Value("params").(url.Values)
+	return params
+}
 
 // Gets the client ip address
 func GetClientIPAddress(req *http.Request) string {
