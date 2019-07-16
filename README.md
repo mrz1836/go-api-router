@@ -1,5 +1,5 @@
 # go-api-middleware
-**go-api-middleware** is a lightweight middleware for cors, logging, and standardized error handling.
+**go-api-middleware** is a lightweight middleware for cors, logging, and standardized error handling. This package is intended to be used with Julien Schmidt's [httprouter](https://github.com/julienschmidt/httprouter) and uses an extendable logging package [go-logger](https://github.com/mrz1836/go-logger).
 
 | | | | | | | |
 |-|-|-|-|-|-|-|
@@ -28,6 +28,11 @@ Updating dependencies in **go-api-middleware**:
 $ cd ../go-api-middleware
 $ dep ensure -update -v
 ```
+
+### Package Dependencies
+- Julien Schmidt's [httprouter](https://github.com/julienschmidt/httprouter) package.
+- Satori's [go.uuid](https://github.com/satori/go.uuid) package.
+- MrZ's [go-logger](https://github.com/mrz1836/go-logger) package.
 
 ## Documentation
 You can view the generated [documentation here](https://godoc.org/github.com/mrz1836/go-api-middleware).
@@ -80,6 +85,10 @@ func main() {
 [@MrZ1836](https://github.com/mrz1836)
 
 ## Contributing
+
+This project uses Julien Schmidt's [httprouter](https://github.com/julienschmidt/httprouter) package.
+
+This project uses Satori's [go.uuid](https://github.com/satori/go.uuid) package.
 
 View the [contributing guidelines](CONTRIBUTING.md) and follow the [code of conduct](CODE_OF_CONDUCT.md).
 
