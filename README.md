@@ -1,5 +1,5 @@
 # go-api-middleware
-**go-api-middleware** is a lightweight middleware for logging, error handling and custom response writer.
+**go-api-middleware** is a lightweight middleware for cors, logging, and standardized error handling.
 
 | | | | | | | |
 |-|-|-|-|-|-|-|

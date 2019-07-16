@@ -1,126 +1,18 @@
 /*
-Package apiMiddleware is a lightweight middleware for logging, error handling and custom response writer.
+Package apiMiddleware is a lightweight middleware for cors, logging, and standardized error handling.
 */
 package apiMiddleware
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/url"
-	"strings"
 	"time"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/mrz1836/go-logger"
 	"github.com/satori/go.uuid"
 )
-
-// APIResponseWriter wraps the ResponseWriter and stores the status of the request.
-// It is used by the LogRequest middleware
-type APIResponseWriter struct {
-	http.ResponseWriter
-	Buffer          bytes.Buffer  `json:"-" url:"-"`
-	CacheIdentifier []string      `json:"cache_identifier" url:"cache_identifier"`
-	CacheTTL        time.Duration `json:"cache_ttl" url:"cache_ttl"`
-	IPAddress       string        `json:"ip_address" url:"ip_address"`
-	Method          string        `json:"method" url:"method"`
-	NoWrite         bool          `json:"no_write" url:"no_write"`
-	RequestID       string        `json:"request_id" url:"request_id"`
-	Status          int           `json:"status" url:"status"`
-	URL             string        `json:"url" url:"url"`
-	UserAgent       string        `json:"user_agent" url:"user_agent"`
-}
-
-// AddCacheIdentifier add cache identifier to the response writer
-func (r *APIResponseWriter) AddCacheIdentifier(identifier string) {
-	if r.CacheIdentifier == nil {
-		r.CacheIdentifier = make([]string, 0, 2)
-	}
-	r.CacheIdentifier = append(r.CacheIdentifier, identifier)
-}
-
-// Header returns the http.Header that will be written to the response
-func (r *APIResponseWriter) Header() http.Header {
-	return r.ResponseWriter.Header()
-}
-
-// WriteHeader will write the header to the client, setting the status code
-func (r *APIResponseWriter) WriteHeader(status int) {
-	r.Status = status
-	if !r.NoWrite {
-		r.ResponseWriter.WriteHeader(status)
-	}
-}
-
-// Write writes the data out to the client, if WriteHeader was not called, it will write status http.StatusOK (200)
-func (r *APIResponseWriter) Write(data []byte) (int, error) {
-	if r.Status == 0 {
-		r.Status = http.StatusOK
-	}
-
-	if r.NoWrite {
-		return r.Buffer.Write(data)
-	}
-
-	return r.ResponseWriter.Write(data)
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-
-const (
-	// ErrCodeUnknown unknown error code (example)
-	ErrCodeUnknown int = 600
-)
-
-// APIError is the enriched error message for API related errors
-type APIError struct {
-	Code            int         `json:"code" url:"code"`                 // Associated error code
-	Data            interface{} `json:"data" url:"data"`                 // Arbitrary data that is relevant
-	InternalMessage string      `json:"-" url:"-"`                       // Internal message for engineers
-	IPAddress       string      `json:"ip_address" url:"ip_address"`     // Current IP of user
-	Method          string      `json:"method" url:"method"`             // Method requested (IE: POST)
-	PublicMessage   string      `json:"message" url:"message"`           // Public error message
-	RequestGUID     string      `json:"request_guid" url:"request_guid"` // Unique Request ID for tracking
-	URL             string      `json:"url" url:"url"`                   // Requesting URL
-}
-
-// NewError generates a new error struct using CustomResponseWriter from LogRequest()
-func NewError(w *APIResponseWriter, internalMessage string, publicMessage string, errorCode int, data interface{}) *APIError {
-	return &APIError{
-		Code:            errorCode,
-		Data:            data,
-		InternalMessage: internalMessage,
-		IPAddress:       w.IPAddress,
-		Method:          w.Method,
-		PublicMessage:   publicMessage,
-		RequestGUID:     w.RequestID,
-		URL:             w.URL,
-	}
-}
-
-// Error returns the string error message (only public message)
-func (e *APIError) Error() string {
-	return e.PublicMessage
-}
-
-// ErrorCode returns the error code
-func (e *APIError) ErrorCode() int {
-	return e.Code
-}
-
-// JSON returns the entire public version of the error message
-func (e *APIError) JSON() (string, error) {
-	m, err := json.Marshal(e)
-	return string(m), err
-}
-
-// Internal returns the string error message (only internal message)
-func (e *APIError) Internal() string {
-	return e.InternalMessage
-}
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -163,8 +55,8 @@ func NewMiddleware() *MiddlewareConfig {
 	return config
 }
 
-// LogRequest will write the request to the logs before calling the handler. The request parameters will be filtered.
-func (m *MiddlewareConfig) LogRequest(h httprouter.Handle) httprouter.Handle {
+// Request will write the request to the logs before and after calling the handler
+func (m *MiddlewareConfig) Request(h httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 
 		// Parse the params (once here, then store in the request)
@@ -196,6 +88,35 @@ func (m *MiddlewareConfig) LogRequest(h httprouter.Handle) httprouter.Handle {
 		// Complete the timer and final log
 		elapsed := time.Since(start)
 		logger.Printf(logTimeFormat, writer.RequestID, writer.Method, writer.URL, writer.IPAddress, writer.UserAgent, int64(elapsed/time.Millisecond), writer.Status)
+	}
+}
+
+// RequestNoLogging will just call the handler without any logging
+// Used for API calls that do not require any logging overhead
+func (m *MiddlewareConfig) RequestNoLogging(h httprouter.Handle) httprouter.Handle {
+	return func(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+
+		// Parse the params (once here, then store in the request)
+		params := req.URL.Query()
+		req = req.WithContext(context.WithValue(req.Context(), "params", params))
+
+		// Start the custom response writer
+		var writer *APIResponseWriter
+		writer = &APIResponseWriter{
+			IPAddress:      GetClientIPAddress(req),
+			Method:         fmt.Sprintf("%s", req.Method),
+			RequestID:      uuid.NewV4().String(),
+			ResponseWriter: w,
+			Status:         0, // future use with Etags
+			URL:            fmt.Sprintf("%s", req.URL),
+			UserAgent:      req.UserAgent(),
+		}
+
+		// Set cross origin on each request that goes through logging
+		m.SetupCrossOrigin(writer, req, ps)
+
+		// Fire the request
+		h(writer, req, ps)
 	}
 }
 
@@ -261,47 +182,6 @@ func (m *MiddlewareConfig) ReturnResponse(w http.ResponseWriter, code int, messa
 	if _, err := w.Write([]byte(message)); err != nil {
 		logger.Data(2, logger.WARN, err.Error())
 	}
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-
-// GetParams gets the params from the http request (parsed once on log request)
-func GetParams(req *http.Request) url.Values {
-	params := req.Context().Value("params").(url.Values)
-	return params
-}
-
-// Gets the client ip address
-func GetClientIPAddress(req *http.Request) string {
-	//The ip address
-	var ip string
-
-	//Do we have a load balancer
-	if xForward := req.Header.Get("X-Forwarded-For"); xForward != "" {
-		//Set the ip as the given forwarded ip
-		ip = xForward
-
-		//Do we have more than one?
-		if strings.Contains(ip, ",") {
-
-			//Set the first ip address (from AWS)
-			ip = strings.Split(ip, ",")[0]
-		}
-	} else {
-		//Use the client address
-		ip = strings.Split(req.RemoteAddr, ":")[0]
-
-		//Remove bracket if local host
-		ip = strings.Replace(ip, "[", "", 1)
-
-		//Hack if no ip is found
-		if len(ip) == 0 {
-			ip = "localhost"
-		}
-	}
-
-	//Return the ip address
-	return ip
 }
 
 //----------------------------------------------------------------------------------------------------------------------
