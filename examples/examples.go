@@ -1,3 +1,6 @@
+/*
+Package main shows examples using the API Router
+*/
 package main
 
 import (
@@ -9,6 +12,7 @@ import (
 	"github.com/mrz1836/go-logger"
 )
 
+// main fires on load (go run examples.go)
 func main() {
 	// Load the router & middleware
 	router := apirouter.New()

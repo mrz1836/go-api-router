@@ -49,7 +49,7 @@ You can view the generated [documentation here](https://godoc.org/github.com/mrz
 - GetParams() parses parameters only once
 
 ## Examples & Tests
-All unit tests and [examples](example/example.go) run via [Travis CI](https://travis-ci.com/mrz1836/go-api-router) and uses [Go version 1.12.x](https://golang.org/doc/go1.12). View the [deployment configuration file](.travis.yml).
+All unit tests and [examples](examples/examples.go) run via [Travis CI](https://travis-ci.com/mrz1836/go-api-router) and uses [Go version 1.12.x](https://golang.org/doc/go1.12). View the [deployment configuration file](.travis.yml).
 
 Run all tests (including integration tests)
 ```bash
@@ -66,7 +66,7 @@ $ go test ./... -v -test.short
 View and run the examples:
 ```bash
 $ cd ../go-api-router/examples
-$ go run example.go
+$ go run examples.go
 ```
 
 ## Benchmarks
@@ -80,7 +80,7 @@ $ go test -bench . -benchmem
 Read more about this Go project's [code standards](CODE_STANDARDS.md).
 
 ## Usage
-View the [examples](examples/example.go)
+View the [examples](examples/examples.go)
 
 Basic implementation:
 ```golang
