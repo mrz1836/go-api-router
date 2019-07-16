@@ -1,6 +1,7 @@
 /*
 Package apirouter is a lightweight API router middleware for cors, logging, and standardized error handling.
-  This package is intended to be used with Julien Schmidt's httprouter and uses MrZ's go-logger package.
+
+This package is intended to be used with Julien Schmidt's httprouter and uses MrZ's go-logger package.
 */
 package apirouter
 
@@ -89,7 +90,7 @@ func (r *Router) Request(h httprouter.Handle) httprouter.Handle {
 		}
 
 		// Set cross origin on each request that goes through logging
-		r.SetupCrossOrigin(writer, req, ps)
+		r.SetCrossOriginHeaders(writer, req, ps)
 
 		// Start the log (timer)
 		logger.Printf(logParamsFormat, writer.RequestID, writer.Method, writer.URL, writer.IPAddress, writer.UserAgent, GetParams(req))
@@ -126,7 +127,7 @@ func (r *Router) RequestNoLogging(h httprouter.Handle) httprouter.Handle {
 		}
 
 		// Set cross origin on each request that goes through logging
-		r.SetupCrossOrigin(writer, req, ps)
+		r.SetCrossOriginHeaders(writer, req, ps)
 
 		// Fire the request
 		h(writer, req, ps)
@@ -152,8 +153,8 @@ func (r *Router) BasicAuth(h httprouter.Handle, requiredUser, requiredPassword s
 	}
 }
 
-// SetupCrossOrigin sets the cross-origin headers if enabled
-func (r *Router) SetupCrossOrigin(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+// SetCrossOriginHeaders sets the cross-origin headers if enabled
+func (r *Router) SetCrossOriginHeaders(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 
 	// Turned cors off? Just return
 	if !r.CorsEnabled {

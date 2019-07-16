@@ -41,7 +41,7 @@ You can view the generated [documentation here](https://godoc.org/github.com/mrz
 
 
 ## Examples & Tests
-All unit tests and [examples](middleware_test.go) run via [Travis CI](https://travis-ci.com/mrz1836/go-api-router) and uses [Go version 1.12.x](https://golang.org/doc/go1.12). View the [deployment configuration file](.travis.yml).
+All unit tests and [examples](example/example.go) run via [Travis CI](https://travis-ci.com/mrz1836/go-api-router) and uses [Go version 1.12.x](https://golang.org/doc/go1.12). View the [deployment configuration file](.travis.yml).
 
 Run all tests (including integration tests)
 ```bash
@@ -55,8 +55,14 @@ $ cd ../go-api-router
 $ go test ./... -v -test.short
 ```
 
+View and run the examples:
+```bash
+$ cd ../go-api-router/examples
+$ go run example.go
+```
+
 ## Benchmarks
-Run the Go [benchmarks](pipl_test.go):
+Run the Go benchmarks:
 ```bash
 $ cd ../go-api-router
 $ go test -bench . -benchmem
@@ -66,17 +72,34 @@ $ go test -bench . -benchmem
 Read more about this Go project's [code standards](CODE_STANDARDS.md).
 
 ## Usage
+View the [examples](examples/example.go)
 
 Basic implementation:
 ```golang
 package main
 
 import (
+	"fmt"
+	"net/http"
 
+	"github.com/julienschmidt/httprouter"
+	"github.com/mrz1836/go-api-router"
+	"github.com/mrz1836/go-logger"
 )
 
 func main() {
+	// Load the router & middleware
+	router := apirouter.New()
 
+	// Set the main index page (navigating to slash)
+	router.HTTPRouter.GET("/", router.Request(index))
+
+	// Serve the router!
+	logger.Fatalln(http.ListenAndServe(":3000", router.HTTPRouter))
+}
+
+func index(w http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
+	_, _ = fmt.Fprint(w, "This is a simple API example!")
 }
 ```
 
