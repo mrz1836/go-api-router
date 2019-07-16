@@ -43,10 +43,10 @@ You can view the generated [documentation here](https://godoc.org/github.com/mrz
 - Uses MrZ's [go-logger](https://github.com/mrz1836/go-logger) for either local or remote logging via [LogEntries](https://logentries.com/)
 - Added Additional CORS Functionality
 - Standardized Error Responses for API Requests
-- Centralized Logging on Requests (requesting user info & request time)
+- Centralized Logging on All Requests (requesting user info & request time)
 - Custom Response Writer for Etag and Cache Support
-- GetClientIPAddress() safely detects IP addresses behind load balancers
-- GetParams() parses parameters only once
+- `GetClientIPAddress()` safely detects IP addresses behind load balancers
+- `GetParams()` parses parameters only once
 
 ## Examples & Tests
 All unit tests and [examples](examples/examples.go) run via [Travis CI](https://travis-ci.com/mrz1836/go-api-router) and uses [Go version 1.12.x](https://golang.org/doc/go1.12). View the [deployment configuration file](.travis.yml).
