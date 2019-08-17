@@ -77,3 +77,12 @@ func StandardHandlerToHandle(next http.Handler) httprouter.Handle {
 		next.ServeHTTP(w, r)
 	}
 }
+
+// StandardHandlerToHandle converts a standard middleware to type Middleware
+func StandardHandlerToMiddleware(next http.Handler) Middleware {
+	return func(fn httprouter.Handle) httprouter.Handle {
+		return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+			next.ServeHTTP(w, r)
+		}
+	}
+}
