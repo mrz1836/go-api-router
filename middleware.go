@@ -1,6 +1,10 @@
 package apirouter
 
-import "github.com/julienschmidt/httprouter"
+import (
+	"net/http"
+
+	"github.com/julienschmidt/httprouter"
+)
 
 // Stack is the interface for middleware
 type Stack interface {
@@ -65,4 +69,11 @@ func (s *stack) Wrap(fn httprouter.Handle) httprouter.Handle {
 	}
 
 	return result
+}
+
+// StandardHandlerToHandle converts a standard middleware to julien handle version
+func StandardHandlerToHandle(next http.Handler) httprouter.Handle {
+	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+		next.ServeHTTP(w, r)
+	}
 }
