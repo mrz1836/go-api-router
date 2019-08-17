@@ -31,6 +31,7 @@ $ dep ensure -update -v
 
 ### Package Dependencies
 - Julien Schmidt's [httprouter](https://github.com/julienschmidt/httprouter) package.
+- Rileyr's [middleware](https://github.com/rileyr/middleware) package.
 - Satori's [go.uuid](https://github.com/satori/go.uuid) package.
 - MrZ's [go-logger](https://github.com/mrz1836/go-logger) package.
 
@@ -41,6 +42,7 @@ You can view the generated [documentation here](https://godoc.org/github.com/mrz
 - Uses the fastest router: Julien Schmidt's [httprouter](https://github.com/julienschmidt/httprouter)
 - Uses Satori's [go.uuid](https://github.com/satori/go.uuid) package to guarantee unique request ids
 - Uses MrZ's [go-logger](https://github.com/mrz1836/go-logger) for either local or remote logging via [LogEntries](https://logentries.com/)
+- Added basic middleware support from Rileyr's [middleware](https://github.com/rileyr/middleware)
 - Added Additional CORS Functionality
 - Standardized Error Responses for API Requests
 - Centralized Logging on All Requests (requesting user info & request time)
@@ -120,6 +122,8 @@ func index(w http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
 This project uses Julien Schmidt's [httprouter](https://github.com/julienschmidt/httprouter) package.
 
 This project uses Satori's [go.uuid](https://github.com/satori/go.uuid) package.
+
+This project uses Rileyr's [middleware](https://github.com/rileyr/middleware) package.
 
 View the [contributing guidelines](CONTRIBUTING.md) and follow the [code of conduct](CODE_OF_CONDUCT.md).
 
