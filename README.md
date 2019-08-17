@@ -115,7 +115,7 @@ func index(w http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
 
 ## Maintainers
 
-[@MrZ1836](https://github.com/mrz1836) | [@kayleg](https://github.com/kayleg)
+[@MrZ1836](https://github.com/mrz1836)
 
 ## Contributing
 
