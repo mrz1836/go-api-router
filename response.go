@@ -65,6 +65,24 @@ func JSONEncodeHierarchy(w io.Writer, objects interface{}, allowed interface{}) 
 	return nil
 }
 
+// ReturnJSONEncode is a mixture of ReturnResponse and JSONEncode
+func ReturnJSONEncode(w http.ResponseWriter, code int, e *json.Encoder, objects interface{}, allowed []string) (err error) {
+
+	// Attempt to encode the objects
+	err = JSONEncode(e, objects, allowed)
+	if err != nil {
+		return
+	}
+
+	// Set the content if JSON
+	w.Header().Set("Content-Type", "application/json")
+
+	// Set the header status code
+	w.WriteHeader(code)
+
+	return
+}
+
 // JSONEncodeModels will encode only the allowed fields of the models
 func JSONEncode(e *json.Encoder, objects interface{}, allowed []string) error {
 	var data []map[string]interface{}
