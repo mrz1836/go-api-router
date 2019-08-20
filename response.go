@@ -151,8 +151,8 @@ func jsonMap(obj interface{}) map[string]interface{} {
 			continue
 		}
 
-		// Exclude ID field and any field starting with an underscore
-		if fieldName == "ID" || strings.Index(fieldName, "_") == 0 {
+		// Exclude any field starting with an underscore
+		if strings.Index(fieldName, "_") == 0 {
 			continue
 		}
 		val := s.Field(i)
