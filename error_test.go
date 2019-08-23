@@ -28,7 +28,7 @@ func TestNewError(t *testing.T) {
 
 	w := setupTest()
 
-	err := NewError(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
+	err := ErrorFromResponse(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
 
 	if err.InternalMessage != "internal message" {
 		t.Fatalf("value expected %s, value received: %s", "internal message", err.InternalMessage)
@@ -50,7 +50,7 @@ func TestNewError(t *testing.T) {
 //ExampleNewError example using NewError()
 func ExampleNewError() {
 	w := setupTest()
-	err := NewError(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
+	err := ErrorFromResponse(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
 	fmt.Println(err.Error())
 	// Output:public message
 }
@@ -59,7 +59,7 @@ func ExampleNewError() {
 func BenchmarkNewError(b *testing.B) {
 	w := setupTest()
 	for i := 0; i < b.N; i++ {
-		_ = NewError(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
+		_ = ErrorFromResponse(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
 	}
 }
 
@@ -68,7 +68,7 @@ func TestAPIError_Error(t *testing.T) {
 
 	w := setupTest()
 
-	err := NewError(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
+	err := ErrorFromResponse(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
 
 	errorString := err.Error()
 	if errorString != `public message` {
@@ -79,7 +79,7 @@ func TestAPIError_Error(t *testing.T) {
 //ExampleAPIError_Error example using Error()
 func ExampleAPIError_Error() {
 	w := setupTest()
-	err := NewError(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
+	err := ErrorFromResponse(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
 	fmt.Println(err.Error())
 	// Output:public message
 }
@@ -87,7 +87,7 @@ func ExampleAPIError_Error() {
 // BenchmarkAPIError_Error benchmarks the Error() method
 func BenchmarkAPIError_Error(b *testing.B) {
 	w := setupTest()
-	err := NewError(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
+	err := ErrorFromResponse(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
 	for i := 0; i < b.N; i++ {
 		_ = err.Error()
 	}
@@ -98,7 +98,7 @@ func TestAPIError_JSON(t *testing.T) {
 
 	w := setupTest()
 
-	err := NewError(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
+	err := ErrorFromResponse(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
 
 	errorString, _ := err.JSON()
 	if errorString != `{"code":600,"data":"{\"something\":\"else\"}","ip_address":"127.0.0.1","method":"GET","message":"public message","request_guid":"unique-guid-per-user","url":"/this/path"}` {
@@ -109,7 +109,7 @@ func TestAPIError_JSON(t *testing.T) {
 //ExampleAPIError_JSON example using JSON()
 func ExampleAPIError_JSON() {
 	w := setupTest()
-	err := NewError(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
+	err := ErrorFromResponse(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
 	str, _ := err.JSON()
 	fmt.Println(str)
 	// Output:{"code":600,"data":"{\"something\":\"else\"}","ip_address":"127.0.0.1","method":"GET","message":"public message","request_guid":"unique-guid-per-user","url":"/this/path"}
@@ -118,7 +118,7 @@ func ExampleAPIError_JSON() {
 // BenchmarkAPIError_JSON benchmarks the NewError() method
 func BenchmarkAPIError_JSON(b *testing.B) {
 	w := setupTest()
-	err := NewError(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
+	err := ErrorFromResponse(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
 	for i := 0; i < b.N; i++ {
 		_, _ = err.JSON()
 	}
@@ -129,7 +129,7 @@ func TestAPIError_Internal(t *testing.T) {
 
 	w := setupTest()
 
-	err := NewError(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
+	err := ErrorFromResponse(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
 
 	errorString := err.Internal()
 	if errorString != `internal message` {
@@ -140,7 +140,7 @@ func TestAPIError_Internal(t *testing.T) {
 //ExampleAPIError_Internal example using Internal()
 func ExampleAPIError_Internal() {
 	w := setupTest()
-	err := NewError(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
+	err := ErrorFromResponse(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
 	fmt.Println(err.Internal())
 	// Output:internal message
 }
@@ -148,7 +148,7 @@ func ExampleAPIError_Internal() {
 // BenchmarkAPIError_Internal benchmarks the Internal() method
 func BenchmarkAPIError_Internal(b *testing.B) {
 	w := setupTest()
-	err := NewError(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
+	err := ErrorFromResponse(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
 	for i := 0; i < b.N; i++ {
 		_ = err.Internal()
 	}
@@ -159,7 +159,7 @@ func TestAPIError_ErrorCode(t *testing.T) {
 
 	w := setupTest()
 
-	err := NewError(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
+	err := ErrorFromResponse(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
 
 	code := err.ErrorCode()
 	if code != err.Code {
@@ -170,7 +170,7 @@ func TestAPIError_ErrorCode(t *testing.T) {
 //ExampleAPIError_ErrorCode example using ErrorCode()
 func ExampleAPIError_ErrorCode() {
 	w := setupTest()
-	err := NewError(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
+	err := ErrorFromResponse(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
 	fmt.Println(err.ErrorCode())
 	// Output:600
 }
@@ -178,7 +178,7 @@ func ExampleAPIError_ErrorCode() {
 // BenchmarkAPIError_ErrorCode benchmarks the ErrorCode() method
 func BenchmarkAPIError_ErrorCode(b *testing.B) {
 	w := setupTest()
-	err := NewError(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
+	err := ErrorFromResponse(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
 	for i := 0; i < b.N; i++ {
 		_ = err.ErrorCode()
 	}
