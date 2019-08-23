@@ -101,7 +101,7 @@ func (r *Router) Request(h httprouter.Handle) httprouter.Handle {
 		r.SetCrossOriginHeaders(writer, req, ps)
 
 		// Start the log (timer)
-		logger.Printf(logParamsFormat, writer.RequestID, writer.Method, writer.URL, writer.IPAddress, writer.UserAgent, GetParams(req))
+		logger.Printf(logParamsFormat, writer.RequestID, writer.Method, writer.URL, writer.IPAddress, writer.UserAgent, params)
 		start := time.Now()
 
 		// Fire the request
