@@ -33,6 +33,16 @@ func NewError(w *APIResponseWriter, internalMessage string, publicMessage string
 	}
 }
 
+// QuickError gives an error without a response writer
+func QuickError(internalMessage string, publicMessage string, errorCode int, data interface{}) *APIError {
+	return &APIError{
+		Code:            errorCode,
+		Data:            data,
+		InternalMessage: internalMessage,
+		PublicMessage:   publicMessage,
+	}
+}
+
 // Error returns the string error message (only public message)
 func (e *APIError) Error() string {
 	return e.PublicMessage

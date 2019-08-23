@@ -38,8 +38,9 @@ func main() {
 }
 
 // index basic request to /
-func index(w http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
-	apirouter.ReturnResponse(w, http.StatusOK, "Welcome to this simple API example!", false)
+func index(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+	var welcomeMessageJSON = map[string]interface{}{"message": "Welcome to this simple API example!"}
+	apirouter.ReturnResponse(w, req, http.StatusOK, welcomeMessageJSON)
 }
 
 //passThrough is an example middleware

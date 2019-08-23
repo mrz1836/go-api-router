@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/julienschmidt/httprouter"
@@ -57,6 +58,12 @@ func TestReturnResponse(t *testing.T) {
 	// Fire the index test
 	indexTestNoJSON(w, req, nil)
 
+	// Test the content type
+	contentType := w.Header().Get("Content-Type")
+	if !strings.Contains(contentType, "application/json") {
+		t.Fatalf("expected value: %s, got: %s", "application/json", contentType)
+	}
+
 	// Get the result
 	resp := w.Result()
 	body, err := ioutil.ReadAll(resp.Body)
@@ -69,16 +76,10 @@ func TestReturnResponse(t *testing.T) {
 		t.Fatalf("expected value: %d, got: %d", http.StatusOK, resp.StatusCode)
 	}
 
-	// Check the content type
-	header := resp.Header.Get("Content-Type")
-	if header != "" {
-		t.Fatalf("expected value: %s, got: %s", "", header)
-	}
-
 	// Check the response
-	response := string(body)
-	if response != "Welcome to this simple API example!" {
-		t.Fatalf("expected value: %s, got: %s", "Welcome to this simple API example!", response)
+	response := strings.TrimSpace(string(body))
+	if response != `{"message":"Welcome to this simple API example!"}` {
+		t.Fatalf("expected value: %s, got: %s", `{"message":"Welcome to this simple API example!"}`, response)
 	}
 }
 
@@ -95,7 +96,7 @@ func TestReturnResponse_WithJSON(t *testing.T) {
 
 	// Test the content type
 	contentType := w.Header().Get("Content-Type")
-	if contentType != "application/json" {
+	if !strings.Contains(contentType, "application/json") {
 		t.Fatalf("expected value: %s, got: %s", "application/json", contentType)
 	}
 
@@ -112,7 +113,7 @@ func TestReturnResponse_WithJSON(t *testing.T) {
 	}
 
 	// Check the response
-	response := string(body)
+	response := strings.TrimSpace(string(body))
 	if response != `{"message":"test"}` {
 		t.Fatalf("expected value: %s, got: %s", `{"message":"test"}`, response)
 	}
@@ -251,11 +252,13 @@ func TestRouter_SetCrossOriginHeaders_CustomOrigin(t *testing.T) {
 }
 
 // indexTestNoJSON basic request to /
-func indexTestNoJSON(w http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
-	ReturnResponse(w, http.StatusOK, "Welcome to this simple API example!", false)
+func indexTestNoJSON(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+	var testDataJSON = map[string]interface{}{"message": "Welcome to this simple API example!"}
+	ReturnResponse(w, req, http.StatusOK, testDataJSON)
 }
 
 // indexTestNoJSON basic request to /
-func indexTestJSON(w http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
-	ReturnResponse(w, http.StatusCreated, `{"message":"test"}`, true)
+func indexTestJSON(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+	var testDataJSON = map[string]interface{}{"message": "test"}
+	ReturnResponse(w, req, http.StatusCreated, testDataJSON)
 }
