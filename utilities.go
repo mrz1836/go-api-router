@@ -5,6 +5,8 @@ import (
 	"net/url"
 	"regexp"
 	"strings"
+
+	"github.com/mrz1836/go-parameters"
 )
 
 //camelCaseRe camel case regex
@@ -32,9 +34,8 @@ func FindString(needle string, haystack []string) int {
 }
 
 // GetParams gets the params from the http request (parsed once on log request)
-func GetParams(req *http.Request) (params url.Values, ok bool) {
-	params, ok = req.Context().Value(paramKey).(url.Values)
-	return
+func GetParams(req *http.Request) *parameters.Params {
+	return parameters.GetParams(req)
 }
 
 // PermitParams will remove all keys that not allowed

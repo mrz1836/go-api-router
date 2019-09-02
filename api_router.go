@@ -83,7 +83,6 @@ func (r *Router) Request(h httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 
 		// Parse the params (once here, then store in the request)
-		// params := req.URL.Query()
 		params := parameters.ParseParams(req)
 		req = req.WithContext(context.WithValue(req.Context(), paramKey, params))
 
