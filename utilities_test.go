@@ -1,8 +1,11 @@
 package apirouter
 
 import (
+	"context"
 	"net/http"
 	"testing"
+
+	"github.com/mrz1836/go-parameters"
 )
 
 // TestSnakeCase test our snake case method
@@ -67,26 +70,33 @@ func TestFindString(t *testing.T) {
 
 // TestGetParams test getting params
 func TestGetParams(t *testing.T) {
-	//router := New()
-
-	//router.HTTPRouter.GET("/test", router.Request(indexTestJSON))
 
 	req, _ := http.NewRequest("GET", "/test?this=that&id=1234", nil)
 
-	//req = req.WithContext(context.WithValue(req.Context(), "params", parameters.ParseParams(req)))
+	req = req.WithContext(context.WithValue(req.Context(), parameters.ParametersKeyName, parameters.ParseParams(req)))
 
-	//logger.Println(req.Context().Value("params"))
-
-	//p := req.Context().Value("params").(*parameters.Params)
-
-	//logger.Println(p.GetString("this"))
-
-	//params := parameters.GetParams(req)
 	params := GetParams(req)
+	if params == nil {
+		t.Fatal("params should not be nil")
+	}
+
 	if id, success := params.GetUint64Ok("id"); !success {
 		t.Fatal("failed to find the param: id", success, id, params)
 	} else if id == 0 {
 		t.Fatal("failed to find the param: id", success, id, params)
+	}
+}
+
+// TestGetParams_BadKey tests a bad key on the context storage
+func TestGetParams_BadKey(t *testing.T) {
+	req, _ := http.NewRequest("GET", "/test?this=that&id=1234", nil)
+
+	req = req.WithContext(context.WithValue(req.Context(), "bad_key", parameters.ParseParams(req)))
+
+	params := GetParams(req)
+
+	if params != nil {
+		t.Fatal("params should be nil")
 	}
 }
 

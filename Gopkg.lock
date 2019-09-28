@@ -34,12 +34,12 @@
   version = "v0.0.3"
 
 [[projects]]
-  branch = "master"
-  digest = "1:77c26cf862c1b0cc6d19472508d358e35db2d5097daf09a721165030ebc8c01d"
+  digest = "1:742249b08bb3e204510991a4fcbb7c42b5efe5bdef8e913d4778baf745e8b44c"
   name = "github.com/mrz1836/go-parameters"
   packages = ["."]
   pruneopts = "NUT"
-  revision = "3c5123876d4d2bd1ed3b1bc95b358ce84fd856c0"
+  revision = "fad90ea2cf80cfdea21defb16941442d08a368ed"
+  version = "v0.0.2"
 
 [[projects]]
   digest = "1:6bc0652ea6e39e22ccd522458b8bdd8665bf23bdc5a20eec90056e4dc7e273ca"
