@@ -26,8 +26,8 @@ import (
 
 // Constants for parameters package
 const (
-	// ParametersKeyName standard key name for parameter data
-	ParametersKeyName paramKey = "params"
+	// ParamsKeyName standard key name for parameter data
+	ParamsKeyName paramKey = "params"
 
 	// DateOnly is only the date
 	DateOnly = "2006-01-02"
@@ -654,7 +654,7 @@ func contains(haystack []string, needle string) bool {
 
 // GetParams get parameters
 func GetParams(req *http.Request) *Params {
-	params, ok := req.Context().Value(ParametersKeyName).(*Params)
+	params, ok := req.Context().Value(ParamsKeyName).(*Params)
 	if !ok {
 		return nil
 	}
@@ -664,7 +664,7 @@ func GetParams(req *http.Request) *Params {
 // ParseParams parse parameters
 func ParseParams(req *http.Request) *Params {
 	var p Params
-	if params, exists := req.Context().Value(ParametersKeyName).(*Params); exists {
+	if params, exists := req.Context().Value(ParamsKeyName).(*Params); exists {
 		return params
 	}
 	ct := req.Header.Get("Content-Type")
@@ -768,7 +768,7 @@ func ParseParams(req *http.Request) *Params {
 // MakeParsedReq make parsed request
 func MakeParsedReq(fn http.HandlerFunc) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
-		r = r.WithContext(context.WithValue(r.Context(), ParametersKeyName, ParseParams(r)))
+		r = r.WithContext(context.WithValue(r.Context(), ParamsKeyName, ParseParams(r)))
 		fn(rw, r)
 	}
 }
@@ -776,7 +776,7 @@ func MakeParsedReq(fn http.HandlerFunc) http.HandlerFunc {
 // MakeHTTPRouterParsedReq make http router parsed request
 func MakeHTTPRouterParsedReq(fn httprouter.Handle) httprouter.Handle {
 	return func(rw http.ResponseWriter, r *http.Request, p httprouter.Params) {
-		r = r.WithContext(context.WithValue(r.Context(), ParametersKeyName, ParseParams(r)))
+		r = r.WithContext(context.WithValue(r.Context(), ParamsKeyName, ParseParams(r)))
 		params := GetParams(r)
 		for _, param := range p {
 			const keyID = "id"

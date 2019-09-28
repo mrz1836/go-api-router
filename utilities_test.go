@@ -73,7 +73,7 @@ func TestGetParams(t *testing.T) {
 
 	req, _ := http.NewRequest("GET", "/test?this=that&id=1234", nil)
 
-	req = req.WithContext(context.WithValue(req.Context(), parameters.ParametersKeyName, parameters.ParseParams(req)))
+	req = req.WithContext(context.WithValue(req.Context(), parameters.ParamsKeyName, parameters.ParseParams(req)))
 
 	params := GetParams(req)
 	if params == nil {
