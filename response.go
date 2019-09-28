@@ -100,7 +100,9 @@ func JSONEncode(e *json.Encoder, objects interface{}, allowed []string) error {
 			delete(obj, k)
 		}
 
-		data[0] = obj
+		if data != nil {
+			data[0] = obj
+		}
 
 		for i := 1; i < count; i++ {
 			obj = jsonMap(raw.Index(i).Interface())
@@ -109,7 +111,9 @@ func JSONEncode(e *json.Encoder, objects interface{}, allowed []string) error {
 				delete(obj, k)
 			}
 
-			data[i] = obj
+			if data != nil {
+				data[i] = obj
+			}
 		}
 
 		return e.Encode(data)
