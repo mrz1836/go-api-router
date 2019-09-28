@@ -1,6 +1,7 @@
 package apirouter
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -8,6 +9,23 @@ import (
 	"testing"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/mrz1836/go-logger"
+)
+
+type testStruct struct {
+	ID              uint64 `json:"id"`
+	FieldOne        string `json:"field_one"`
+	FieldTwo        string `json:"field_two"`
+	RestrictedField string `json:"restricted_field"`
+}
+
+var (
+	// All fields that can be displayed
+	testRestrictedFields = []string{
+		"id",
+		"field_one",
+		"field_two",
+	}
 )
 
 // TestNew tests the New() method
@@ -44,6 +62,74 @@ func TestNew(t *testing.T) {
 	// Make sure we have a HTTP router
 	if router.HTTPRouter == nil {
 		t.Fatal("expected to have http router, got nil")
+	}
+}
+
+// TestRouter_Request tests a basic request
+func TestRouter_Request(t *testing.T) {
+
+	router := New()
+
+	router.HTTPRouter.GET("/test", router.Request(indexTestJSON))
+
+	req, _ := http.NewRequest("GET", "/test?this=that&id=1234", nil)
+	rr := httptest.NewRecorder()
+
+	router.HTTPRouter.ServeHTTP(rr, req)
+	if status := rr.Code; status != http.StatusCreated {
+		t.Errorf("Wrong status %d", status)
+	}
+}
+
+// TestRouter_RequestNoLogging tests a basic request
+func TestRouter_RequestNoLogging(t *testing.T) {
+
+	router := New()
+
+	router.HTTPRouter.GET("/test", router.RequestNoLogging(indexTestJSON))
+
+	req, _ := http.NewRequest("GET", "/test?this=that&id=1234", nil)
+	rr := httptest.NewRecorder()
+
+	router.HTTPRouter.ServeHTTP(rr, req)
+	if status := rr.Code; status != http.StatusCreated {
+		t.Errorf("Wrong status %d", status)
+	}
+}
+
+// TestReturnResponseWithJSON tests the ReturnResponse()
+// Only tests the basics, method is very simple
+func TestReturnJSONEncode(t *testing.T) {
+
+	// Create new test recorder
+	req := httptest.NewRequest("GET", "/test?this=that&id=123", nil)
+	w := httptest.NewRecorder()
+
+	// Fire the index test
+	indexTestReturnJSONEncode(w, req, nil)
+
+	// Test the content type
+	contentType := w.Header().Get("Content-Type")
+	if !strings.Contains(contentType, "application/json") {
+		t.Fatalf("expected value: %s, got: %s", "application/json", contentType)
+	}
+
+	// Get the result
+	resp := w.Result()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		t.Fatal("got an error", err.Error())
+	}
+
+	// Test the code returned
+	if resp.StatusCode != http.StatusCreated {
+		t.Fatalf("expected value: %d, got: %d", http.StatusCreated, resp.StatusCode)
+	}
+
+	// Check the response
+	response := strings.TrimSpace(string(body))
+	if response != `{"field_one":"this","field_two":"that","id":123}` {
+		t.Fatalf("expected value: %s, got: %s", `{"field_one":"this","field_two":"that","id":123}`, response)
 	}
 }
 
@@ -261,4 +347,18 @@ func indexTestNoJSON(w http.ResponseWriter, req *http.Request, _ httprouter.Para
 func indexTestJSON(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	var testDataJSON = map[string]interface{}{"message": "test"}
 	ReturnResponse(w, req, http.StatusCreated, testDataJSON)
+}
+
+// indexTestNoJSON basic request to /
+func indexTestReturnJSONEncode(w http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
+
+	testFields := new(testStruct)
+	testFields.ID = 123
+	testFields.FieldOne = "this"
+	testFields.FieldTwo = "that"
+
+	err := ReturnJSONEncode(w, http.StatusCreated, json.NewEncoder(w), testFields, testRestrictedFields)
+	if err != nil {
+		logger.Data(2, logger.ERROR, err.Error())
+	}
 }
