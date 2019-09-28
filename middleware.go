@@ -71,7 +71,7 @@ func (s *stack) Wrap(fn httprouter.Handle) httprouter.Handle {
 	return result
 }
 
-// StandardHandlerToHandle converts a standard middleware to julien handle version
+// StandardHandlerToHandle converts a standard middleware to Julien handle version
 func StandardHandlerToHandle(next http.Handler) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		next.ServeHTTP(w, r)
