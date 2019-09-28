@@ -1,12 +1,8 @@
 package apirouter
 
 import (
-	"context"
 	"net/http"
 	"testing"
-
-	"github.com/mrz1836/go-logger"
-	"github.com/mrz1836/go-parameters"
 )
 
 // TestSnakeCase test our snake case method
@@ -77,15 +73,16 @@ func TestGetParams(t *testing.T) {
 
 	req, _ := http.NewRequest("GET", "/test?this=that&id=1234", nil)
 
-	req = req.WithContext(context.WithValue(req.Context(), "params", parameters.ParseParams(req)))
+	//req = req.WithContext(context.WithValue(req.Context(), "params", parameters.ParseParams(req)))
 
-	logger.Println(req.Context().Value("params"))
+	//logger.Println(req.Context().Value("params"))
 
-	p := req.Context().Value("params").(*parameters.Params)
+	//p := req.Context().Value("params").(*parameters.Params)
 
-	logger.Println(p.GetString("this"))
+	//logger.Println(p.GetString("this"))
 
-	params := parameters.GetParams(req)
+	//params := parameters.GetParams(req)
+	params := GetParams(req)
 	if id, success := params.GetUint64Ok("id"); !success {
 		t.Fatal("failed to find the param: id", success, id, params)
 	} else if id == 0 {
