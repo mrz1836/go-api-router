@@ -2,17 +2,16 @@ package apirouter
 
 import (
 	"net/http"
-	"net/url"
 	"regexp"
 	"strings"
 
 	"github.com/mrz1836/go-parameters"
 )
 
-//camelCaseRe camel case regex
+// camelCaseRe camel case regex
 var camelCaseRe = regexp.MustCompile(`(?:^[\p{Ll}]|API|JSON|IP|_?\d+|_|[\p{Lu}]+)[\p{Ll}]*`)
 
-//SnakeCase takes a camelCaseWord and breaks it into camel_case_word
+// SnakeCase takes a camelCaseWord and breaks it into camel_case_word
 func SnakeCase(str string) string {
 	words := camelCaseRe.FindAllString(str, -1)
 
@@ -23,7 +22,7 @@ func SnakeCase(str string) string {
 	return strings.Join(words, "_")
 }
 
-//FindString returns the index of the first instance of needle in the array or -1 if it could not be found
+// FindString returns the index of the first instance of needle in the array or -1 if it could not be found
 func FindString(needle string, haystack []string) int {
 	for i, straw := range haystack {
 		if needle == straw {
@@ -34,17 +33,15 @@ func FindString(needle string, haystack []string) int {
 }
 
 // GetParams gets the params from the http request (parsed once on log request)
+// Helper method for the parameters package
 func GetParams(req *http.Request) *parameters.Params {
 	return parameters.GetParams(req)
 }
 
 // PermitParams will remove all keys that not allowed
-func PermitParams(params url.Values, allowedKeys []string) {
-	for key, _ := range params {
-		if !contains(allowedKeys, key) {
-			params.Del(key)
-		}
-	}
+// Helper method for the parameters package
+func PermitParams(params *parameters.Params, allowedKeys []string) {
+	params.Permit(allowedKeys)
 }
 
 // GetIPFromRequest gets the stored ip from the request if found
