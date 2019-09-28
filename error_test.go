@@ -23,8 +23,8 @@ func setupTest() *APIResponseWriter {
 	}
 }
 
-// TestNewError test the creation of an error TestNewError()
-func TestNewError(t *testing.T) {
+// TestErrorFromResponse test the creation of an error ErrorFromResponse()
+func TestErrorFromResponse(t *testing.T) {
 
 	w := setupTest()
 
@@ -47,16 +47,16 @@ func TestNewError(t *testing.T) {
 	}
 }
 
-//ExampleNewError example using NewError()
-func ExampleNewError() {
+//ExampleErrorFromResponse example using ErrorFromResponse()
+func ExampleErrorFromResponse() {
 	w := setupTest()
 	err := ErrorFromResponse(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
 	fmt.Println(err.Error())
 	// Output:public message
 }
 
-// BenchmarkNewError benchmarks the NewError() method
-func BenchmarkNewError(b *testing.B) {
+// BenchmarkErrorFromResponse benchmarks the ErrorFromResponse() method
+func BenchmarkErrorFromResponse(b *testing.B) {
 	w := setupTest()
 	for i := 0; i < b.N; i++ {
 		_ = ErrorFromResponse(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)

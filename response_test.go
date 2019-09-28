@@ -13,7 +13,7 @@ func TestJsonEncode(t *testing.T) {
 	type TestStruct struct {
 		TestKey    string `json:"test_key"`
 		TestKeyTwo string `json:"test_key_two"`
-		notAllowed string `json:"not_allowed"`
+		notAllowed string
 	}
 
 	//Base model and test model
