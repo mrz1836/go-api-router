@@ -50,7 +50,6 @@ func TestJsonEncode(t *testing.T) {
 	} else if modelTest.notAllowed == "PrivateValue" {
 		t.Fatal("Field not removed! notAllowed does not have the right value! Encoding failed.", modelTest.notAllowed)
 	}
-
 }
 
 //TestJsonEncodeSubstruct tests the the json encoder removes fields that are not approved

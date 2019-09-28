@@ -9,7 +9,7 @@ import (
 )
 
 // camelCaseRe camel case regex
-var camelCaseRe = regexp.MustCompile(`(?:^[\p{Ll}]|API|JSON|IP|_?\d+|_|[\p{Lu}]+)[\p{Ll}]*`)
+var camelCaseRe = regexp.MustCompile(`(?:^[\p{Ll}]|API|JSON|IP|URL|_?\d+|_|[\p{Lu}]+)[\p{Ll}]*`)
 
 // SnakeCase takes a camelCaseWord and breaks it into camel_case_word
 func SnakeCase(str string) string {
@@ -87,15 +87,4 @@ func GetClientIPAddress(req *http.Request) string {
 
 	//Return the ip address
 	return ip
-}
-
-// contains looks in a haystack of slice for a needle string
-func contains(haystack []string, needle string) bool {
-	needle = strings.ToLower(needle)
-	for _, straw := range haystack {
-		if strings.ToLower(straw) == needle {
-			return true
-		}
-	}
-	return false
 }

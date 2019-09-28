@@ -11,7 +11,7 @@ import (
 // TestSnakeCase test our snake case method
 func TestSnakeCase(t *testing.T) {
 
-	//Test a valid case
+	// Test a valid case
 	word := "testCamelCase"
 	result := SnakeCase(word)
 
@@ -19,7 +19,7 @@ func TestSnakeCase(t *testing.T) {
 		t.Fatal("SnakeCase conversion failed!", result)
 	}
 
-	//Test a valid case
+	// Test a valid case
 	word = "TestCamelCase"
 	result = SnakeCase(word)
 
@@ -27,7 +27,7 @@ func TestSnakeCase(t *testing.T) {
 		t.Fatal("SnakeCase conversion failed!", result)
 	}
 
-	//Test a valid case
+	// Test a valid case
 	word = "TEstCamelCase"
 	result = SnakeCase(word)
 
@@ -35,7 +35,7 @@ func TestSnakeCase(t *testing.T) {
 		t.Fatal("SnakeCase conversion failed!", result)
 	}
 
-	//Test a valid case
+	// Test a valid case
 	word = "testCamelCASE"
 	result = SnakeCase(word)
 
@@ -43,11 +43,43 @@ func TestSnakeCase(t *testing.T) {
 		t.Fatal("SnakeCase conversion failed!", result)
 	}
 
-	//Test a valid case
+	// Test a valid case
 	word = "testCamel!CASE"
 	result = SnakeCase(word)
 
 	if result != "test_camel_case" {
+		t.Fatal("SnakeCase conversion failed!", result)
+	}
+
+	// Test a valid case (API)
+	word = "testCamelAPI"
+	result = SnakeCase(word)
+
+	if result != "test_camel_api" {
+		t.Fatal("SnakeCase conversion failed!", result)
+	}
+
+	// Test a valid case (IP)
+	word = "testCamelIP"
+	result = SnakeCase(word)
+
+	if result != "test_camel_ip" {
+		t.Fatal("SnakeCase conversion failed!", result)
+	}
+
+	// Test a valid case (URL)
+	word = "testCamelURL"
+	result = SnakeCase(word)
+
+	if result != "test_camel_url" {
+		t.Fatal("SnakeCase conversion failed!", result)
+	}
+
+	// Test a valid case (JSON)
+	word = "testCamelJSON"
+	result = SnakeCase(word)
+
+	if result != "test_camel_json" {
 		t.Fatal("SnakeCase conversion failed!", result)
 	}
 }
@@ -100,53 +132,65 @@ func TestGetParams_BadKey(t *testing.T) {
 	}
 }
 
-// TestPermitParams test permitting parameters
-/*func TestPermitParams(t *testing.T) {
+// TestPermitParams tests the permitting params
+func TestPermitParams(t *testing.T) {
+	req, _ := http.NewRequest("GET", "/test?this=that&id=1234&private=data", nil)
 
-	// Test parsing a url
-	testUrl, err := url.Parse("https://example.com/endpoint/?param1=test1&param2=test2")
-	if err != nil {
-		t.Fatal("error parsing url", err)
+	req = req.WithContext(context.WithValue(req.Context(), parameters.ParamsKeyName, parameters.ParseParams(req)))
+
+	params := GetParams(req)
+	if params == nil {
+		t.Fatal("params should not be nil")
 	}
 
-	// Test parsing values from a url
-	testValues := testUrl.Query()
-	param1 := testValues.Get("param1")
-	param2 := testValues.Get("param2")
-	if len(param1) == 0 || param1 != "test1" {
-		t.Fatal("missing param1")
-	} else if len(param2) == 0 || param2 != "test2" {
-		t.Fatal("missing param2")
+	PermitParams(params, []string{"this", "id"})
+
+	p, ok := params.GetStringOk("private")
+	if ok {
+		t.Fatal("parameter should not exit", p, ok)
+	} else if len(p) > 0 {
+		t.Fatal("parameter value should be empty")
 	}
-
-	// Test permit params (testing all "all lower case"
-	allowedKeys := []string{"anotherParam", "PAram1"}
-
-	// Test the allowed keys vs the values
-	PermitParams(testValues, allowedKeys)
-
-	testParam1 := testValues.Get("param1")
-	testParam2 := testValues.Get("param2")
-	if testParam1 != param1 {
-		t.Fatal("failed, expected param1 to eq param1:", testParam1, param1)
-	}
-
-	if testParam2 == param2 {
-		t.Fatal("expected this value to be empty, removed from permit:", testParam2, param2)
-	}
-}*/
+}
 
 // TestGetIPFromRequest test getting IP from req
 func TestGetIPFromRequest(t *testing.T) {
 
+	// Fake storing the ip address
+	testIp := "127.0.0.1"
+	req, _ := http.NewRequest("GET", "/test?this=that&id=1234", nil)
+	req = req.WithContext(context.WithValue(req.Context(), ipAddressKey, testIp))
+
+	ip, ok := GetIPFromRequest(req)
+	if !ok {
+		t.Fatal("failed to get ip address", ip, ok)
+	} else if ip != testIp {
+		t.Fatal("ip address was not what was returned", ip, ok)
+	}
 }
 
 // TestGetRequestID test getting request ID from req
 func TestGetRequestID(t *testing.T) {
 
+	// Fake storing the ip address
+	testFakeID := "ern8347t88e7zrhg8eh48e7hg8e"
+	req, _ := http.NewRequest("GET", "/test?this=that&id=1234", nil)
+	req = req.WithContext(context.WithValue(req.Context(), requestIDKey, testFakeID))
+
+	id, ok := GetRequestID(req)
+	if !ok {
+		t.Fatal("failed to get request id", id, ok)
+	} else if id != testFakeID {
+		t.Fatal("request id was not what was returned", id, ok)
+	}
 }
 
-// TestGetClientIPAddress test getting client IP
+// TestGetClientIPAddress test getting client ip address
 func TestGetClientIPAddress(t *testing.T) {
+	req, _ := http.NewRequest("GET", "/test?this=that&id=1234", nil)
 
+	ip := GetClientIPAddress(req)
+	if ip != "localhost" {
+		t.Fatal("expected ip to be localhost on the test")
+	}
 }
