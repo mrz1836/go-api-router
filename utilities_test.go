@@ -1,8 +1,12 @@
 package apirouter
 
 import (
-	"net/url"
+	"context"
+	"net/http"
 	"testing"
+
+	"github.com/mrz1836/go-logger"
+	"github.com/mrz1836/go-parameters"
 )
 
 // TestSnakeCase test our snake case method
@@ -67,11 +71,30 @@ func TestFindString(t *testing.T) {
 
 // TestGetParams test getting params
 func TestGetParams(t *testing.T) {
+	//router := New()
 
+	//router.HTTPRouter.GET("/test", router.Request(indexTestJSON))
+
+	req, _ := http.NewRequest("GET", "/test?this=that&id=1234", nil)
+
+	req = req.WithContext(context.WithValue(req.Context(), "params", parameters.ParseParams(req)))
+
+	logger.Println(req.Context().Value("params"))
+
+	p := req.Context().Value("params").(*parameters.Params)
+
+	logger.Println(p.GetString("this"))
+
+	params := parameters.GetParams(req)
+	if id, success := params.GetUint64Ok("id"); !success {
+		t.Fatal("failed to find the param: id", success, id, params)
+	} else if id == 0 {
+		t.Fatal("failed to find the param: id", success, id, params)
+	}
 }
 
 // TestPermitParams test permitting parameters
-func TestPermitParams(t *testing.T) {
+/*func TestPermitParams(t *testing.T) {
 
 	// Test parsing a url
 	testUrl, err := url.Parse("https://example.com/endpoint/?param1=test1&param2=test2")
@@ -104,7 +127,7 @@ func TestPermitParams(t *testing.T) {
 	if testParam2 == param2 {
 		t.Fatal("expected this value to be empty, removed from permit:", testParam2, param2)
 	}
-}
+}*/
 
 // TestGetIPFromRequest test getting IP from req
 func TestGetIPFromRequest(t *testing.T) {
