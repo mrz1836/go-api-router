@@ -21,7 +21,7 @@ func TestUse(t *testing.T) {
 	s.Use(mw)
 
 	if len(s.middlewares) != c+1 {
-		t.Error("expected Use() to increase the number of items in the stack")
+		t.Error("expected Use() to increase the number of items in the InternalStack")
 	}
 }
 
@@ -46,7 +46,7 @@ func TestWrap(t *testing.T) {
 	wrapped := s.Wrap(hn)
 	req := httptest.NewRequest("GET", "/example", nil)
 	w := httptest.NewRecorder()
-	handler := http.HandlerFunc(plainHandler(wrapped))
+	handler := plainHandler(wrapped)
 	handler.ServeHTTP(w, req)
 
 	if !handlerCalled {
@@ -111,7 +111,7 @@ func TestWrap_Ordering(t *testing.T) {
 	wrapped := s.Wrap(hn)
 	req := httptest.NewRequest("GET", "/example", nil)
 	w := httptest.NewRecorder()
-	handler := http.HandlerFunc(plainHandler(wrapped))
+	handler := plainHandler(wrapped)
 	handler.ServeHTTP(w, req)
 
 	if firstCallAt == nil || secondCallAt == nil || thirdCallAt == nil || fourthCallAt == nil || handlerCallAt == nil {
@@ -138,7 +138,7 @@ func TestWrap_WhenEmpty(t *testing.T) {
 	w := s.Wrap(hn)
 
 	if reflect.ValueOf(hn).Pointer() != reflect.ValueOf(w).Pointer() {
-		t.Error("expected that Wrap() would return the given function when stack is empty")
+		t.Error("expected that Wrap() would return the given function when InternalStack is empty")
 	}
 }
 
