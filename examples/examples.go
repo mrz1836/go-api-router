@@ -20,7 +20,7 @@ func main() {
 	// Create a middleware stack
 	s := apirouter.NewStack()
 
-	// Use a julien middleware
+	// Use a Julien middleware
 	s.Use(passThrough)
 
 	// Set the main index page (navigating to slash)
@@ -29,7 +29,7 @@ func main() {
 	// Set a test method (testing converting a standard handler to a handle)
 	router.HTTPRouter.GET("/test", s.Wrap(router.Request(apirouter.StandardHandlerToHandle(StdHandler()))))
 
-	// Set the options request on slash for Cors
+	// Set the options request on slash for CrossOrigin
 	router.HTTPRouter.OPTIONS("/", router.SetCrossOriginHeaders)
 
 	// Logout the loading of the API
@@ -43,7 +43,7 @@ func index(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	apirouter.ReturnResponse(w, req, http.StatusOK, welcomeMessageJSON)
 }
 
-//passThrough is an example middleware
+// passThrough is an example middleware
 func passThrough(fn httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		logger.Data(2, logger.DEBUG, "middleware method hit!")

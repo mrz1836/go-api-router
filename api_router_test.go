@@ -12,6 +12,7 @@ import (
 	"github.com/mrz1836/go-logger"
 )
 
+// testStruct is for testing restricted fields
 type testStruct struct {
 	ID              uint64 `json:"id"`
 	FieldOne        string `json:"field_one"`
