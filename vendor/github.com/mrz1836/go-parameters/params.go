@@ -428,7 +428,7 @@ func (p *Params) GetBytesOk(key string) ([]byte, bool) {
 			var err error
 			dataByte, err = base64.StdEncoding.DecodeString(dataStr.(string))
 			if err != nil {
-				log.Println("Error decoding data:", key, err)
+				log.Println("error decoding data:", key, err)
 				return nil, false
 			}
 			p.Values[key] = dataByte
@@ -557,8 +557,8 @@ func (p *Params) Imbue(obj interface{}) {
 
 		// Did we get a parameter that is not our object?
 		if !found {
-			//Error or log
-			log.Println("Attempted to set missing param k: ", k, " and key as", key)
+			// Error or log
+			log.Println("attempted to set missing param k:", k, "and key as:", key)
 			continue
 		}
 
@@ -594,7 +594,7 @@ func (p *Params) Imbue(obj interface{}) {
 			// Set []string
 			field.Set(reflect.ValueOf(p.GetStringSlice(k)))
 
-		} else if fieldType.Type == reflect.SliceOf(reflect.TypeOf(int(0))) {
+		} else if fieldType.Type == reflect.SliceOf(reflect.TypeOf(0)) {
 			// Set []int
 			field.Set(reflect.ValueOf(p.GetIntSlice(k)))
 
@@ -671,11 +671,11 @@ func ParseParams(req *http.Request) *Params {
 	ct = strings.Split(ct, ";")[0]
 	if ct == "multipart/form-data" {
 		if err := req.ParseMultipartForm(10000000); err != nil {
-			log.Println("Request.ParseMultipartForm Error", err)
+			log.Println("Request.ParseMultipartForm error:", err)
 		}
 	} else {
 		if err := req.ParseForm(); err != nil {
-			log.Println("Request.ParseForm Error", err)
+			log.Println("request.ParseForm error:", err)
 		}
 	}
 	tempMap := make(map[string]interface{}, len(req.Form))
@@ -698,7 +698,7 @@ func ParseParams(req *http.Request) *Params {
 	if ct == "application/json" && req.ContentLength > 0 {
 		err := json.NewDecoder(req.Body).Decode(&p.Values)
 		if err != nil {
-			log.Println("Content-Type is \"application/json\" but no valid json data received", err)
+			log.Println("content-type is \"application/json\" but no valid json data received:", err)
 			p.Values = tempMap
 		}
 		for k, v := range tempMap {
@@ -717,7 +717,7 @@ func ParseParams(req *http.Request) *Params {
 			if (first >= 0x80 && first <= 0x8f) || (first == 0xde || first == 0xdf) {
 				err := codec.NewDecoder(buff, &mh).Decode(&p.Values)
 				if err != nil && err != io.EOF {
-					log.Println("Failed decoding msgpack", err)
+					log.Println("failed decoding msgpack:", err)
 				}
 			} else {
 				if p.Values == nil {
@@ -728,7 +728,7 @@ func ParseParams(req *http.Request) *Params {
 					paramValues := make([]interface{}, 0)
 					err = codec.NewDecoder(buff, &mh).Decode(&paramValues)
 					if err != nil && err != io.EOF {
-						log.Println("Failed decoding msgpack", err)
+						log.Println("failed decoding msgpack:", err)
 					} else {
 						for i := len(paramValues) - 1; i >= 1; i -= 2 {
 							p.Values[string(paramValues[i-1].([]byte))] = paramValues[i]

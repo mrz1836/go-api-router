@@ -56,8 +56,8 @@ var filterReplace = [...]string{"FILTERED"}
 // FilteredKeys is a lower case array of keys to filter when logging
 var FilteredKeys []string
 
-// filterMap will filter the parameters and not log parameters with sensitive data. To add more parameters - see the if in the loop
-func filterMap(params *Params) *Params {
+// FilterMap will filter the parameters and not log parameters with sensitive data. To add more parameters - see the if in the loop
+func FilterMap(params *Params) *Params {
 	var filtered Params
 	filtered.Values = make(map[string]interface{}, len(params.Values))
 
