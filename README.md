@@ -34,6 +34,7 @@ $ dep ensure -update -v
 - Rileyr's [middleware](https://github.com/rileyr/middleware) package.
 - Satori's [go.uuid](https://github.com/satori/go.uuid) package.
 - MrZ's [go-logger](https://github.com/mrz1836/go-logger) package.
+- MrZ's [go-parameters](https://github.com/mrz1836/go-parameters) package.
 
 ## Documentation
 You can view the generated [documentation here](https://godoc.org/github.com/mrz1836/go-api-router).
@@ -42,6 +43,7 @@ You can view the generated [documentation here](https://godoc.org/github.com/mrz
 - Uses the fastest router: Julien Schmidt's [httprouter](https://github.com/julienschmidt/httprouter)
 - Uses Satori's [go.uuid](https://github.com/satori/go.uuid) package to guarantee unique request ids
 - Uses MrZ's [go-logger](https://github.com/mrz1836/go-logger) for either local or remote logging via [LogEntries](https://logentries.com/)
+- Uses MrZ's [go-parameters](https://github.com/mrz1836/go-parameters) for parsing any type of incoming parameter with ease
 - Added basic middleware support from Rileyr's [middleware](https://github.com/rileyr/middleware)
 - Added Additional CORS Functionality
 - Standardized Error Responses for API Requests
