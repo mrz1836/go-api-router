@@ -68,7 +68,7 @@ func JSONEncodeHierarchy(w io.Writer, objects interface{}, allowed interface{}) 
 	return nil
 }
 
-// JSONEncodeModels will encode only the allowed fields of the models
+// JSONEncode will encode only the allowed fields of the models
 func JSONEncode(e *json.Encoder, objects interface{}, allowed []string) error {
 	var data []map[string]interface{}
 	isMulti := false
