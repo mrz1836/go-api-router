@@ -121,9 +121,13 @@ func TestGetParams(t *testing.T) {
 
 // TestGetParams_BadKey tests a bad key on the context storage
 func TestGetParams_BadKey(t *testing.T) {
+
+	type badParamKey string
+	const BadParamKey badParamKey = "bad_key"
+
 	req, _ := http.NewRequest("GET", "/test?this=that&id=1234", nil)
 
-	req = req.WithContext(context.WithValue(req.Context(), "bad_key", parameters.ParseParams(req)))
+	req = req.WithContext(context.WithValue(req.Context(), BadParamKey, parameters.ParseParams(req)))
 
 	params := GetParams(req)
 
@@ -157,14 +161,14 @@ func TestPermitParams(t *testing.T) {
 func TestGetIPFromRequest(t *testing.T) {
 
 	// Fake storing the ip address
-	testIp := "127.0.0.1"
+	testIP := "127.0.0.1"
 	req, _ := http.NewRequest("GET", "/test?this=that&id=1234", nil)
-	req = req.WithContext(context.WithValue(req.Context(), ipAddressKey, testIp))
+	req = req.WithContext(context.WithValue(req.Context(), ipAddressKey, testIP))
 
 	ip, ok := GetIPFromRequest(req)
 	if !ok {
 		t.Fatal("failed to get ip address", ip, ok)
-	} else if ip != testIp {
+	} else if ip != testIP {
 		t.Fatal("ip address was not what was returned", ip, ok)
 	}
 }
