@@ -81,7 +81,7 @@ func logError(errorCode int, internalMessage string) {
 		logLevel = logger.WARN
 	}
 
-	logger.Data(2, logLevel, "internal error message: "+internalMessage, logger.MakeParameter("code", errorCode))
+	logger.Data(1, logLevel, "internal error message: "+internalMessage, logger.MakeParameter("code", errorCode))
 }
 
 // Error returns the string error message (only public message)
