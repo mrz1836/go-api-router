@@ -82,6 +82,23 @@ func TestRouter_Request(t *testing.T) {
 	}
 }
 
+// TestRouter_RequestSkipPath tests a basic request
+func TestRouter_RequestSkipPath(t *testing.T) {
+
+	router := New()
+	router.SkipLoggingPaths = append(router.SkipLoggingPaths, "/health")
+
+	router.HTTPRouter.GET("/health", router.Request(indexTestJSON))
+
+	req, _ := http.NewRequest("GET", "/health", nil)
+	rr := httptest.NewRecorder()
+
+	router.HTTPRouter.ServeHTTP(rr, req)
+	if status := rr.Code; status != http.StatusCreated {
+		t.Errorf("Wrong status %d", status)
+	}
+}
+
 // TestRouter_RequestNoLogging tests a basic request
 func TestRouter_RequestNoLogging(t *testing.T) {
 
