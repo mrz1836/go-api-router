@@ -194,7 +194,7 @@ func TestGetClientIPAddress(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/test?this=that&id=1234", nil)
 
 	ip := GetClientIPAddress(req)
-	if ip != "localhost" {
-		t.Fatal("expected ip to be localhost on the test")
+	if ip != "" {
+		t.Fatal("expected ip to be localhost on the test, IP:", ip)
 	}
 }
