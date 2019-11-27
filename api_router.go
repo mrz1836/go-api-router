@@ -26,9 +26,10 @@ const (
 
 // Package variables
 var (
-	authTokenKey paramRequestKey = "auth_token"
-	ipAddressKey paramRequestKey = "ip_address"
-	requestIDKey paramRequestKey = "request_id"
+	authTokenKey  paramRequestKey = "auth_token"
+	customDataKey paramRequestKey = "custom_data"
+	ipAddressKey  paramRequestKey = "ip_address"
+	requestIDKey  paramRequestKey = "request_id"
 )
 
 // paramRequestKey for context key

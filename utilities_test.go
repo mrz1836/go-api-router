@@ -176,7 +176,7 @@ func TestGetIPFromRequest(t *testing.T) {
 // TestGetRequestID test getting request ID from req
 func TestGetRequestID(t *testing.T) {
 
-	// Fake storing the ip address
+	// Fake storing the request id
 	testFakeID := "ern8347t88e7zrhg8eh48e7hg8e"
 	req, _ := http.NewRequest("GET", "/test?this=that&id=1234", nil)
 
@@ -203,7 +203,7 @@ func TestGetClientIPAddress(t *testing.T) {
 // TestSetAuthToken test setting the auth token
 func TestSetAuthToken(t *testing.T) {
 
-	// Fake storing the ip address
+	// Fake storing the token
 	testFakeToken := "ern8347t88e7zrhg8eh48e7hg8e"
 	req, _ := http.NewRequest("GET", "/test?this=that&id=1234", nil)
 
@@ -220,7 +220,7 @@ func TestSetAuthToken(t *testing.T) {
 // TestGetAuthToken test setting the auth token
 func TestGetAuthToken(t *testing.T) {
 
-	// Fake storing the ip address
+	// Test getting the token
 	testFakeToken := "ern8347t88e7zrhg8eh48e7hg8e"
 	req, _ := http.NewRequest("GET", "/test?this=that&id=1234", nil)
 
@@ -231,6 +231,58 @@ func TestGetAuthToken(t *testing.T) {
 		t.Fatal("failed to get auth token", token, ok)
 	} else if token != testFakeToken {
 		t.Fatal("token was not what was returned", token, ok)
+	}
+}
+
+// TestSetUserData test setting the auth token
+func TestSetUserData(t *testing.T) {
+
+	type TestThis struct {
+		FieldName string
+		FieldTwo  string
+	}
+
+	// Fake storing the ip address
+	testFakeUserData := new(TestThis)
+	testFakeUserData.FieldName = "this"
+	testFakeUserData.FieldTwo = "that"
+	req, _ := http.NewRequest("GET", "/test?this=that&id=1234", nil)
+
+	req = SetCustomData(req, testFakeUserData)
+
+	data, ok := GetCustomData(req)
+	if !ok {
+		t.Fatal("failed to get user data", data, ok)
+	}
+	newData := data.(*TestThis)
+	if newData.FieldTwo != testFakeUserData.FieldTwo {
+		t.Fatal("failed get the correct data", newData.FieldTwo, testFakeUserData.FieldTwo)
+	}
+}
+
+// TestGetUserData test setting the auth token
+func TestGetUserData(t *testing.T) {
+
+	type TestThis struct {
+		FieldName string
+		FieldTwo  string
+	}
+
+	// Fake storing the ip address
+	testFakeUserData := new(TestThis)
+	testFakeUserData.FieldName = "this"
+	testFakeUserData.FieldTwo = "that"
+	req, _ := http.NewRequest("GET", "/test?this=that&id=1234", nil)
+
+	req = SetCustomData(req, testFakeUserData)
+
+	data, ok := GetCustomData(req)
+	if !ok {
+		t.Fatal("failed to get user data", data, ok)
+	}
+	newData := data.(*TestThis)
+	if newData.FieldName != testFakeUserData.FieldName {
+		t.Fatal("failed get the correct data", newData.FieldName, testFakeUserData.FieldName)
 	}
 }
 

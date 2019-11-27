@@ -120,7 +120,7 @@ func GetClientIPAddress(req *http.Request) string {
 }
 
 // SetOnRequest will set the value on the request with the given key
-func SetOnRequest(req *http.Request, keyName paramRequestKey, value string) *http.Request {
+func SetOnRequest(req *http.Request, keyName paramRequestKey, value interface{}) *http.Request {
 	return req.WithContext(context.WithValue(req.Context(), keyName, value))
 }
 
@@ -132,6 +132,17 @@ func SetAuthToken(req *http.Request, authToken string) *http.Request {
 // GetAuthToken gets the stored authentication token from the request
 func GetAuthToken(req *http.Request) (token string, ok bool) {
 	token, ok = req.Context().Value(authTokenKey).(string)
+	return
+}
+
+// SetCustomData set the custom data / user profile / permissions / etc
+func SetCustomData(req *http.Request, data interface{}) *http.Request {
+	return SetOnRequest(req, customDataKey, data)
+}
+
+// GetCustomData gets the stored custom data
+func GetCustomData(req *http.Request) (data interface{}, ok bool) {
+	data, ok = req.Context().Value(customDataKey).(interface{})
 	return
 }
 
