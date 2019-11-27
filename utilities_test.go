@@ -163,7 +163,7 @@ func TestGetIPFromRequest(t *testing.T) {
 	// Fake storing the ip address
 	testIP := "127.0.0.1"
 	req, _ := http.NewRequest("GET", "/test?this=that&id=1234", nil)
-	req = req.WithContext(context.WithValue(req.Context(), ipAddressKey, testIP))
+	req = SetOnRequest(req, ipAddressKey, testIP)
 
 	ip, ok := GetIPFromRequest(req)
 	if !ok {
@@ -179,7 +179,8 @@ func TestGetRequestID(t *testing.T) {
 	// Fake storing the ip address
 	testFakeID := "ern8347t88e7zrhg8eh48e7hg8e"
 	req, _ := http.NewRequest("GET", "/test?this=that&id=1234", nil)
-	req = req.WithContext(context.WithValue(req.Context(), requestIDKey, testFakeID))
+
+	req = SetOnRequest(req, requestIDKey, testFakeID)
 
 	id, ok := GetRequestID(req)
 	if !ok {
@@ -198,3 +199,39 @@ func TestGetClientIPAddress(t *testing.T) {
 		t.Fatal("expected ip to be localhost on the test, IP:", ip)
 	}
 }
+
+// TestSetAuthToken test setting the auth token
+func TestSetAuthToken(t *testing.T) {
+
+	// Fake storing the ip address
+	testFakeToken := "ern8347t88e7zrhg8eh48e7hg8e"
+	req, _ := http.NewRequest("GET", "/test?this=that&id=1234", nil)
+
+	req = SetAuthToken(req, testFakeToken)
+
+	token, ok := GetAuthToken(req)
+	if !ok {
+		t.Fatal("failed to get auth token", token, ok)
+	} else if token != testFakeToken {
+		t.Fatal("token was not what was returned", token, ok)
+	}
+}
+
+// TestGetAuthToken test setting the auth token
+func TestGetAuthToken(t *testing.T) {
+
+	// Fake storing the ip address
+	testFakeToken := "ern8347t88e7zrhg8eh48e7hg8e"
+	req, _ := http.NewRequest("GET", "/test?this=that&id=1234", nil)
+
+	req = SetAuthToken(req, testFakeToken)
+
+	token, ok := GetAuthToken(req)
+	if !ok {
+		t.Fatal("failed to get auth token", token, ok)
+	} else if token != testFakeToken {
+		t.Fatal("token was not what was returned", token, ok)
+	}
+}
+
+// todo: add test for NoCache()

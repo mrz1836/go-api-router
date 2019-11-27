@@ -1,6 +1,7 @@
 package apirouter
 
 import (
+	"context"
 	"net"
 	"net/http"
 	"regexp"
@@ -116,6 +117,22 @@ func GetClientIPAddress(req *http.Request) string {
 
 	//Return the ip address
 	return ip
+}
+
+// SetOnRequest will set the value on the request with the given key
+func SetOnRequest(req *http.Request, keyName paramRequestKey, value string) *http.Request {
+	return req.WithContext(context.WithValue(req.Context(), keyName, value))
+}
+
+// SetAuthToken set the authentication token on the request
+func SetAuthToken(req *http.Request, authToken string) *http.Request {
+	return SetOnRequest(req, authTokenKey, authToken)
+}
+
+// GetAuthToken gets the stored authentication token from the request
+func GetAuthToken(req *http.Request) (token string, ok bool) {
+	token, ok = req.Context().Value(authTokenKey).(string)
+	return
 }
 
 // NoCache is a simple piece of middleware that sets a number of HTTP headers to prevent

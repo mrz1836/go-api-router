@@ -6,7 +6,6 @@ This package is intended to be used with Julien Schmidt's httprouter and uses Mr
 package apirouter
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"time"
@@ -27,6 +26,7 @@ const (
 
 // Package variables
 var (
+	authTokenKey paramRequestKey = "auth_token"
 	ipAddressKey paramRequestKey = "ip_address"
 	requestIDKey paramRequestKey = "request_id"
 )
@@ -98,8 +98,8 @@ func (r *Router) Request(h httprouter.Handle) httprouter.Handle {
 		}
 
 		// Store key information into the request that can be used by other methods
-		req = req.WithContext(context.WithValue(req.Context(), ipAddressKey, writer.IPAddress))
-		req = req.WithContext(context.WithValue(req.Context(), requestIDKey, writer.RequestID))
+		SetOnRequest(req, ipAddressKey, writer.IPAddress)
+		SetOnRequest(req, requestIDKey, writer.RequestID)
 
 		// Set cross origin on each request that goes through logging
 		r.SetCrossOriginHeaders(writer, req, ps)
@@ -143,9 +143,6 @@ func (r *Router) Request(h httprouter.Handle) httprouter.Handle {
 func (r *Router) RequestNoLogging(h httprouter.Handle) httprouter.Handle {
 	return parameters.MakeHTTPRouterParsedReq(func(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 
-		// Get the params from MakeHTTPRouterParsedReq()
-		//params := GetParams(req)
-
 		// Start the custom response writer
 		var writer *APIResponseWriter
 		writer = &APIResponseWriter{
@@ -157,6 +154,10 @@ func (r *Router) RequestNoLogging(h httprouter.Handle) httprouter.Handle {
 			URL:            fmt.Sprintf("%s", req.URL),
 			UserAgent:      req.UserAgent(),
 		}
+
+		// Store key information into the request that can be used by other methods
+		SetOnRequest(req, ipAddressKey, writer.IPAddress)
+		SetOnRequest(req, requestIDKey, writer.RequestID)
 
 		// Set cross origin on each request that goes through logging
 		r.SetCrossOriginHeaders(writer, req, ps)
