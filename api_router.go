@@ -99,8 +99,8 @@ func (r *Router) Request(h httprouter.Handle) httprouter.Handle {
 		}
 
 		// Store key information into the request that can be used by other methods
-		SetOnRequest(req, ipAddressKey, writer.IPAddress)
-		SetOnRequest(req, requestIDKey, writer.RequestID)
+		req = SetOnRequest(req, ipAddressKey, writer.IPAddress)
+		req = SetOnRequest(req, requestIDKey, writer.RequestID)
 
 		// Set cross origin on each request that goes through logging
 		r.SetCrossOriginHeaders(writer, req, ps)
@@ -157,8 +157,8 @@ func (r *Router) RequestNoLogging(h httprouter.Handle) httprouter.Handle {
 		}
 
 		// Store key information into the request that can be used by other methods
-		SetOnRequest(req, ipAddressKey, writer.IPAddress)
-		SetOnRequest(req, requestIDKey, writer.RequestID)
+		req = SetOnRequest(req, ipAddressKey, writer.IPAddress)
+		req = SetOnRequest(req, requestIDKey, writer.RequestID)
 
 		// Set cross origin on each request that goes through logging
 		r.SetCrossOriginHeaders(writer, req, ps)
