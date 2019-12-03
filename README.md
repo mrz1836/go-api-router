@@ -21,23 +21,16 @@
 
 ## Installation
 
-**go-api-router** requires a [supported release of Go](https://golang.org/doc/devel/release.html#policy) and [dep](https://github.com/golang/dep).
+**go-api-router** requires a [supported release of Go](https://golang.org/doc/devel/release.html#policy).
 ```bash
 $ go get -u github.com/mrz1836/go-api-router
-```
-
-Updating dependencies in **go-api-router**:
-```bash
-$ cd ../go-api-router
-$ dep ensure -update -v
 ```
 
 ### Package Dependencies
 - Julien Schmidt's [httprouter](https://github.com/julienschmidt/httprouter) package.
 - Rileyr's [middleware](https://github.com/rileyr/middleware) package.
 - Satori's [go.uuid](https://github.com/satori/go.uuid) package.
-- MrZ's [go-logger](https://github.com/mrz1836/go-logger) package.
-- MrZ's [go-parameters](https://github.com/mrz1836/go-parameters) package.
+- MrZ's [go-logger](https://github.com/mrz1836/go-logger) and [go-parameters](https://github.com/mrz1836/go-parameters) package.
 
 ## Documentation
 You can view the generated [documentation here](https://godoc.org/github.com/mrz1836/go-api-router).
@@ -120,7 +113,7 @@ func index(w http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
 
 ## Maintainers
 
-[@MrZ1836](https://github.com/mrz1836)
+[@MrZ](https://github.com/mrz1836)
 
 ## Contributing
 
