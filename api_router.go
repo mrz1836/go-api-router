@@ -13,7 +13,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/mrz1836/go-logger"
 	"github.com/mrz1836/go-parameters"
-	"github.com/satori/go.uuid"
+	uuid "github.com/satori/go.uuid"
 )
 
 // Log formats for the request
@@ -208,9 +208,7 @@ func (r *Router) SetCrossOriginHeaders(w http.ResponseWriter, req *http.Request,
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
 	}
 
-	// Allowed methods to accept
+	// Set access control
 	w.Header().Set("Access-Control-Allow-Methods", r.CrossOriginAllowMethods)
-
-	// Allowed headers to accept
 	w.Header().Set("Access-Control-Allow-Headers", r.CrossOriginAllowHeaders)
 }
