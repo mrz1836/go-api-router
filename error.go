@@ -69,13 +69,13 @@ func ErrorFromRequest(req *http.Request, internalMessage string, publicMessage s
 func logError(errorCode int, internalMessage, requestID, ipAddress string) {
 
 	// Skip non-error codes
-	if errorCode < 400 || errorCode == 404 {
+	if errorCode < http.StatusBadRequest || errorCode == http.StatusNotFound {
 		return
 	}
 
 	// Switch based on severity
 	var logLevel logger.LogLevel
-	if errorCode == 400 || errorCode > 422 {
+	if errorCode == http.StatusBadRequest || errorCode > http.StatusUnprocessableEntity {
 		logLevel = logger.ERROR
 	} else {
 		logLevel = logger.WARN
