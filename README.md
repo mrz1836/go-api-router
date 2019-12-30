@@ -1,6 +1,7 @@
 # go-api-router
 **go-api-router** is a lightweight API [httprouter](https://github.com/julienschmidt/httprouter) middleware: cors, logging, and standardized error handling. Extends Julien Schmidt's [httprouter](https://github.com/julienschmidt/httprouter) package.
 
+[![Go](https://img.shields.io/github/go-mod/go-version/mrz1836/go-api-router)](https://golang.org/)
 [![Build Status](https://travis-ci.com/mrz1836/go-api-router.svg?branch=master)](https://travis-ci.com/mrz1836/go-api-router)
 [![Report](https://goreportcard.com/badge/github.com/mrz1836/go-api-router?style=flat&p=1)](https://goreportcard.com/report/github.com/mrz1836/go-api-router)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/0b377a0d1dde4b6ba189545aa7ee2e17)](https://www.codacy.com/app/mrz1818/go-api-router?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=mrz1836/go-api-router&amp;utm_campaign=Badge_Grade)
