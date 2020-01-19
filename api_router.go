@@ -122,7 +122,7 @@ func (r *Router) Request(h httprouter.Handle) httprouter.Handle {
 		if !skipLogging {
 
 			// Start the log (timer)
-			logger.Printf(logParamsFormat, writer.RequestID, writer.Method, writer.URL, writer.IPAddress, writer.UserAgent, params)
+			logger.NoFilePrintf(logParamsFormat, writer.RequestID, writer.Method, writer.URL, writer.IPAddress, writer.UserAgent, params)
 			start := time.Now()
 
 			// Fire the request
@@ -130,7 +130,7 @@ func (r *Router) Request(h httprouter.Handle) httprouter.Handle {
 
 			// Complete the timer and final log
 			elapsed := time.Since(start)
-			logger.Printf(logTimeFormat, writer.RequestID, writer.Method, writer.URL, writer.IPAddress, writer.UserAgent, int64(elapsed/time.Millisecond), writer.Status)
+			logger.NoFilePrintf(logTimeFormat, writer.RequestID, writer.Method, writer.URL, writer.IPAddress, writer.UserAgent, int64(elapsed/time.Millisecond), writer.Status)
 
 		} else {
 			// Fire the request (no logging)
