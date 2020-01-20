@@ -81,10 +81,9 @@ func logError(errorCode int, internalMessage, requestID, ipAddress string) {
 		logLevel = logger.WARN
 	}
 
-	logger.Data(
-		1,
+	logger.NoFileData(
 		logLevel,
-		"internal error message: "+internalMessage,
+		"internal message: "+internalMessage,
 		logger.MakeParameter("code", errorCode),
 		logger.MakeParameter("request_id", requestID),
 		logger.MakeParameter("ip_address", ipAddress),
