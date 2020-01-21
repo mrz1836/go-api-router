@@ -73,22 +73,16 @@ func logError(errorCode int, internalMessage, requestID, ipAddress string) {
 		return
 	}
 
-	// Switch based on severity
-	logLevel := "warn"
-	if errorCode == http.StatusBadRequest || errorCode > http.StatusUnprocessableEntity {
-		logLevel = "error"
+	// Start with error
+	logLevel := "error"
+
+	// Switch based on known statuses
+	if errorCode == http.StatusBadRequest || errorCode == http.StatusLocked || errorCode == http.StatusForbidden {
+		logLevel = "warn"
 	}
 
 	// Show the log in a standard way
 	logger.NoFilePrintf(logErrorFormat, requestID, ipAddress, logLevel, internalMessage, errorCode)
-
-	/*logger.NoFileData(
-		logLevel,
-		"internal message: "+internalMessage,
-		logger.MakeParameter("code", errorCode),
-		logger.MakeParameter("request_id", requestID),
-		logger.MakeParameter("ip_address", ipAddress),
-	)*/
 }
 
 // Error returns the string error message (only public message)
