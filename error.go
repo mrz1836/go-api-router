@@ -77,7 +77,7 @@ func logError(errorCode int, internalMessage, requestID, ipAddress string) {
 	logLevel := "error"
 
 	// Switch based on known statuses
-	if errorCode == http.StatusBadRequest || errorCode == http.StatusLocked || errorCode == http.StatusForbidden {
+	if errorCode == http.StatusBadRequest || errorCode == http.StatusLocked || errorCode == http.StatusForbidden || errorCode == http.StatusUnprocessableEntity {
 		logLevel = "warn"
 	}
 
