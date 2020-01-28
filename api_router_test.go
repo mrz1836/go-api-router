@@ -2,6 +2,7 @@ package apirouter
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -353,6 +354,23 @@ func TestRouter_SetCrossOriginHeaders_CustomOrigin(t *testing.T) {
 	if err != nil {
 		t.Fatal("got an error", err.Error())
 	}
+}
+
+// TestPanic will test the panic feature in Request logging
+func TestPanic(t *testing.T) {
+	router := New()
+
+	router.HTTPRouter.GET("/test", router.Request(indexTestPanic))
+
+	req, _ := http.NewRequest("GET", "/test?this=that&id=1234", nil)
+	rr := httptest.NewRecorder()
+
+	router.HTTPRouter.ServeHTTP(rr, req)
+}
+
+// indexTestPanic basic request to trigger a panic
+func indexTestPanic(_ http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
+	panic(fmt.Errorf("error occurred"))
 }
 
 // indexTestNoJSON basic request to /
