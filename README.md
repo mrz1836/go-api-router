@@ -3,7 +3,7 @@
 
 [![Go](https://img.shields.io/github/go-mod/go-version/mrz1836/go-api-router)](https://golang.org/)
 [![Build Status](https://travis-ci.com/mrz1836/go-api-router.svg?branch=master)](https://travis-ci.com/mrz1836/go-api-router)
-[![Report](https://goreportcard.com/badge/github.com/mrz1836/go-api-router?style=flat&p=1)](https://goreportcard.com/report/github.com/mrz1836/go-api-router)
+[![Report](https://goreportcard.com/badge/github.com/mrz1836/go-api-router?style=flat)](https://goreportcard.com/report/github.com/mrz1836/go-api-router)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/0b377a0d1dde4b6ba189545aa7ee2e17)](https://www.codacy.com/app/mrz1818/go-api-router?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=mrz1836/go-api-router&amp;utm_campaign=Badge_Grade)
 [![Release](https://img.shields.io/github/release-pre/mrz1836/go-api-router.svg?style=flat)](https://github.com/mrz1836/go-api-router/releases)
 [![standard-readme compliant](https://img.shields.io/badge/standard--readme-OK-green.svg?style=flat)](https://github.com/RichardLitt/standard-readme)
@@ -48,6 +48,7 @@ You can view the generated [documentation here](https://godoc.org/github.com/mrz
 - Custom Response Writer for Etag and Cache Support
 - `GetClientIPAddress()` safely detects IP addresses behind load balancers
 - `GetParams()` parses parameters only once
+- `FilterMap()` can remove any confidential parameters from logs
 
 ## Examples & Tests
 All unit tests and [examples](examples/examples.go) run via [Travis CI](https://travis-ci.com/mrz1836/go-api-router) and uses [Go version 1.13.x](https://golang.org/doc/go1.13). View the [deployment configuration file](.travis.yml).
@@ -135,4 +136,4 @@ Support the development of this project 🙏
 
 ## License
 
-![License](https://img.shields.io/github/license/mrz1836/go-api-router.svg?style=flat&p=1)
+![License](https://img.shields.io/github/license/mrz1836/go-api-router.svg?style=flat)
