@@ -61,7 +61,7 @@ func TestNew(t *testing.T) {
 		t.Fatalf("expected value: %s, got: %s", defaultMethods, router.CrossOriginAllowMethods)
 	}
 
-	// Make sure we have a HTTP router
+	// Make sure we have a real HTTP router
 	if router.HTTPRouter == nil {
 		t.Fatal("expected to have http router, got nil")
 	}
@@ -75,6 +75,22 @@ func TestRouter_Request(t *testing.T) {
 	router.HTTPRouter.GET("/test", router.Request(indexTestJSON))
 
 	req, _ := http.NewRequest("GET", "/test?this=that&id=1234", nil)
+	rr := httptest.NewRecorder()
+
+	router.HTTPRouter.ServeHTTP(rr, req)
+	if status := rr.Code; status != http.StatusCreated {
+		t.Errorf("Wrong status %d", status)
+	}
+}
+
+// TestRouter_RequestFilterFields tests a basic request (filter protected fields)
+func TestRouter_RequestFilterFields(t *testing.T) {
+
+	router := New()
+
+	router.HTTPRouter.GET("/test", router.Request(indexTestJSON))
+
+	req, _ := http.NewRequest("GET", "/test?password=1234", nil)
 	rr := httptest.NewRecorder()
 
 	router.HTTPRouter.ServeHTTP(rr, req)
@@ -237,14 +253,14 @@ func TestRouter_SetCrossOriginHeaders(t *testing.T) {
 
 	// Test the header
 	allowOrigin := w.Header().Get("Access-Control-Allow-Origin")
-	if allowOrigin != req.Header.Get("Origin") {
-		t.Fatalf("expected value: %s, got: %s", req.Header.Get("Origin"), allowOrigin)
+	if allowOrigin != req.Header.Get(origin) {
+		t.Fatalf("expected value: %s, got: %s", req.Header.Get(origin), allowOrigin)
 	}
 
 	// Test the header
 	vary := w.Header().Get("Vary")
-	if vary != "Origin" {
-		t.Fatalf("expected value: %s, got: %s", "Origin", vary)
+	if vary != origin {
+		t.Fatalf("expected value: %s, got: %s", origin, vary)
 	}
 
 	// Test the header
@@ -293,7 +309,7 @@ func TestRouter_SetCrossOriginHeaders_Disabled(t *testing.T) {
 
 	// Test the header
 	vary := w.Header().Get("Vary")
-	if vary == "Origin" {
+	if vary == origin {
 		t.Fatalf("expected value: %s, got: %s", "", vary)
 	}
 
@@ -344,7 +360,7 @@ func TestRouter_SetCrossOriginHeaders_CustomOrigin(t *testing.T) {
 
 	// Test the header
 	vary := w.Header().Get("Vary")
-	if vary == "Origin" {
+	if vary == origin {
 		t.Fatalf("expected value: %s, got: %s", "", vary)
 	}
 

@@ -21,11 +21,12 @@ import (
 // Log formats for the request
 const (
 	defaultHeaders  string = "Accept, Content-Type, Content-Length, Cache-Control, Pragma, Accept-Encoding, X-CSRF-Token, Authorization, X-Auth-Cookie"
-	defaultMethods  string = "POST, GET, OPTIONS, PUT, DELETE, LINK, HEAD"
+	defaultMethods  string = "POST, GET, OPTIONS, PUT, DELETE, HEAD"
 	logErrorFormat  string = "request_id=\"%s\" ip_address=\"%s\" type=\"%s\" internal_message=\"%s\" code=%d\n"
 	logPanicFormat  string = "request_id=\"%s\" method=\"%s\" path=\"%s\" type=\"%s\" error_message=\"%s\" stack_trace=\"%s\"\n"
 	logParamsFormat string = "request_id=\"%s\" method=\"%s\" path=\"%s\" ip_address=\"%s\" user_agent=\"%s\" params=\"%v\"\n"
 	logTimeFormat   string = "request_id=\"%s\" method=\"%s\" path=\"%s\" ip_address=\"%s\" user_agent=\"%s\" service=%dms status=%d\n"
+	origin          string = "Origin"
 )
 
 // Package variables
@@ -34,6 +35,18 @@ var (
 	customDataKey paramRequestKey = "custom_data"
 	ipAddressKey  paramRequestKey = "ip_address"
 	requestIDKey  paramRequestKey = "request_id"
+
+	// defaultFilterFields is the fields to filter from logs
+	defaultFilterFields = []string{
+		"api_key",
+		"new_password",
+		"new_password_confirmation",
+		"password",
+		"password_check",
+		"password_confirmation",
+		"social_security_number",
+		"ssn",
+	}
 )
 
 // paramRequestKey for context key
@@ -47,8 +60,9 @@ type Router struct {
 	CrossOriginAllowOrigin      string             `json:"cross_origin_allow_origin" url:"cross_origin_allow_origin"`           // Custom value for allow origin
 	CrossOriginAllowOriginAll   bool               `json:"cross_origin_allow_origin_all" url:"cross_origin_allow_origin_all"`   // Allow all origins
 	CrossOriginEnabled          bool               `json:"cross_origin_enabled" url:"cross_origin_enabled"`                     // Enable or Disable CrossOrigin
+	FilterFields                []string           `json:"filter_fields" url:"filter_fields"`                                   // Filter out protected fields from logging
 	HTTPRouter                  *httprouter.Router `json:"-" url:"-"`                                                           // J Schmidt's httprouter
-	SkipLoggingPaths            []string           `json:"skip_logging_paths" url:"skip_logging_paths"`                         // Skip logging on these paths  (IE: /health)
+	SkipLoggingPaths            []string           `json:"skip_logging_paths" url:"skip_logging_paths"`                         // Skip logging on these paths (IE: /health)
 }
 
 // New returns a router middleware configuration to use for all future requests
@@ -66,7 +80,7 @@ func New() *Router {
 	// Default is to allow all (easier to get started)
 	config.CrossOriginAllowOriginAll = true
 
-	// Default is for CrossOrigin to be enabled and these are common headers
+	// Default is defaultHeaders
 	config.CrossOriginAllowHeaders = defaultHeaders
 
 	// Default is for the common request methods
@@ -79,6 +93,9 @@ func New() *Router {
 	config.HTTPRouter.RedirectTrailingSlash = true
 	config.HTTPRouter.RedirectFixedPath = true
 
+	// Set the filter fields to default
+	config.FilterFields = defaultFilterFields
+
 	// return the default configuration
 	return config
 }
@@ -87,18 +104,18 @@ func New() *Router {
 func (r *Router) Request(h httprouter.Handle) httprouter.Handle {
 	return parameters.MakeHTTPRouterParsedReq(func(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 
-		// Get the params from MakeHTTPRouterParsedReq()
+		// Get the params from parameters.GetParams(req)
 		params := GetParams(req)
 
 		// Start the custom response writer
 		var writer *APIResponseWriter
 		writer = &APIResponseWriter{
 			IPAddress:      GetClientIPAddress(req),
-			Method:         fmt.Sprintf("%s", req.Method),
+			Method:         req.Method,
 			RequestID:      uuid.NewV4().String(),
 			ResponseWriter: w,
 			Status:         0, // future use with E-tags
-			URL:            fmt.Sprintf("%s", req.URL),
+			URL:            req.URL.String(),
 			UserAgent:      req.UserAgent(),
 		}
 
@@ -110,8 +127,7 @@ func (r *Router) Request(h httprouter.Handle) httprouter.Handle {
 		r.SetCrossOriginHeaders(writer, req, ps)
 
 		// Do we have paths to skip?
-		// todo: this was added because some requests are confidential or health checks and they
-		//  can't be split apart from the router
+		// todo: this was added because some requests are confidential or "health-checks" and they can't be split apart from the router
 		var skipLogging bool
 		if len(r.SkipLoggingPaths) > 0 {
 			for _, path := range r.SkipLoggingPaths {
@@ -133,7 +149,7 @@ func (r *Router) Request(h httprouter.Handle) httprouter.Handle {
 			}()
 
 			// Start the log (timer)
-			logger.NoFilePrintf(logParamsFormat, writer.RequestID, writer.Method, writer.URL, writer.IPAddress, writer.UserAgent, params)
+			logger.NoFilePrintf(logParamsFormat, writer.RequestID, writer.Method, writer.URL, writer.IPAddress, writer.UserAgent, FilterMap(params, r.FilterFields).Values)
 			start := time.Now()
 
 			// Fire the request
@@ -201,16 +217,16 @@ func (r *Router) BasicAuth(h httprouter.Handle, requiredUser, requiredPassword s
 // SetCrossOriginHeaders sets the cross-origin headers if enabled
 func (r *Router) SetCrossOriginHeaders(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 
-	// Turned cross_origin off? Just return
+	// Turned cross_origin off?
 	if !r.CrossOriginEnabled {
 		return
 	}
 
 	// On for all origins?
 	if r.CrossOriginAllowOriginAll {
-		w.Header().Set("Access-Control-Allow-Origin", req.Header.Get("Origin"))
-		w.Header().Set("Vary", "Origin")
-	} else { //Only the origin set by config
+		w.Header().Set("Access-Control-Allow-Origin", req.Header.Get(origin))
+		w.Header().Set("Vary", origin)
+	} else { // Only the origin set by config
 		w.Header().Set("Access-Control-Allow-Origin", r.CrossOriginAllowOrigin)
 	}
 

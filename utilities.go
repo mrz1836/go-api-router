@@ -30,10 +30,13 @@ var etagHeaders = []string{
 	"If-Unmodified-Since",
 }
 
+// filterReplace is the replacement for protected values
+var filterReplace = [...]string{"PROTECTED"}
+
 // camelCaseRe camel case regex
 var camelCaseRe = regexp.MustCompile(`(?:^[\p{Ll}]|API|JSON|IP|URL|_?\d+|_|[\p{Lu}]+)[\p{Ll}]*`)
 
-// SnakeCase takes a camelCaseWord and breaks it into camel_case_word
+// SnakeCase takes a camelCaseWord and breaks it into a camel_case_word
 func SnakeCase(str string) string {
 	words := camelCaseRe.FindAllString(str, -1)
 
@@ -52,6 +55,37 @@ func FindString(needle string, haystack []string) int {
 		}
 	}
 	return -1
+}
+
+// FilterMap will filter the parameters and not log parameters with sensitive data. To add more parameters - see the if in the loop.
+func FilterMap(params *parameters.Params, filterOutFields []string) (filtered *parameters.Params) {
+
+	// Filtered parameters
+	filtered = new(parameters.Params)
+
+	// Map the values
+	filtered.Values = make(map[string]interface{}, len(params.Values))
+
+	// Loop the param values
+	for k, v := range params.Values {
+		if isInList(k, filterOutFields) {
+			filtered.Values[k] = filterReplace[:]
+		} else {
+			filtered.Values[k] = v
+		}
+	}
+
+	return
+}
+
+// isInList checks if string is known or not
+func isInList(test string, list []string) bool {
+	for _, a := range list {
+		if test == a {
+			return true
+		}
+	}
+	return false
 }
 
 // GetParams gets the params from the http request (parsed once on log request)
@@ -102,9 +136,9 @@ func GetClientIPAddress(req *http.Request) string {
 		ip = strings.Replace(ip, "[", "", 1)
 
 		// Hack if no ip is found
-		//if len(ip) == 0 {
+		// if len(ip) == 0 {
 		//	ip = "localhost"
-		//}
+		// }
 	}
 
 	// Parsing will also validate if it's IPv4 or IPv6
@@ -115,7 +149,7 @@ func GetClientIPAddress(req *http.Request) string {
 		ip = parsed.String()
 	}
 
-	//Return the ip address
+	// Return the ip address
 	return ip
 }
 
