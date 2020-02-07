@@ -86,7 +86,7 @@ func TestSnakeCase(t *testing.T) {
 
 // TestFindString test our find string method
 func TestFindString(t *testing.T) {
-	//needle string, haystack []string
+	// needle string, haystack []string
 	haystack := []string{"test", "stack"}
 	needle := "stack"
 

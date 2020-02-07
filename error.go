@@ -16,7 +16,7 @@ const (
 type APIError struct {
 	Code            int         `json:"code" url:"code"`                 // Associated error code
 	Data            interface{} `json:"data" url:"data"`                 // Arbitrary data that is relevant
-	InternalMessage string      `json:"-" url:"-"`                       // Internal message for engineers
+	InternalMessage string      `json:"-" url:"-"`                       // An internal message for engineers
 	IPAddress       string      `json:"ip_address" url:"ip_address"`     // Current IP of user
 	Method          string      `json:"method" url:"method"`             // Method requested (IE: POST)
 	PublicMessage   string      `json:"message" url:"message"`           // Public error message
@@ -81,7 +81,7 @@ func logError(errorCode int, internalMessage, requestID, ipAddress string) {
 		logLevel = "warn"
 	}
 
-	// Show the log in a standard way
+	// Show the login a standard way
 	logger.NoFilePrintf(logErrorFormat, requestID, ipAddress, logLevel, internalMessage, errorCode)
 }
 

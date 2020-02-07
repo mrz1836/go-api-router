@@ -37,7 +37,7 @@ type InternalStack struct {
 	middlewares []Middleware
 }
 
-// NewStack create a new InternalStack
+// NewStack will create an InternalStack struct
 func NewStack() *InternalStack {
 	return &InternalStack{
 		middlewares: []Middleware{},
@@ -62,8 +62,7 @@ func (s *InternalStack) Wrap(fn httprouter.Handle) httprouter.Handle {
 	var result httprouter.Handle
 	result = s.middlewares[l-1](fn)
 
-	// Reverse through the InternalStack for the remaining elements,
-	// and wrap the result with each layer:
+	// Reverse through the InternalStack for the remaining elements and wrap the result with each layer:
 	for i := 0; i < (l - 1); i++ {
 		result = s.middlewares[l-(2+i)](result)
 	}
