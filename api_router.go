@@ -43,6 +43,7 @@ var (
 		"new_password_confirmation",
 		"password",
 		"password_check",
+		"password_confirm",
 		"password_confirmation",
 		"social_security_number",
 		"ssn",
