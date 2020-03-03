@@ -47,7 +47,7 @@ func TestErrorFromResponse(t *testing.T) {
 	}
 }
 
-//ExampleErrorFromResponse example using ErrorFromResponse()
+// ExampleErrorFromResponse example using ErrorFromResponse()
 func ExampleErrorFromResponse() {
 	w := setupTest()
 	err := ErrorFromResponse(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
@@ -76,7 +76,7 @@ func TestAPIError_Error(t *testing.T) {
 	}
 }
 
-//ExampleAPIError_Error example using Error()
+// ExampleAPIError_Error example using Error()
 func ExampleAPIError_Error() {
 	w := setupTest()
 	err := ErrorFromResponse(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
@@ -106,7 +106,7 @@ func TestAPIError_JSON(t *testing.T) {
 	}
 }
 
-//ExampleAPIError_JSON example using JSON()
+// ExampleAPIError_JSON example using JSON()
 func ExampleAPIError_JSON() {
 	w := setupTest()
 	err := ErrorFromResponse(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
@@ -137,7 +137,7 @@ func TestAPIError_Internal(t *testing.T) {
 	}
 }
 
-//ExampleAPIError_Internal example using Internal()
+// ExampleAPIError_Internal example using Internal()
 func ExampleAPIError_Internal() {
 	w := setupTest()
 	err := ErrorFromResponse(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
@@ -167,7 +167,7 @@ func TestAPIError_ErrorCode(t *testing.T) {
 	}
 }
 
-//ExampleAPIError_ErrorCode example using ErrorCode()
+// ExampleAPIError_ErrorCode example using ErrorCode()
 func ExampleAPIError_ErrorCode() {
 	w := setupTest()
 	err := ErrorFromResponse(w, "internal message", "public message", ErrCodeUnknown, `{"something":"else"}`)
