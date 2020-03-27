@@ -12,10 +12,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gofrs/uuid"
 	"github.com/julienschmidt/httprouter"
 	"github.com/mrz1836/go-logger"
 	"github.com/mrz1836/go-parameters"
-	uuid "github.com/satori/go.uuid"
 )
 
 // Log formats for the request
@@ -110,10 +110,11 @@ func (r *Router) Request(h httprouter.Handle) httprouter.Handle {
 
 		// Start the custom response writer
 		var writer *APIResponseWriter
+		guid, _ := uuid.NewV4()
 		writer = &APIResponseWriter{
 			IPAddress:      GetClientIPAddress(req),
 			Method:         req.Method,
-			RequestID:      uuid.NewV4().String(),
+			RequestID:      guid.String(),
 			ResponseWriter: w,
 			Status:         0, // future use with E-tags
 			URL:            req.URL.String(),
@@ -174,10 +175,11 @@ func (r *Router) RequestNoLogging(h httprouter.Handle) httprouter.Handle {
 
 		// Start the custom response writer
 		var writer *APIResponseWriter
+		guid, _ := uuid.NewV4()
 		writer = &APIResponseWriter{
 			IPAddress:      GetClientIPAddress(req),
 			Method:         fmt.Sprintf("%s", req.Method),
-			RequestID:      uuid.NewV4().String(),
+			RequestID:      guid.String(),
 			ResponseWriter: w,
 			Status:         0, // future use with E-tags
 			URL:            fmt.Sprintf("%s", req.URL),

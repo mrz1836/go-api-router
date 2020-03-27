@@ -30,7 +30,7 @@ $ go get -u github.com/mrz1836/go-api-router
 ### Package Dependencies
 - Julien Schmidt's [httprouter](https://github.com/julienschmidt/httprouter) package.
 - Rileyr's [middleware](https://github.com/rileyr/middleware) package.
-- Satori's [go.uuid](https://github.com/satori/go.uuid) package.
+- gofrs [uuid](https://github.com/gofrs/uuid) package.
 - MrZ's [go-logger](https://github.com/mrz1836/go-logger) and [go-parameters](https://github.com/mrz1836/go-parameters) package.
 
 ## Documentation
@@ -38,7 +38,7 @@ You can view the generated [documentation here](https://godoc.org/github.com/mrz
 
 ### Features
 - Uses the fastest router: Julien Schmidt's [httprouter](https://github.com/julienschmidt/httprouter)
-- Uses Satori's [go.uuid](https://github.com/satori/go.uuid) package to guarantee unique request ids
+- Uses gofrs [uuid](https://github.com/gofrs/uuid) package to guarantee unique request ids
 - Uses MrZ's [go-logger](https://github.com/mrz1836/go-logger) for either local or remote logging via [LogEntries](https://logentries.com/)
 - Uses MrZ's [go-parameters](https://github.com/mrz1836/go-parameters) for parsing any type of incoming parameter with ease
 - Added basic middleware support from Rileyr's [middleware](https://github.com/rileyr/middleware)
@@ -124,7 +124,7 @@ func index(w http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
 
 This project uses Julien Schmidt's [httprouter](https://github.com/julienschmidt/httprouter) package.
 
-This project uses Satori's [go.uuid](https://github.com/satori/go.uuid) package.
+This project uses gofrs [uuid](https://github.com/gofrs/uuid) package.
 
 This project uses Rileyr's [middleware](https://github.com/rileyr/middleware) package.
 
