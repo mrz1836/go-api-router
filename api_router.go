@@ -20,13 +20,15 @@ import (
 
 // Log formats for the request
 const (
-	defaultHeaders  string = "Accept, Content-Type, Content-Length, Cache-Control, Pragma, Accept-Encoding, X-CSRF-Token, Authorization, X-Auth-Cookie"
-	defaultMethods  string = "POST, GET, OPTIONS, PUT, DELETE, HEAD"
-	logErrorFormat  string = "request_id=\"%s\" ip_address=\"%s\" type=\"%s\" internal_message=\"%s\" code=%d\n"
-	logPanicFormat  string = "request_id=\"%s\" method=\"%s\" path=\"%s\" type=\"%s\" error_message=\"%s\" stack_trace=\"%s\"\n"
-	logParamsFormat string = "request_id=\"%s\" method=\"%s\" path=\"%s\" ip_address=\"%s\" user_agent=\"%s\" params=\"%v\"\n"
-	logTimeFormat   string = "request_id=\"%s\" method=\"%s\" path=\"%s\" ip_address=\"%s\" user_agent=\"%s\" service=%dms status=%d\n"
-	origin          string = "Origin"
+	defaultHeaders    string = "Accept, Content-Type, Content-Length, Cache-Control, Pragma, Accept-Encoding, X-CSRF-Token, Authorization, X-Auth-Cookie"
+	defaultMethods    string = "POST, GET, OPTIONS, PUT, DELETE, HEAD"
+	forwardedHost     string = "x-forwarded-host"
+	forwardedProtocol string = "x-forwarded-proto"
+	logErrorFormat    string = "request_id=\"%s\" ip_address=\"%s\" type=\"%s\" internal_message=\"%s\" code=%d\n"
+	logPanicFormat    string = "request_id=\"%s\" method=\"%s\" path=\"%s\" type=\"%s\" error_message=\"%s\" stack_trace=\"%s\"\n"
+	logParamsFormat   string = "request_id=\"%s\" method=\"%s\" path=\"%s\" ip_address=\"%s\" user_agent=\"%s\" params=\"%v\"\n"
+	logTimeFormat     string = "request_id=\"%s\" method=\"%s\" path=\"%s\" ip_address=\"%s\" user_agent=\"%s\" service=%dms status=%d\n"
+	origin            string = "Origin"
 )
 
 // Package variables
@@ -93,6 +95,50 @@ func New() *Router {
 	// Turn on trailing slash redirect
 	config.HTTPRouter.RedirectTrailingSlash = true
 	config.HTTPRouter.RedirectFixedPath = true
+
+	// Turn on default CORs options handler
+	config.HTTPRouter.HandleOPTIONS = true
+	config.HTTPRouter.GlobalOPTIONS = http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+
+		// Turned cross_origin off?
+		if !config.CrossOriginEnabled {
+			return
+		}
+
+		// Set the header
+		header := w.Header()
+
+		// On for all origins?
+		if config.CrossOriginAllowOriginAll {
+
+			// Normal requests use the Origin header
+			originDomain := req.Header.Get(origin)
+			if len(originDomain) == 0 {
+
+				// Maybe it's behind a proxy?
+				originDomain = req.Header.Get(forwardedHost)
+				if len(originDomain) > 0 {
+					originDomain = req.Header.Get(forwardedProtocol) + "//" + originDomain
+				}
+			}
+			header.Set("Access-Control-Allow-Origin", originDomain)
+			header.Set("Vary", origin)
+		} else { // Only the origin set by config
+			header.Set("Access-Control-Allow-Origin", config.CrossOriginAllowOrigin)
+		}
+
+		// Allow credentials (used for BasicAuth)
+		if config.CrossOriginAllowCredentials {
+			header.Set("Access-Control-Allow-Credentials", "true")
+		}
+
+		// Set access control
+		header.Set("Access-Control-Allow-Methods", config.CrossOriginAllowMethods)
+		header.Set("Access-Control-Allow-Headers", config.CrossOriginAllowHeaders)
+
+		// Adjust status code to 204
+		w.WriteHeader(http.StatusNoContent)
+	})
 
 	// Set the filter fields to default
 	config.FilterFields = defaultFilterFields
@@ -218,6 +264,7 @@ func (r *Router) BasicAuth(h httprouter.Handle, requiredUser, requiredPassword s
 }
 
 // SetCrossOriginHeaders sets the cross-origin headers if enabled
+// todo: combine this method and the GlobalOPTIONS  http.HandlerFunc() method
 func (r *Router) SetCrossOriginHeaders(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 
 	// Turned cross_origin off?
@@ -225,20 +272,37 @@ func (r *Router) SetCrossOriginHeaders(w http.ResponseWriter, req *http.Request,
 		return
 	}
 
+	// Set the header
+	header := w.Header()
+
 	// On for all origins?
 	if r.CrossOriginAllowOriginAll {
-		w.Header().Set("Access-Control-Allow-Origin", req.Header.Get(origin))
-		w.Header().Set("Vary", origin)
+
+		// Normal requests use the Origin header
+		originDomain := req.Header.Get(origin)
+		if len(originDomain) == 0 {
+
+			// Maybe it's behind a proxy?
+			originDomain = req.Header.Get(forwardedHost)
+			if len(originDomain) > 0 {
+				originDomain = req.Header.Get(forwardedProtocol) + "//" + originDomain
+			}
+		}
+		header.Set("Access-Control-Allow-Origin", originDomain)
+		header.Set("Vary", origin)
 	} else { // Only the origin set by config
-		w.Header().Set("Access-Control-Allow-Origin", r.CrossOriginAllowOrigin)
+		header.Set("Access-Control-Allow-Origin", r.CrossOriginAllowOrigin)
 	}
 
 	// Allow credentials (used for BasicAuth)
 	if r.CrossOriginAllowCredentials {
-		w.Header().Set("Access-Control-Allow-Credentials", "true")
+		header.Set("Access-Control-Allow-Credentials", "true")
 	}
 
 	// Set access control
-	w.Header().Set("Access-Control-Allow-Methods", r.CrossOriginAllowMethods)
-	w.Header().Set("Access-Control-Allow-Headers", r.CrossOriginAllowHeaders)
+	header.Set("Access-Control-Allow-Methods", r.CrossOriginAllowMethods)
+	header.Set("Access-Control-Allow-Headers", r.CrossOriginAllowHeaders)
+
+	// Adjust status code to 204 (Leaving this out, allowing customized response)
+	// w.WriteHeader(http.StatusNoContent)
 }
