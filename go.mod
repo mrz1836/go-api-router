@@ -7,6 +7,6 @@ require (
 	github.com/gofrs/uuid v3.2.0+incompatible
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/matryer/respond v1.0.1
-	github.com/mrz1836/go-logger v0.1.5
-	github.com/mrz1836/go-parameters v0.1.3
+	github.com/mrz1836/go-logger v0.1.6
+	github.com/mrz1836/go-parameters v0.1.4
 )
