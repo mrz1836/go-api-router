@@ -4,6 +4,7 @@
 [![Go](https://img.shields.io/github/go-mod/go-version/mrz1836/go-api-router)](https://golang.org/)
 [![Build Status](https://travis-ci.com/mrz1836/go-api-router.svg?branch=master)](https://travis-ci.com/mrz1836/go-api-router)
 [![Report](https://goreportcard.com/badge/github.com/mrz1836/go-api-router?style=flat)](https://goreportcard.com/report/github.com/mrz1836/go-api-router)
+[![codecov](https://codecov.io/gh/mrz1836/go-api-router/branch/master/graph/badge.svg)](https://codecov.io/gh/mrz1836/go-api-router)
 [![Release](https://img.shields.io/github/release-pre/mrz1836/go-api-router.svg?style=flat)](https://github.com/mrz1836/go-api-router/releases)
 [![GoDoc](https://godoc.org/github.com/mrz1836/go-api-router?status.svg&style=flat)](https://pkg.go.dev/github.com/mrz1836/go-api-router)
 
@@ -71,7 +72,6 @@ $ make help
 
 List of all current commands:
 ```text
-all                            Runs test, install, clean, docs
 bench                          Run all benchmarks in the Go application
 clean                          Remove previous builds and any test cache data
 clean-mods                     Remove all the Go mod cache
@@ -82,6 +82,7 @@ lint                           Run the Go lint application
 release                        Full production release (creates release in Github)
 release-test                   Full production test release (everything except deploy)
 release-snap                   Test the full release (build binaries)
+run-examples                   Runs all the examples
 tag                            Generate a new tag and push (IE: make tag version=0.0.0)
 tag-remove                     Remove a tag if found (IE: make tag-remove version=0.0.0)
 tag-update                     Update an existing tag to current commit (IE: make tag-update version=0.0.0)
@@ -124,7 +125,7 @@ Read more about this Go project's [code standards](CODE_STANDARDS.md).
 View the [examples](examples/examples.go)
 
 Basic implementation:
-```golang
+```go
 package main
 
 import (
