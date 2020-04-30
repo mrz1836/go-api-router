@@ -1,5 +1,6 @@
 # go-api-router
 > Lightweight API [httprouter](https://github.com/julienschmidt/httprouter) middleware: cors, logging, and standardized error handling.
+
 > Extends Julien Schmidt's [httprouter](https://github.com/julienschmidt/httprouter) package.
 
 [![Go](https://img.shields.io/github/go-mod/go-version/mrz1836/go-api-router)](https://golang.org/)
