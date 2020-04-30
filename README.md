@@ -1,5 +1,5 @@
 # go-api-router
-**go-api-router** is a lightweight API [httprouter](https://github.com/julienschmidt/httprouter) middleware: cors, logging, and standardized error handling. Extends Julien Schmidt's [httprouter](https://github.com/julienschmidt/httprouter) package.
+> Lightweight API [httprouter](https://github.com/julienschmidt/httprouter) middleware: cors, logging, and standardized error handling. Extends Julien Schmidt's [httprouter](https://github.com/julienschmidt/httprouter) package.
 
 [![Go](https://img.shields.io/github/go-mod/go-version/mrz1836/go-api-router)](https://golang.org/)
 [![Build Status](https://travis-ci.com/mrz1836/go-api-router.svg?branch=master)](https://travis-ci.com/mrz1836/go-api-router)
@@ -22,8 +22,8 @@
 ## Installation
 
 **go-api-router** requires a [supported release of Go](https://golang.org/doc/devel/release.html#policy).
-```bash
-$ go get -u github.com/mrz1836/go-api-router
+```shell script
+go get -u github.com/mrz1836/go-api-router
 ```
 
 ## Documentation
@@ -66,8 +66,8 @@ Use `make release-snap` to create a snapshot version of the release, and finally
 <summary><strong><code>Makefile Commands</code></strong></summary>
 
 View all `makefile` commands
-```bash
-$ make help
+```shell script
+make help
 ```
 
 List of all current commands:
@@ -98,24 +98,24 @@ vet                            Run the Go vet application
 All unit tests and [examples](examples/examples.go) run via [Travis CI](https://travis-ci.com/mrz1836/go-api-router) and uses [Go version 1.14.x](https://golang.org/doc/go1.14). View the [deployment configuration file](.travis.yml).
 
 Run all tests (including integration tests)
-```bash
-$ make test
+```shell script
+make test
 ```
 
 Run tests (excluding integration tests)
-```bash
-$ make test-short
+```shell script
+make test-short
 ```
 
 View and run the examples:
-```bash
-$ make run-examples
+```shell script
+make run-examples
 ```
 
 ## Benchmarks
 Run the Go benchmarks:
-```bash
-$ make bench
+```shell script
+make bench
 ```
 
 ## Code Standards
