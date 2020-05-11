@@ -1,12 +1,15 @@
 # go-api-router
 > Lightweight API [httprouter](https://github.com/julienschmidt/httprouter) middleware: cors, logging, and standardized error handling.
 
-[![Go](https://img.shields.io/github/go-mod/go-version/mrz1836/go-api-router)](https://golang.org/)
+[![Release](https://img.shields.io/github/release-pre/mrz1836/go-api-router.svg?logo=github&style=flat)](https://github.com/mrz1836/go-api-router/releases)
 [![Build Status](https://travis-ci.com/mrz1836/go-api-router.svg?branch=master)](https://travis-ci.com/mrz1836/go-api-router)
 [![Report](https://goreportcard.com/badge/github.com/mrz1836/go-api-router?style=flat)](https://goreportcard.com/report/github.com/mrz1836/go-api-router)
 [![codecov](https://codecov.io/gh/mrz1836/go-api-router/branch/master/graph/badge.svg)](https://codecov.io/gh/mrz1836/go-api-router)
-[![Release](https://img.shields.io/github/release-pre/mrz1836/go-api-router.svg?style=flat)](https://github.com/mrz1836/go-api-router/releases)
-[![GoDoc](https://godoc.org/github.com/mrz1836/go-api-router?status.svg&style=flat)](https://pkg.go.dev/github.com/mrz1836/go-api-router)
+[![Go](https://img.shields.io/github/go-mod/go-version/mrz1836/go-api-router)](https://golang.org/)
+[![Sponsor](https://img.shields.io/badge/sponsor-MrZ-181717.svg?logo=github&style=flat&v=3)](https://github.com/sponsors/mrz1836)
+[![Donate](https://img.shields.io/badge/donate-bitcoin-ff9900.svg?logo=bitcoin&style=flat)](https://mrz1818.com/?tab=tips&af=go-api-router)
+
+<br/>
 
 ## Table of Contents
 - [Installation](#installation)
@@ -19,6 +22,8 @@
 - [Contributing](#contributing)
 - [License](#license)
 
+<br/>
+
 ## Installation
 
 **go-api-router** requires a [supported release of Go](https://golang.org/doc/devel/release.html#policy).
@@ -26,8 +31,12 @@
 go get -u github.com/mrz1836/go-api-router
 ```
 
+<br/>
+
 ## Documentation
-You can view the generated [documentation here](https://pkg.go.dev/github.com/mrz1836/go-api-router).
+View the generated [documentation](https://pkg.go.dev/github.com/mrz1836/go-api-router)
+
+[![GoDoc](https://godoc.org/github.com/mrz1836/go-api-router?status.svg&style=flat)](https://pkg.go.dev/github.com/mrz1836/go-api-router)
 
 ### Features
 - Uses the fastest router: Julien Schmidt's [httprouter](https://github.com/julienschmidt/httprouter)
@@ -95,6 +104,8 @@ update-releaser                Update the goreleaser application
 vet                            Run the Go vet application
 ```
 </details>
+ 
+<br/>
 
 ## Examples & Tests
 All unit tests and [examples](examples/examples.go) run via [Travis CI](https://travis-ci.com/mrz1836/go-api-router) and uses [Go version 1.14.x](https://golang.org/doc/go1.14). View the [deployment configuration file](.travis.yml).
@@ -114,14 +125,20 @@ Run the examples:
 make run-examples
 ```
 
+<br/>
+
 ## Benchmarks
 Run the Go benchmarks:
 ```shell script
 make bench
 ```
 
+<br/>
+
 ## Code Standards
 Read more about this Go project's [code standards](CODE_STANDARDS.md).
+
+<br/>
 
 ## Usage
 View the [examples](examples/examples.go)
@@ -155,6 +172,8 @@ func index(w http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
 }
 ```
 
+<br/>
+
 ## Maintainers
 
 | [<img src="https://github.com/mrz1836.png" height="50" alt="MrZ" />](https://github.com/mrz1836) |
@@ -162,19 +181,18 @@ func index(w http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
 | [MrZ](https://github.com/mrz1836) |
 
 
+<br/>
+
 ## Contributing
+View the [contributing guidelines](CONTRIBUTING.md) and please follow the [code of conduct](CODE_OF_CONDUCT.md).
 
-This project uses Julien Schmidt's [httprouter](https://github.com/julienschmidt/httprouter) package.
+### How can I help?
+All kinds of contributions are welcome :raised_hands:! 
+The most basic way to show your support is to star :star2: the project, or to raise issues :speech_balloon:. 
+You can also support this project by [becoming a sponsor on GitHub](https://github.com/sponsors/mrz1836) :clap: 
+or by making a [**bitcoin donation**](https://mrz1818.com/?tab=tips&af=go-api-router) to ensure this journey continues indefinitely! :rocket:
 
-This project uses gofrs [uuid](https://github.com/gofrs/uuid) package.
-
-This project uses Rileyr's [middleware](https://github.com/rileyr/middleware) package.
-
-View the [contributing guidelines](CONTRIBUTING.md) and follow the [code of conduct](CODE_OF_CONDUCT.md).
-
-Support the development of this project 🙏
-
-[![Donate](https://img.shields.io/badge/donate-bitcoin-brightgreen.svg)](https://mrz1818.com/?tab=tips&af=go-api-router)
+<br/>
 
 ## License
 
