@@ -54,6 +54,7 @@ View the generated [documentation](https://pkg.go.dev/github.com/mrz1836/go-api-
 
 <details>
 <summary><strong><code>Package Dependencies</code></strong></summary>
+<br/>
 
 - Julien Schmidt's [httprouter](https://github.com/julienschmidt/httprouter) package.
 - Rileyr's [middleware](https://github.com/rileyr/middleware) package.
@@ -63,6 +64,7 @@ View the generated [documentation](https://pkg.go.dev/github.com/mrz1836/go-api-
 
 <details>
 <summary><strong><code>Library Deployment</code></strong></summary>
+<br/>
 
 [goreleaser](https://github.com/goreleaser/goreleaser) for easy binary or library deployment to Github and can be installed via: `brew install goreleaser`.
 
@@ -73,6 +75,7 @@ Use `make release-snap` to create a snapshot version of the release, and finally
 
 <details>
 <summary><strong><code>Makefile Commands</code></strong></summary>
+<br/>
 
 View all `makefile` commands
 ```shell script
@@ -175,7 +178,6 @@ func index(w http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
 <br/>
 
 ## Maintainers
-
 | [<img src="https://github.com/mrz1836.png" height="50" alt="MrZ" />](https://github.com/mrz1836) |
 |:---:|
 | [MrZ](https://github.com/mrz1836) |
@@ -195,5 +197,4 @@ or by making a [**bitcoin donation**](https://mrz1818.com/?tab=tips&af=go-api-ro
 <br/>
 
 ## License
-
 ![License](https://img.shields.io/github/license/mrz1836/go-api-router.svg?style=flat)
