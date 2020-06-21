@@ -44,22 +44,23 @@ View the generated [documentation](https://pkg.go.dev/github.com/mrz1836/go-api-
 - Uses MrZ's [go-logger](https://github.com/mrz1836/go-logger) for either local or remote logging via [Log Entries (Rapid7)](https://www.rapid7.com/products/insightops/)
 - Uses MrZ's [go-parameters](https://github.com/mrz1836/go-parameters) for parsing any type of incoming parameter with ease
 - Added basic middleware support from Rileyr's [middleware](https://github.com/rileyr/middleware)
-- Added Additional CORS Functionality
-- Standardized Error Responses for API Requests
-- Centralized Logging on All Requests (requesting user info & request time)
-- Custom Response Writer for Etag and Cache Support
+- Added additional CORS functionality
+- Standardized error responses for API requests
+- Centralized logging on all requests (requesting user info & request time)
+- Custom response writer for Etag and cache support
 - `GetClientIPAddress()` safely detects IP addresses behind load balancers
 - `GetParams()` parses parameters only once
-- `FilterMap()` can remove any confidential parameters from logs
+- `FilterMap()` removes any confidential parameters from logs
+- ...and more!
 
 <details>
 <summary><strong><code>Package Dependencies</code></strong></summary>
 <br/>
 
-- Julien Schmidt's [httprouter](https://github.com/julienschmidt/httprouter) package.
-- Rileyr's [middleware](https://github.com/rileyr/middleware) package.
-- gofrs [uuid](https://github.com/gofrs/uuid) package.
-- MrZ's [go-logger](https://github.com/mrz1836/go-logger) and [go-parameters](https://github.com/mrz1836/go-parameters) package.
+- Julien Schmidt's [httprouter](https://github.com/julienschmidt/httprouter) package
+- Rileyr's [middleware](https://github.com/rileyr/middleware) package
+- gofrs [uuid](https://github.com/gofrs/uuid) package
+- MrZ's [go-logger](https://github.com/mrz1836/go-logger) and [go-parameters](https://github.com/mrz1836/go-parameters) package
 </details>
 
 <details>
@@ -173,7 +174,7 @@ func main() {
 }
 
 func index(w http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
-	_, _ = fmt.Fprint(w, "This is a simple API example!")
+	_, _ = fmt.Fprint(w, "This is a simple route example!")
 }
 ```
 
