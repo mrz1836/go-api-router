@@ -57,6 +57,7 @@ type paramRequestKey string
 
 // Router is the configuration for the middleware service
 type Router struct {
+	AccessControlExposeHeaders  string             `json:"access_control_expose_headers" url:"access_control_expose_headers"`   // Allow specific headers for cors
 	CrossOriginAllowCredentials bool               `json:"cross_origin_allow_credentials" url:"cross_origin_allow_credentials"` // Allow credentials for BasicAuth()
 	CrossOriginAllowHeaders     string             `json:"cross_origin_allow_headers" url:"cross_origin_allow_headers"`         // Allowed headers
 	CrossOriginAllowMethods     string             `json:"cross_origin_allow_methods" url:"cross_origin_allow_methods"`         // Allowed methods
@@ -174,6 +175,11 @@ func (r *Router) Request(h httprouter.Handle) httprouter.Handle {
 		// Set cross origin on each request that goes through logging
 		r.SetCrossOriginHeaders(writer, req, ps)
 
+		// Set access control headers
+		if len(r.AccessControlExposeHeaders) > 0 {
+			w.Header().Set("Access-Control-Expose-Headers", r.AccessControlExposeHeaders)
+		}
+
 		// Do we have paths to skip?
 		// todo: this was added because some requests are confidential or "health-checks" and they can't be split apart from the router
 		var skipLogging bool
@@ -238,6 +244,11 @@ func (r *Router) RequestNoLogging(h httprouter.Handle) httprouter.Handle {
 
 		// Set cross origin on each request that goes through logging
 		r.SetCrossOriginHeaders(writer, req, ps)
+
+		// Set access control headers
+		if len(r.AccessControlExposeHeaders) > 0 {
+			w.Header().Set("Access-Control-Expose-Headers", r.AccessControlExposeHeaders)
+		}
 
 		// Fire the request
 		h(writer, req, ps)
