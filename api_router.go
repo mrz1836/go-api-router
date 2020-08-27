@@ -6,7 +6,6 @@ This package is intended to be used with Julien Schmidt's httprouter and uses Mr
 package apirouter
 
 import (
-	"fmt"
 	"net/http"
 	"runtime/debug"
 	"strings"
@@ -18,17 +17,29 @@ import (
 	"github.com/mrz1836/go-parameters"
 )
 
+// Headers for CORs and Authentication
+const (
+	allowCredentialsHeader string = "Access-Control-Allow-Credentials"
+	allowHeadersHeader     string = "Access-Control-Allow-Headers"
+	allowMethodsHeader     string = "Access-Control-Allow-Methods"
+	allowOriginHeader      string = "Access-Control-Allow-Origin"
+	authenticateHeader     string = "WWW-Authenticate"
+	contentTypeHeader      string = "Content-Type"
+	defaultHeaders         string = "Accept, Content-Type, Content-Length, Cache-Control, Pragma, Accept-Encoding, X-CSRF-Token, Authorization, X-Auth-Cookie"
+	defaultMethods         string = "POST, GET, OPTIONS, PUT, DELETE, HEAD"
+	exposeHeader           string = "Access-Control-Expose-Headers"
+	forwardedHost          string = "x-forwarded-host"
+	forwardedProtocol      string = "x-forwarded-proto"
+	origin                 string = "Origin"
+	varyHeaderString       string = "Vary"
+)
+
 // Log formats for the request
 const (
-	defaultHeaders    string = "Accept, Content-Type, Content-Length, Cache-Control, Pragma, Accept-Encoding, X-CSRF-Token, Authorization, X-Auth-Cookie"
-	defaultMethods    string = "POST, GET, OPTIONS, PUT, DELETE, HEAD"
-	forwardedHost     string = "x-forwarded-host"
-	forwardedProtocol string = "x-forwarded-proto"
-	logErrorFormat    string = "request_id=\"%s\" ip_address=\"%s\" type=\"%s\" internal_message=\"%s\" code=%d\n"
-	logPanicFormat    string = "request_id=\"%s\" method=\"%s\" path=\"%s\" type=\"%s\" error_message=\"%s\" stack_trace=\"%s\"\n"
-	logParamsFormat   string = "request_id=\"%s\" method=\"%s\" path=\"%s\" ip_address=\"%s\" user_agent=\"%s\" params=\"%v\"\n"
-	logTimeFormat     string = "request_id=\"%s\" method=\"%s\" path=\"%s\" ip_address=\"%s\" user_agent=\"%s\" service=%dms status=%d\n"
-	origin            string = "Origin"
+	logErrorFormat  string = "request_id=\"%s\" ip_address=\"%s\" type=\"%s\" internal_message=\"%s\" code=%d\n"
+	logPanicFormat  string = "request_id=\"%s\" method=\"%s\" path=\"%s\" type=\"%s\" error_message=\"%s\" stack_trace=\"%s\"\n"
+	logParamsFormat string = "request_id=\"%s\" method=\"%s\" path=\"%s\" ip_address=\"%s\" user_agent=\"%s\" params=\"%v\"\n"
+	logTimeFormat   string = "request_id=\"%s\" method=\"%s\" path=\"%s\" ip_address=\"%s\" user_agent=\"%s\" service=%dms status=%d\n"
 )
 
 // Package variables
@@ -122,20 +133,20 @@ func New() *Router {
 					originDomain = req.Header.Get(forwardedProtocol) + "//" + originDomain
 				}
 			}
-			header.Set("Access-Control-Allow-Origin", originDomain)
-			header.Set("Vary", origin)
+			header.Set(allowOriginHeader, originDomain)
+			header.Set(varyHeaderString, origin)
 		} else { // Only the origin set by config
-			header.Set("Access-Control-Allow-Origin", config.CrossOriginAllowOrigin)
+			header.Set(allowOriginHeader, config.CrossOriginAllowOrigin)
 		}
 
 		// Allow credentials (used for BasicAuth)
 		if config.CrossOriginAllowCredentials {
-			header.Set("Access-Control-Allow-Credentials", "true")
+			header.Set(allowCredentialsHeader, "true")
 		}
 
 		// Set access control
-		header.Set("Access-Control-Allow-Methods", config.CrossOriginAllowMethods)
-		header.Set("Access-Control-Allow-Headers", config.CrossOriginAllowHeaders)
+		header.Set(allowMethodsHeader, config.CrossOriginAllowMethods)
+		header.Set(allowHeadersHeader, config.CrossOriginAllowHeaders)
 
 		// Adjust status code to 204
 		w.WriteHeader(http.StatusNoContent)
@@ -156,9 +167,9 @@ func (r *Router) Request(h httprouter.Handle) httprouter.Handle {
 		params := GetParams(req)
 
 		// Start the custom response writer
-		var writer *APIResponseWriter
+		// var writer *APIResponseWriter
 		guid, _ := uuid.NewV4()
-		writer = &APIResponseWriter{
+		writer := &APIResponseWriter{
 			IPAddress:      GetClientIPAddress(req),
 			Method:         req.Method,
 			RequestID:      guid.String(),
@@ -177,7 +188,7 @@ func (r *Router) Request(h httprouter.Handle) httprouter.Handle {
 
 		// Set access control headers
 		if len(r.AccessControlExposeHeaders) > 0 {
-			w.Header().Set("Access-Control-Expose-Headers", r.AccessControlExposeHeaders)
+			w.Header().Set(exposeHeader, r.AccessControlExposeHeaders)
 		}
 
 		// Do we have paths to skip?
@@ -226,15 +237,15 @@ func (r *Router) RequestNoLogging(h httprouter.Handle) httprouter.Handle {
 	return parameters.MakeHTTPRouterParsedReq(func(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 
 		// Start the custom response writer
-		var writer *APIResponseWriter
+		// var writer *APIResponseWriter
 		guid, _ := uuid.NewV4()
-		writer = &APIResponseWriter{
+		writer := &APIResponseWriter{
 			IPAddress:      GetClientIPAddress(req),
-			Method:         fmt.Sprintf("%s", req.Method),
+			Method:         req.Method,
 			RequestID:      guid.String(),
 			ResponseWriter: w,
 			Status:         0, // future use with E-tags
-			URL:            fmt.Sprintf("%s", req.URL),
+			URL:            req.URL.String(),
 			UserAgent:      req.UserAgent(),
 		}
 
@@ -247,7 +258,7 @@ func (r *Router) RequestNoLogging(h httprouter.Handle) httprouter.Handle {
 
 		// Set access control headers
 		if len(r.AccessControlExposeHeaders) > 0 {
-			w.Header().Set("Access-Control-Expose-Headers", r.AccessControlExposeHeaders)
+			w.Header().Set(exposeHeader, r.AccessControlExposeHeaders)
 		}
 
 		// Fire the request
@@ -268,7 +279,7 @@ func (r *Router) BasicAuth(h httprouter.Handle, requiredUser, requiredPassword s
 			h(w, req, ps)
 		} else {
 			// Request Basic Authentication otherwise
-			w.Header().Set("WWW-Authenticate", "Basic realm=Restricted")
+			w.Header().Set(authenticateHeader, "Basic realm=Restricted")
 			ReturnResponse(w, req, http.StatusUnauthorized, errorResponse)
 		}
 	}
@@ -299,20 +310,20 @@ func (r *Router) SetCrossOriginHeaders(w http.ResponseWriter, req *http.Request,
 				originDomain = req.Header.Get(forwardedProtocol) + "//" + originDomain
 			}
 		}
-		header.Set("Access-Control-Allow-Origin", originDomain)
-		header.Set("Vary", origin)
+		header.Set(allowOriginHeader, originDomain)
+		header.Set(varyHeaderString, origin)
 	} else { // Only the origin set by config
-		header.Set("Access-Control-Allow-Origin", r.CrossOriginAllowOrigin)
+		header.Set(allowOriginHeader, r.CrossOriginAllowOrigin)
 	}
 
 	// Allow credentials (used for BasicAuth)
 	if r.CrossOriginAllowCredentials {
-		header.Set("Access-Control-Allow-Credentials", "true")
+		header.Set(allowCredentialsHeader, "true")
 	}
 
 	// Set access control
-	header.Set("Access-Control-Allow-Methods", r.CrossOriginAllowMethods)
-	header.Set("Access-Control-Allow-Headers", r.CrossOriginAllowHeaders)
+	header.Set(allowMethodsHeader, r.CrossOriginAllowMethods)
+	header.Set(allowHeadersHeader, r.CrossOriginAllowHeaders)
 
 	// Adjust status code to 204 (Leaving this out, allowing customized response)
 	// w.WriteHeader(http.StatusNoContent)
