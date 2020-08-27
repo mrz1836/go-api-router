@@ -142,15 +142,12 @@ func GetClientIPAddress(req *http.Request) string {
 	}
 
 	// Parsing will also validate if it's IPv4 or IPv6
-	parsed := net.ParseIP(ip)
-	if parsed == nil {
-		ip = ""
-	} else {
-		ip = parsed.String()
+	if parsed := net.ParseIP(ip); parsed != nil {
+		return parsed.String()
 	}
 
-	// Return the ip address
-	return ip
+	// IP failed to parse
+	return ""
 }
 
 // SetOnRequest will set the value on the request with the given key
