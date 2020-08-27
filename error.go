@@ -30,6 +30,7 @@ func ErrorFromResponse(w *APIResponseWriter, internalMessage string, publicMessa
 	// Log the error
 	logError(errorCode, internalMessage, w.RequestID, w.IPAddress)
 
+	// Return an error
 	return &APIError{
 		Code:            errorCode,
 		Data:            data,
