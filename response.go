@@ -22,7 +22,7 @@ func ReturnResponse(w http.ResponseWriter, req *http.Request, code int, data int
 func ReturnJSONEncode(w http.ResponseWriter, code int, e *json.Encoder, objects interface{}, allowed []string) (err error) {
 
 	// Set the content if JSON
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set(contentTypeHeader, "application/json")
 
 	// Set the header status code
 	w.WriteHeader(code)
