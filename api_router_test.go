@@ -32,6 +32,7 @@ var (
 
 // TestNew tests the New() method
 func TestNew(t *testing.T) {
+	t.Parallel()
 
 	// Create a new router with default properties
 	router := New()
@@ -69,12 +70,13 @@ func TestNew(t *testing.T) {
 
 // TestRouter_Request tests a basic request
 func TestRouter_Request(t *testing.T) {
+	t.Parallel()
 
 	router := New()
 
 	router.HTTPRouter.GET("/test", router.Request(indexTestJSON))
 
-	req, _ := http.NewRequest("GET", "/test?this=that&id=1234", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/test?this=that&id=1234", nil)
 	rr := httptest.NewRecorder()
 
 	router.HTTPRouter.ServeHTTP(rr, req)
@@ -85,12 +87,13 @@ func TestRouter_Request(t *testing.T) {
 
 // TestRouter_RequestFilterFields tests a basic request (filter protected fields)
 func TestRouter_RequestFilterFields(t *testing.T) {
+	t.Parallel()
 
 	router := New()
 
 	router.HTTPRouter.GET("/test", router.Request(indexTestJSON))
 
-	req, _ := http.NewRequest("GET", "/test?password=1234", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/test?password=1234", nil)
 	rr := httptest.NewRecorder()
 
 	router.HTTPRouter.ServeHTTP(rr, req)
@@ -101,13 +104,14 @@ func TestRouter_RequestFilterFields(t *testing.T) {
 
 // TestRouter_RequestSkipPath tests a basic request
 func TestRouter_RequestSkipPath(t *testing.T) {
+	t.Parallel()
 
 	router := New()
 	router.SkipLoggingPaths = append(router.SkipLoggingPaths, "/health")
 
 	router.HTTPRouter.GET("/health", router.Request(indexTestJSON))
 
-	req, _ := http.NewRequest("GET", "/health", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/health", nil)
 	rr := httptest.NewRecorder()
 
 	router.HTTPRouter.ServeHTTP(rr, req)
@@ -118,12 +122,13 @@ func TestRouter_RequestSkipPath(t *testing.T) {
 
 // TestRouter_RequestNoLogging tests a basic request
 func TestRouter_RequestNoLogging(t *testing.T) {
+	t.Parallel()
 
 	router := New()
 
 	router.HTTPRouter.GET("/test", router.RequestNoLogging(indexTestJSON))
 
-	req, _ := http.NewRequest("GET", "/test?this=that&id=1234", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/test?this=that&id=1234", nil)
 	rr := httptest.NewRecorder()
 
 	router.HTTPRouter.ServeHTTP(rr, req)
@@ -135,16 +140,17 @@ func TestRouter_RequestNoLogging(t *testing.T) {
 // TestReturnResponseWithJSON tests the ReturnResponse()
 // Only tests the basics, method is very simple
 func TestReturnJSONEncode(t *testing.T) {
+	t.Parallel()
 
 	// Create new test recorder
-	req := httptest.NewRequest("GET", "/test?this=that&id=123", nil)
+	req := httptest.NewRequest(http.MethodGet, "/test?this=that&id=123", nil)
 	w := httptest.NewRecorder()
 
 	// Fire the index test
 	indexTestReturnJSONEncode(w, req, nil)
 
 	// Test the content type
-	contentType := w.Header().Get("Content-Type")
+	contentType := w.Header().Get(contentTypeHeader)
 	if !strings.Contains(contentType, "application/json") {
 		t.Fatalf("expected value: %s, got: %s", "application/json", contentType)
 	}
@@ -171,16 +177,17 @@ func TestReturnJSONEncode(t *testing.T) {
 // TestReturnResponse tests the ReturnResponse()
 // Only tests the basics, method is very simple
 func TestReturnResponse(t *testing.T) {
+	t.Parallel()
 
 	// Create new test recorder
-	req := httptest.NewRequest("GET", "/", nil)
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	w := httptest.NewRecorder()
 
 	// Fire the index test
 	indexTestNoJSON(w, req, nil)
 
 	// Test the content type
-	contentType := w.Header().Get("Content-Type")
+	contentType := w.Header().Get(contentTypeHeader)
 	if !strings.Contains(contentType, "application/json") {
 		t.Fatalf("expected value: %s, got: %s", "application/json", contentType)
 	}
@@ -207,16 +214,17 @@ func TestReturnResponse(t *testing.T) {
 // TestReturnResponseWithJSON tests the ReturnResponse()
 // Only tests the basics, method is very simple
 func TestReturnResponse_WithJSON(t *testing.T) {
+	t.Parallel()
 
 	// Create new test recorder
-	req := httptest.NewRequest("GET", "/", nil)
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	w := httptest.NewRecorder()
 
 	// Fire the index test
 	indexTestJSON(w, req, nil)
 
 	// Test the content type
-	contentType := w.Header().Get("Content-Type")
+	contentType := w.Header().Get(contentTypeHeader)
 	if !strings.Contains(contentType, "application/json") {
 		t.Fatalf("expected value: %s, got: %s", "application/json", contentType)
 	}
@@ -242,8 +250,10 @@ func TestReturnResponse_WithJSON(t *testing.T) {
 
 // TestRouter_SetCrossOriginHeaders tests SetCrossOriginHeaders() method
 func TestRouter_SetCrossOriginHeaders(t *testing.T) {
+	t.Parallel()
+
 	// Create new test recorder
-	req := httptest.NewRequest("GET", "/", nil)
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	w := httptest.NewRecorder()
 
 	router := New()
@@ -252,47 +262,48 @@ func TestRouter_SetCrossOriginHeaders(t *testing.T) {
 	router.SetCrossOriginHeaders(w, req, nil)
 
 	// Test the header
-	allowOrigin := w.Header().Get("Access-Control-Allow-Origin")
+	allowOrigin := w.Header().Get(allowOriginHeader)
 	if allowOrigin != req.Header.Get(origin) {
 		t.Fatalf("expected value: %s, got: %s", req.Header.Get(origin), allowOrigin)
 	}
 
 	// Test the header
-	vary := w.Header().Get("Vary")
+	vary := w.Header().Get(varyHeaderString)
 	if vary != origin {
 		t.Fatalf("expected value: %s, got: %s", origin, vary)
 	}
 
 	// Test the header
-	credentials := w.Header().Get("Access-Control-Allow-Credentials")
+	credentials := w.Header().Get(allowCredentialsHeader)
 	if credentials != "true" {
 		t.Fatalf("expected value: %s, got: %s", "true", credentials)
 	}
 
 	// Test the header
-	methods := w.Header().Get("Access-Control-Allow-Methods")
+	methods := w.Header().Get(allowMethodsHeader)
 	if methods != defaultMethods {
 		t.Fatalf("expected value: %s, got: %s", defaultMethods, methods)
 	}
 
 	// Test the header
-	headers := w.Header().Get("Access-Control-Allow-Headers")
+	headers := w.Header().Get(allowHeadersHeader)
 	if headers != defaultHeaders {
 		t.Fatalf("expected value: %s, got: %s", defaultHeaders, headers)
 	}
 
 	// Get the result
 	resp := w.Result()
-	_, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
+	if _, err := ioutil.ReadAll(resp.Body); err != nil {
 		t.Fatal("got an error", err.Error())
 	}
 }
 
 // TestRouter_SetCrossOriginHeaders_Disabled tests SetCrossOriginHeaders() method
 func TestRouter_SetCrossOriginHeaders_Disabled(t *testing.T) {
+	t.Parallel()
+
 	// Create new test recorder
-	req := httptest.NewRequest("GET", "/", nil)
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	w := httptest.NewRecorder()
 
 	router := New()
@@ -302,47 +313,48 @@ func TestRouter_SetCrossOriginHeaders_Disabled(t *testing.T) {
 	router.SetCrossOriginHeaders(w, req, nil)
 
 	// Test the header
-	allowOrigin := w.Header().Get("Access-Control-Allow-Origin")
+	allowOrigin := w.Header().Get(allowOriginHeader)
 	if allowOrigin != "" {
 		t.Fatalf("expected value: %s, got: %s", "", allowOrigin)
 	}
 
 	// Test the header
-	vary := w.Header().Get("Vary")
+	vary := w.Header().Get(varyHeaderString)
 	if vary == origin {
 		t.Fatalf("expected value: %s, got: %s", "", vary)
 	}
 
 	// Test the header
-	credentials := w.Header().Get("Access-Control-Allow-Credentials")
+	credentials := w.Header().Get(allowCredentialsHeader)
 	if credentials == "true" {
 		t.Fatalf("expected value: %s, got: %s", "", credentials)
 	}
 
 	// Test the header
-	methods := w.Header().Get("Access-Control-Allow-Methods")
+	methods := w.Header().Get(allowMethodsHeader)
 	if methods == defaultMethods {
 		t.Fatalf("expected value: %s, got: %s", "", methods)
 	}
 
 	// Test the header
-	headers := w.Header().Get("Access-Control-Allow-Headers")
+	headers := w.Header().Get(allowHeadersHeader)
 	if headers == defaultHeaders {
 		t.Fatalf("expected value: %s, got: %s", "", headers)
 	}
 
 	// Get the result
 	resp := w.Result()
-	_, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
+	if _, err := ioutil.ReadAll(resp.Body); err != nil {
 		t.Fatal("got an error", err.Error())
 	}
 }
 
 // TestRouter_SetCrossOriginHeaders_CustomOrigin tests SetCrossOriginHeaders() method
 func TestRouter_SetCrossOriginHeaders_CustomOrigin(t *testing.T) {
+	t.Parallel()
+
 	// Create new test recorder
-	req := httptest.NewRequest("GET", "/", nil)
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	w := httptest.NewRecorder()
 
 	router := New()
@@ -353,32 +365,33 @@ func TestRouter_SetCrossOriginHeaders_CustomOrigin(t *testing.T) {
 	router.SetCrossOriginHeaders(w, req, nil)
 
 	// Test the header
-	allowOrigin := w.Header().Get("Access-Control-Allow-Origin")
+	allowOrigin := w.Header().Get(allowOriginHeader)
 	if allowOrigin != router.CrossOriginAllowOrigin {
 		t.Fatalf("expected value: %s, got: %s", router.CrossOriginAllowOrigin, allowOrigin)
 	}
 
 	// Test the header
-	vary := w.Header().Get("Vary")
+	vary := w.Header().Get(varyHeaderString)
 	if vary == origin {
 		t.Fatalf("expected value: %s, got: %s", "", vary)
 	}
 
 	// Get the result
 	resp := w.Result()
-	_, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
+	if _, err := ioutil.ReadAll(resp.Body); err != nil {
 		t.Fatal("got an error", err.Error())
 	}
 }
 
 // TestPanic will test the panic feature in Request logging
 func TestPanic(t *testing.T) {
+	t.Parallel()
+
 	router := New()
 
 	router.HTTPRouter.GET("/test", router.Request(indexTestPanic))
 
-	req, _ := http.NewRequest("GET", "/test?this=that&id=1234", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/test?this=that&id=1234", nil)
 	rr := httptest.NewRecorder()
 
 	router.HTTPRouter.ServeHTTP(rr, req)

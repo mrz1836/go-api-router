@@ -8,6 +8,7 @@ import (
 
 // TestJsonEncode tests the json encoder removes fields that are not approved
 func TestJsonEncode(t *testing.T) {
+	t.Parallel()
 
 	// Setup a mock struct for testing
 	type TestStruct struct {
@@ -37,8 +38,7 @@ func TestJsonEncode(t *testing.T) {
 	}
 
 	// Now unmarshal and test
-	err = json.Unmarshal([]byte(b.String()), &modelTest)
-	if err != nil {
+	if err = json.Unmarshal([]byte(b.String()), &modelTest); err != nil {
 		t.Fatal(err)
 	}
 
@@ -54,6 +54,7 @@ func TestJsonEncode(t *testing.T) {
 
 // TestJsonEncodeSubstruct tests the json encoder removes fields that are not approved
 func TestJsonEncodeSubstruct(t *testing.T) {
+	t.Parallel()
 
 	// Setup a new mock substruct
 	type TestSubStruct struct {
@@ -87,8 +88,7 @@ func TestJsonEncodeSubstruct(t *testing.T) {
 	}
 
 	// Now unmarshal and test
-	err = json.Unmarshal([]byte(b.String()), &modelTest)
-	if err != nil {
+	if err = json.Unmarshal([]byte(b.String()), &modelTest); err != nil {
 		t.Fatal(err)
 	}
 

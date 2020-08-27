@@ -25,6 +25,7 @@ func setupTest() *APIResponseWriter {
 
 // TestErrorFromResponse test the creation of an error ErrorFromResponse()
 func TestErrorFromResponse(t *testing.T) {
+	t.Parallel()
 
 	w := setupTest()
 
@@ -65,6 +66,7 @@ func BenchmarkErrorFromResponse(b *testing.B) {
 
 // TestError_Error test the method Error()
 func TestAPIError_Error(t *testing.T) {
+	t.Parallel()
 
 	w := setupTest()
 
@@ -95,6 +97,7 @@ func BenchmarkAPIError_Error(b *testing.B) {
 
 // TestError_JSON test the method JSON()
 func TestAPIError_JSON(t *testing.T) {
+	t.Parallel()
 
 	w := setupTest()
 
@@ -126,6 +129,7 @@ func BenchmarkAPIError_JSON(b *testing.B) {
 
 // TestError_Internal test the method Internal()
 func TestAPIError_Internal(t *testing.T) {
+	t.Parallel()
 
 	w := setupTest()
 
@@ -156,6 +160,7 @@ func BenchmarkAPIError_Internal(b *testing.B) {
 
 // TestError_ErrorCode test the method ErrorCode()
 func TestAPIError_ErrorCode(t *testing.T) {
+	t.Parallel()
 
 	w := setupTest()
 

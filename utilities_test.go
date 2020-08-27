@@ -10,82 +10,36 @@ import (
 
 // TestSnakeCase test our snake case method
 func TestSnakeCase(t *testing.T) {
+	t.Parallel()
 
-	// Test a valid case
-	word := "testCamelCase"
-	result := SnakeCase(word)
-
-	if result != "test_camel_case" {
-		t.Fatal("SnakeCase conversion failed!", result)
+	// Create the list of tests
+	var tests = []struct {
+		input    string
+		expected string
+	}{
+		{"testCamelCase", "test_camel_case"},
+		{"TestCamelCase", "test_camel_case"},
+		{"TEstCamelCase", "test_camel_case"},
+		{"testCamelCASE", "test_camel_case"},
+		{"testCamel!CASE", "test_camel_case"},
+		{"testCamelAPI", "test_camel_api"},
+		{"testCamelIP", "test_camel_ip"},
+		{"testCamelURL", "test_camel_url"},
+		{"testCamelJSON", "test_camel_json"},
 	}
 
-	// Test a valid case
-	word = "TestCamelCase"
-	result = SnakeCase(word)
-
-	if result != "test_camel_case" {
-		t.Fatal("SnakeCase conversion failed!", result)
-	}
-
-	// Test a valid case
-	word = "TEstCamelCase"
-	result = SnakeCase(word)
-
-	if result != "test_camel_case" {
-		t.Fatal("SnakeCase conversion failed!", result)
-	}
-
-	// Test a valid case
-	word = "testCamelCASE"
-	result = SnakeCase(word)
-
-	if result != "test_camel_case" {
-		t.Fatal("SnakeCase conversion failed!", result)
-	}
-
-	// Test a valid case
-	word = "testCamel!CASE"
-	result = SnakeCase(word)
-
-	if result != "test_camel_case" {
-		t.Fatal("SnakeCase conversion failed!", result)
-	}
-
-	// Test a valid case (API)
-	word = "testCamelAPI"
-	result = SnakeCase(word)
-
-	if result != "test_camel_api" {
-		t.Fatal("SnakeCase conversion failed!", result)
-	}
-
-	// Test a valid case (IP)
-	word = "testCamelIP"
-	result = SnakeCase(word)
-
-	if result != "test_camel_ip" {
-		t.Fatal("SnakeCase conversion failed!", result)
-	}
-
-	// Test a valid case (URL)
-	word = "testCamelURL"
-	result = SnakeCase(word)
-
-	if result != "test_camel_url" {
-		t.Fatal("SnakeCase conversion failed!", result)
-	}
-
-	// Test a valid case (JSON)
-	word = "testCamelJSON"
-	result = SnakeCase(word)
-
-	if result != "test_camel_json" {
-		t.Fatal("SnakeCase conversion failed!", result)
+	// Test all
+	for _, test := range tests {
+		if output := SnakeCase(test.input); output != test.expected {
+			t.Errorf("%s Failed: [%s] inputted and [%s] expected, received: [%s]", t.Name(), test.input, test.expected, output)
+		}
 	}
 }
 
 // TestFindString test our find string method
 func TestFindString(t *testing.T) {
+	t.Parallel()
+
 	// needle string, haystack []string
 	haystack := []string{"test", "stack"}
 	needle := "stack"
@@ -102,8 +56,9 @@ func TestFindString(t *testing.T) {
 
 // TestGetParams test getting params
 func TestGetParams(t *testing.T) {
+	t.Parallel()
 
-	req, _ := http.NewRequest("GET", "/test?this=that&id=1234", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/test?this=that&id=1234", nil)
 
 	req = req.WithContext(context.WithValue(req.Context(), parameters.ParamsKeyName, parameters.ParseParams(req)))
 
@@ -121,11 +76,12 @@ func TestGetParams(t *testing.T) {
 
 // TestGetParams_BadKey tests a bad key on the context storage
 func TestGetParams_BadKey(t *testing.T) {
+	t.Parallel()
 
 	type badParamKey string
 	const BadParamKey badParamKey = "bad_key"
 
-	req, _ := http.NewRequest("GET", "/test?this=that&id=1234", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/test?this=that&id=1234", nil)
 
 	req = req.WithContext(context.WithValue(req.Context(), BadParamKey, parameters.ParseParams(req)))
 
@@ -138,7 +94,9 @@ func TestGetParams_BadKey(t *testing.T) {
 
 // TestPermitParams tests the permitting params
 func TestPermitParams(t *testing.T) {
-	req, _ := http.NewRequest("GET", "/test?this=that&id=1234&private=data", nil)
+	t.Parallel()
+
+	req, _ := http.NewRequest(http.MethodGet, "/test?this=that&id=1234&private=data", nil)
 
 	req = req.WithContext(context.WithValue(req.Context(), parameters.ParamsKeyName, parameters.ParseParams(req)))
 
@@ -159,10 +117,11 @@ func TestPermitParams(t *testing.T) {
 
 // TestGetIPFromRequest test getting IP from req
 func TestGetIPFromRequest(t *testing.T) {
+	t.Parallel()
 
 	// Fake storing the ip address
 	testIP := "127.0.0.1"
-	req, _ := http.NewRequest("GET", "/test?this=that&id=1234", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/test?this=that&id=1234", nil)
 	req = SetOnRequest(req, ipAddressKey, testIP)
 
 	ip, ok := GetIPFromRequest(req)
@@ -175,10 +134,11 @@ func TestGetIPFromRequest(t *testing.T) {
 
 // TestGetRequestID test getting request ID from req
 func TestGetRequestID(t *testing.T) {
+	t.Parallel()
 
 	// Fake storing the request id
 	testFakeID := "ern8347t88e7zrhg8eh48e7hg8e"
-	req, _ := http.NewRequest("GET", "/test?this=that&id=1234", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/test?this=that&id=1234", nil)
 
 	req = SetOnRequest(req, requestIDKey, testFakeID)
 
@@ -192,7 +152,9 @@ func TestGetRequestID(t *testing.T) {
 
 // TestGetClientIPAddress test getting client ip address
 func TestGetClientIPAddress(t *testing.T) {
-	req, _ := http.NewRequest("GET", "/test?this=that&id=1234", nil)
+	t.Parallel()
+
+	req, _ := http.NewRequest(http.MethodGet, "/test?this=that&id=1234", nil)
 
 	ip := GetClientIPAddress(req)
 	if ip != "" {
@@ -202,10 +164,11 @@ func TestGetClientIPAddress(t *testing.T) {
 
 // TestSetAuthToken test setting the auth token
 func TestSetAuthToken(t *testing.T) {
+	t.Parallel()
 
 	// Fake storing the token
 	testFakeToken := "ern8347t88e7zrhg8eh48e7hg8e"
-	req, _ := http.NewRequest("GET", "/test?this=that&id=1234", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/test?this=that&id=1234", nil)
 
 	req = SetAuthToken(req, testFakeToken)
 
@@ -219,10 +182,11 @@ func TestSetAuthToken(t *testing.T) {
 
 // TestGetAuthToken test setting the auth token
 func TestGetAuthToken(t *testing.T) {
+	t.Parallel()
 
 	// Test getting the token
 	testFakeToken := "ern8347t88e7zrhg8eh48e7hg8e"
-	req, _ := http.NewRequest("GET", "/test?this=that&id=1234", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/test?this=that&id=1234", nil)
 
 	req = SetAuthToken(req, testFakeToken)
 
@@ -236,6 +200,7 @@ func TestGetAuthToken(t *testing.T) {
 
 // TestSetUserData test setting the auth token
 func TestSetUserData(t *testing.T) {
+	t.Parallel()
 
 	type TestThis struct {
 		FieldName string
@@ -246,7 +211,7 @@ func TestSetUserData(t *testing.T) {
 	testFakeUserData := new(TestThis)
 	testFakeUserData.FieldName = "this"
 	testFakeUserData.FieldTwo = "that"
-	req, _ := http.NewRequest("GET", "/test?this=that&id=1234", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/test?this=that&id=1234", nil)
 
 	req = SetCustomData(req, testFakeUserData)
 
@@ -262,6 +227,7 @@ func TestSetUserData(t *testing.T) {
 
 // TestGetUserData test setting the auth token
 func TestGetUserData(t *testing.T) {
+	t.Parallel()
 
 	type TestThis struct {
 		FieldName string
@@ -272,7 +238,7 @@ func TestGetUserData(t *testing.T) {
 	testFakeUserData := new(TestThis)
 	testFakeUserData.FieldName = "this"
 	testFakeUserData.FieldTwo = "that"
-	req, _ := http.NewRequest("GET", "/test?this=that&id=1234", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/test?this=that&id=1234", nil)
 
 	req = SetCustomData(req, testFakeUserData)
 

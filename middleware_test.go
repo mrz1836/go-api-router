@@ -12,6 +12,8 @@ import (
 
 // TestUse test the use method
 func TestUse(t *testing.T) {
+	t.Parallel()
+
 	s := NewStack()
 	mw := func(fn httprouter.Handle) httprouter.Handle {
 		return fn
@@ -27,6 +29,8 @@ func TestUse(t *testing.T) {
 
 // TestWrap test the wrap method
 func TestWrap(t *testing.T) {
+	t.Parallel()
+
 	s := NewStack()
 
 	var middlewareCalled bool
@@ -60,6 +64,8 @@ func TestWrap(t *testing.T) {
 
 // TestWrap_Ordering test wrap ordering
 func TestWrap_Ordering(t *testing.T) {
+	t.Parallel()
+
 	s := NewStack()
 
 	var firstCallAt *time.Time
@@ -133,6 +139,8 @@ func TestWrap_Ordering(t *testing.T) {
 
 // TestWrap_WhenEmpty test wrap when empty
 func TestWrap_WhenEmpty(t *testing.T) {
+	t.Parallel()
+
 	s := NewStack()
 	hn := func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {}
 	w := s.Wrap(hn)
