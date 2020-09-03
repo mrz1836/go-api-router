@@ -10,6 +10,9 @@ import (
 const (
 	// ErrCodeUnknown unknown error code (example)
 	ErrCodeUnknown int = 600
+
+	// StatusCodeUnknown unknown HTTP status code (example)
+	StatusCodeUnknown int = 600
 )
 
 // APIError is the enriched error message for API related errors
@@ -21,14 +24,15 @@ type APIError struct {
 	Method          string      `json:"method" url:"method"`             // Method requested (IE: POST)
 	PublicMessage   string      `json:"message" url:"message"`           // Public error message
 	RequestGUID     string      `json:"request_guid" url:"request_guid"` // Unique Request ID for tracking
+	StatusCode      int         `json:"status_code" url:"status_code"`   // Associated HTTP status code (should be in request as well)
 	URL             string      `json:"url" url:"url"`                   // Requesting URL
 }
 
 // ErrorFromResponse generates a new error struct using CustomResponseWriter from LogRequest()
-func ErrorFromResponse(w *APIResponseWriter, internalMessage string, publicMessage string, errorCode int, data interface{}) *APIError {
+func ErrorFromResponse(w *APIResponseWriter, internalMessage, publicMessage string, errorCode, statusCode int, data interface{}) *APIError {
 
 	// Log the error
-	logError(errorCode, internalMessage, w.RequestID, w.IPAddress)
+	logError(statusCode, internalMessage, w.RequestID, w.IPAddress)
 
 	// Return an error
 	return &APIError{
@@ -39,12 +43,13 @@ func ErrorFromResponse(w *APIResponseWriter, internalMessage string, publicMessa
 		Method:          w.Method,
 		PublicMessage:   publicMessage,
 		RequestGUID:     w.RequestID,
+		StatusCode:      statusCode,
 		URL:             w.URL,
 	}
 }
 
 // ErrorFromRequest gives an error without a response writer using the request
-func ErrorFromRequest(req *http.Request, internalMessage string, publicMessage string, errorCode int, data interface{}) *APIError {
+func ErrorFromRequest(req *http.Request, internalMessage, publicMessage string, errorCode, statusCode int, data interface{}) *APIError {
 
 	// Get values from req if available
 	ip, _ := GetIPFromRequest(req)
@@ -62,15 +67,16 @@ func ErrorFromRequest(req *http.Request, internalMessage string, publicMessage s
 		Method:          req.Method,
 		PublicMessage:   publicMessage,
 		RequestGUID:     id,
+		StatusCode:      statusCode,
 		URL:             req.URL.String(),
 	}
 }
 
 // logError will log the internal message and code for diagnosing
-func logError(errorCode int, internalMessage, requestID, ipAddress string) {
+func logError(statusCode int, internalMessage, requestID, ipAddress string) {
 
 	// Skip non-error codes
-	if errorCode < http.StatusBadRequest || errorCode == http.StatusNotFound {
+	if statusCode < http.StatusBadRequest || statusCode == http.StatusNotFound {
 		return
 	}
 
@@ -78,12 +84,12 @@ func logError(errorCode int, internalMessage, requestID, ipAddress string) {
 	logLevel := "error"
 
 	// Switch based on known statuses
-	if errorCode == http.StatusBadRequest || errorCode == http.StatusUnauthorized || errorCode == http.StatusLocked || errorCode == http.StatusForbidden || errorCode == http.StatusUnprocessableEntity {
+	if statusCode == http.StatusBadRequest || statusCode == http.StatusUnauthorized || statusCode == http.StatusLocked || statusCode == http.StatusForbidden || statusCode == http.StatusUnprocessableEntity {
 		logLevel = "warn"
 	}
 
 	// Show the login a standard way
-	logger.NoFilePrintf(logErrorFormat, requestID, ipAddress, logLevel, internalMessage, errorCode)
+	logger.NoFilePrintf(logErrorFormat, requestID, ipAddress, logLevel, internalMessage, statusCode)
 }
 
 // Error returns the string error message (only public message)
