@@ -52,8 +52,11 @@ var (
 	// defaultFilterFields is the fields to filter from logs
 	defaultFilterFields = []string{
 		"api_key",
+		"jwt",
 		"new_password",
 		"new_password_confirmation",
+		"oauth",
+		"oauth_token",
 		"password",
 		"password_check",
 		"password_confirm",
