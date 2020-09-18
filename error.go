@@ -56,7 +56,7 @@ func ErrorFromRequest(req *http.Request, internalMessage, publicMessage string, 
 	id, _ := GetRequestID(req)
 
 	// Log the error
-	logError(errorCode, internalMessage, id, ip)
+	logError(statusCode, internalMessage, id, ip)
 
 	// Return an error
 	return &APIError{
