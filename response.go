@@ -137,7 +137,7 @@ func JSONEncode(e *json.Encoder, objects interface{}, allowed []string) error {
 
 // jsonMap converts an object to a map of string interfaces
 func jsonMap(obj interface{}) map[string]interface{} {
-	fieldValues := make(map[string]interface{}, 0)
+	fieldValues := make(map[string]interface{})
 
 	var s, stringPointer reflect.Value
 
@@ -176,7 +176,7 @@ func jsonMap(obj interface{}) map[string]interface{} {
 		key = comps[0]
 		fieldType := structField.Type
 		if fieldType.Kind() != reflect.Ptr && val.CanAddr() {
-			fieldType = reflect.PtrTo(fieldType)
+			// fieldType = reflect.PtrTo(fieldType)
 			val = val.Addr()
 		}
 		fieldValues[key] = val.Interface()

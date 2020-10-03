@@ -38,7 +38,7 @@ func TestJsonEncode(t *testing.T) {
 	}
 
 	// Now unmarshal and test
-	if err = json.Unmarshal([]byte(b.String()), &modelTest); err != nil {
+	if err = json.Unmarshal(b.Bytes(), &modelTest); err != nil {
 		t.Fatal(err)
 	}
 
@@ -88,7 +88,7 @@ func TestJsonEncodeSubstruct(t *testing.T) {
 	}
 
 	// Now unmarshal and test
-	if err = json.Unmarshal([]byte(b.String()), &modelTest); err != nil {
+	if err = json.Unmarshal(b.Bytes(), &modelTest); err != nil {
 		t.Fatal(err)
 	}
 

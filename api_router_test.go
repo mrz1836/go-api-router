@@ -1,6 +1,7 @@
 package apirouter
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -76,7 +77,7 @@ func TestRouter_Request(t *testing.T) {
 
 	router.HTTPRouter.GET("/test", router.Request(indexTestJSON))
 
-	req, _ := http.NewRequest(http.MethodGet, "/test?this=that&id=1234", nil)
+	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/test?this=that&id=1234", nil)
 	rr := httptest.NewRecorder()
 
 	router.HTTPRouter.ServeHTTP(rr, req)
@@ -93,7 +94,7 @@ func TestRouter_RequestFilterFields(t *testing.T) {
 
 	router.HTTPRouter.GET("/test", router.Request(indexTestJSON))
 
-	req, _ := http.NewRequest(http.MethodGet, "/test?password=1234", nil)
+	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/test?password=1234", nil)
 	rr := httptest.NewRecorder()
 
 	router.HTTPRouter.ServeHTTP(rr, req)
@@ -111,7 +112,7 @@ func TestRouter_RequestSkipPath(t *testing.T) {
 
 	router.HTTPRouter.GET("/health", router.Request(indexTestJSON))
 
-	req, _ := http.NewRequest(http.MethodGet, "/health", nil)
+	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/health", nil)
 	rr := httptest.NewRecorder()
 
 	router.HTTPRouter.ServeHTTP(rr, req)
@@ -128,7 +129,7 @@ func TestRouter_RequestNoLogging(t *testing.T) {
 
 	router.HTTPRouter.GET("/test", router.RequestNoLogging(indexTestJSON))
 
-	req, _ := http.NewRequest(http.MethodGet, "/test?this=that&id=1234", nil)
+	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/test?this=that&id=1234", nil)
 	rr := httptest.NewRecorder()
 
 	router.HTTPRouter.ServeHTTP(rr, req)
@@ -157,6 +158,11 @@ func TestReturnJSONEncode(t *testing.T) {
 
 	// Get the result
 	resp := w.Result()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
+
+	// read body
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		t.Fatal("got an error", err.Error())
@@ -194,6 +200,9 @@ func TestReturnResponse(t *testing.T) {
 
 	// Get the result
 	resp := w.Result()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		t.Fatal("got an error", err.Error())
@@ -231,6 +240,9 @@ func TestReturnResponse_WithJSON(t *testing.T) {
 
 	// Get the result
 	resp := w.Result()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		t.Fatal("got an error", err.Error())
@@ -293,6 +305,9 @@ func TestRouter_SetCrossOriginHeaders(t *testing.T) {
 
 	// Get the result
 	resp := w.Result()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	if _, err := ioutil.ReadAll(resp.Body); err != nil {
 		t.Fatal("got an error", err.Error())
 	}
@@ -344,6 +359,9 @@ func TestRouter_SetCrossOriginHeaders_Disabled(t *testing.T) {
 
 	// Get the result
 	resp := w.Result()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	if _, err := ioutil.ReadAll(resp.Body); err != nil {
 		t.Fatal("got an error", err.Error())
 	}
@@ -378,6 +396,9 @@ func TestRouter_SetCrossOriginHeaders_CustomOrigin(t *testing.T) {
 
 	// Get the result
 	resp := w.Result()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	if _, err := ioutil.ReadAll(resp.Body); err != nil {
 		t.Fatal("got an error", err.Error())
 	}
@@ -391,7 +412,7 @@ func TestPanic(t *testing.T) {
 
 	router.HTTPRouter.GET("/test", router.Request(indexTestPanic))
 
-	req, _ := http.NewRequest(http.MethodGet, "/test?this=that&id=1234", nil)
+	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/test?this=that&id=1234", nil)
 	rr := httptest.NewRecorder()
 
 	router.HTTPRouter.ServeHTTP(rr, req)
