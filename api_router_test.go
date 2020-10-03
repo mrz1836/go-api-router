@@ -74,10 +74,32 @@ func TestRouter_Request(t *testing.T) {
 	t.Parallel()
 
 	router := New()
+	router.AccessControlExposeHeaders = "Authorization"
+	router.CrossOriginAllowCredentials = true
 
 	router.HTTPRouter.GET("/test", router.Request(indexTestJSON))
 
 	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/test?this=that&id=1234", nil)
+	rr := httptest.NewRecorder()
+
+	router.HTTPRouter.ServeHTTP(rr, req)
+	if status := rr.Code; status != http.StatusCreated {
+		t.Errorf("Wrong status %d", status)
+	}
+}
+
+// TestRouter_RequestOptions tests a basic request
+func TestRouter_RequestOptions(t *testing.T) {
+	t.Parallel()
+
+	router := New()
+	router.AccessControlExposeHeaders = "Authorization"
+	router.CrossOriginAllowCredentials = true
+	router.CrossOriginAllowOriginAll = true
+
+	router.HTTPRouter.OPTIONS("/test", router.Request(indexTestJSON))
+
+	req, _ := http.NewRequestWithContext(context.Background(), http.MethodOptions, "/test?this=that&id=1234", nil)
 	rr := httptest.NewRecorder()
 
 	router.HTTPRouter.ServeHTTP(rr, req)
