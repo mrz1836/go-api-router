@@ -1,6 +1,7 @@
 package apirouter
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -65,6 +66,51 @@ func BenchmarkErrorFromResponse(b *testing.B) {
 	w := setupTest()
 	for i := 0; i < b.N; i++ {
 		_ = ErrorFromResponse(w, "internal message", "public message", ErrCodeUnknown, StatusCodeUnknown, `{"something":"else"}`)
+	}
+}
+
+// TestErrorFromRequest test the creation of an error ErrorFromRequest()
+func TestErrorFromRequest(t *testing.T) {
+	t.Parallel()
+
+	// w := setupTest()
+
+	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "", nil)
+
+	err := ErrorFromRequest(req, "internal message", "public message", ErrCodeUnknown, StatusCodeUnknown, `{"something":"else"}`)
+
+	if err.InternalMessage != "internal message" {
+		t.Fatalf("value expected %s, value received: %s", "internal message", err.InternalMessage)
+	}
+
+	if err.PublicMessage != "public message" {
+		t.Fatalf("value expected %s, value received: %s", "public message", err.PublicMessage)
+	}
+
+	if err.Code != ErrCodeUnknown {
+		t.Fatalf("value expected %d, value received: %d", ErrCodeUnknown, err.Code)
+	}
+
+	if err.StatusCode != StatusCodeUnknown {
+		t.Fatalf("value expected %d, value received: %d", StatusCodeUnknown, err.Code)
+	}
+
+	if err.Data != `{"something":"else"}` {
+		t.Fatalf("value expected %s, value received: %s", `{"something":"else"}`, err.Data)
+	}
+
+	// Test error code cases
+	err = ErrorFromRequest(req, "internal message", "public message", ErrCodeUnknown, http.StatusNotFound, `{"something":"else"}`)
+	if err == nil {
+		t.Fatalf("expected error to be returned")
+	}
+	err = ErrorFromRequest(req, "internal message", "public message", ErrCodeUnknown, http.StatusBadRequest, `{"something":"else"}`)
+	if err == nil {
+		t.Fatalf("expected error to be returned")
+	}
+	err = ErrorFromRequest(req, "internal message", "public message", ErrCodeUnknown, http.StatusUnauthorized, `{"something":"else"}`)
+	if err == nil {
+		t.Fatalf("expected error to be returned")
 	}
 }
 
