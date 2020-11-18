@@ -10,8 +10,8 @@ github.com/julienschmidt/httprouter v1.3.0 h1:U0609e9tgbseu3rBINet9P48AI/D3oJs4d
 github.com/julienschmidt/httprouter v1.3.0/go.mod h1:JR6WtHb+2LUe8TCKY3cZOxFyyO8IZAc4RVcycCCAKdM=
 github.com/matryer/respond v1.0.1 h1:RSG07jdn32pH46t4UO1TnpnKlR/ayIpEa4aiK2f9k1U=
 github.com/matryer/respond v1.0.1/go.mod h1:XHpqRsK4LZQgk6twGA/CrtxNBaayoYiKUqj0Mjkj3Hg=
-github.com/mrz1836/go-logger v0.2.3 h1:QWTrmOw5LTGiciiN7M+fQ4ljjpOz11SNl2IOTEDFV6g=
-github.com/mrz1836/go-logger v0.2.3/go.mod h1:sOcErN+MhKJ4McAsToubFoyDgdoKN6hbMqzO9t/CkeI=
+github.com/mrz1836/go-logger v0.2.4 h1:2YZ7toHbnTiYuC7n303akMI1x27yncuEdvTxmFbxuxI=
+github.com/mrz1836/go-logger v0.2.4/go.mod h1:sOcErN+MhKJ4McAsToubFoyDgdoKN6hbMqzO9t/CkeI=
 github.com/mrz1836/go-parameters v0.2.4 h1:N4z/EVIDMyCuPQY5rO5HmBNdPIhYcYF4euzJ5JSKcmQ=
 github.com/mrz1836/go-parameters v0.2.4/go.mod h1:QoSVq4soDM9buJONKlAT8y9UOZYglgUY3awAa6VxaD8=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
