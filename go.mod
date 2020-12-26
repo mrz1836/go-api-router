@@ -8,6 +8,5 @@ require (
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/matryer/respond v1.0.1
 	github.com/mrz1836/go-logger v0.2.4
-	github.com/mrz1836/go-parameters v0.2.4
-	github.com/ugorji/go v1.2.1 // indirect
+	github.com/mrz1836/go-parameters v0.2.5
 )
