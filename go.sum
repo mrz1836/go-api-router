@@ -10,15 +10,13 @@ github.com/julienschmidt/httprouter v1.3.0 h1:U0609e9tgbseu3rBINet9P48AI/D3oJs4d
 github.com/julienschmidt/httprouter v1.3.0/go.mod h1:JR6WtHb+2LUe8TCKY3cZOxFyyO8IZAc4RVcycCCAKdM=
 github.com/matryer/respond v1.0.1 h1:RSG07jdn32pH46t4UO1TnpnKlR/ayIpEa4aiK2f9k1U=
 github.com/matryer/respond v1.0.1/go.mod h1:XHpqRsK4LZQgk6twGA/CrtxNBaayoYiKUqj0Mjkj3Hg=
-github.com/mrz1836/go-logger v0.2.4 h1:2YZ7toHbnTiYuC7n303akMI1x27yncuEdvTxmFbxuxI=
-github.com/mrz1836/go-logger v0.2.4/go.mod h1:sOcErN+MhKJ4McAsToubFoyDgdoKN6hbMqzO9t/CkeI=
+github.com/mrz1836/go-logger v0.2.5 h1:n4yQKHalut4MYoZsk9pXVf7bIcW9J/vdl9zYJAE67ts=
+github.com/mrz1836/go-logger v0.2.5/go.mod h1:E4gFkyzOlEb2MmaLaTYO0KUKKcsXB1KeMPhcJIGD5F4=
 github.com/mrz1836/go-parameters v0.2.6 h1:wjE2FoUeGJuW4JZefazYodSHveGXiexF6L9HW4U2q9I=
 github.com/mrz1836/go-parameters v0.2.6/go.mod h1:iHi+8X1XrYDQ26UttaYArpV8YXit+HR7n0VQoB98xFE=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
-github.com/stretchr/testify v1.6.1 h1:hDPOHmpOpP40lSULcqw7IrRb/u7w6RpDC9399XyoNd0=
-github.com/stretchr/testify v1.6.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/stretchr/testify v1.7.0 h1:nwc3DEeHmmLAfoZucVR881uASk0Mfjw8xYJ99tb5CcY=
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/ugorji/go v1.2.3 h1:WbFSXLxDFKVN69Sk8t+XHGzVCD7R8UoAATR8NqZgTbk=
