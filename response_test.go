@@ -10,7 +10,7 @@ import (
 func TestJsonEncode(t *testing.T) {
 	t.Parallel()
 
-	// Setup a mock struct for testing
+	// Set up a mock struct for testing
 	type TestStruct struct {
 		TestKey    string `json:"test_key"`
 		TestKeyTwo string `json:"test_key_two"`
@@ -56,11 +56,11 @@ func TestJsonEncode(t *testing.T) {
 func TestJsonEncodeSubstruct(t *testing.T) {
 	t.Parallel()
 
-	// Setup a new mock substruct
+	// Set up a new mock substruct
 	type TestSubStruct struct {
 		TestSubKey string `json:"test_sub_key"`
 	}
-	// Setup a mock struct for testing
+	// Set up a mock struct for testing
 	type TestStruct struct {
 		TestKey    string        `json:"test_key"`
 		TestKeyTwo TestSubStruct `json:"test_key_two"`

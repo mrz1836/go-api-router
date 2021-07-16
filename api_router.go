@@ -24,6 +24,7 @@ const (
 	allowMethodsHeader     string = "Access-Control-Allow-Methods"
 	allowOriginHeader      string = "Access-Control-Allow-Origin"
 	authenticateHeader     string = "WWW-Authenticate"
+	connectionHeader       string = "Connection"
 	contentTypeHeader      string = "Content-Type"
 	defaultHeaders         string = "Accept, Content-Type, Content-Length, Cache-Control, Pragma, Accept-Encoding, X-CSRF-Token, Authorization, X-Auth-Cookie"
 	defaultMethods         string = "POST, GET, OPTIONS, PUT, DELETE, HEAD"
@@ -70,8 +71,6 @@ var (
 type paramRequestKey string
 
 // Router is the configuration for the middleware service
-//
-// DO NOT CHANGE ORDER - Optimized for memory (maligned)
 type Router struct {
 	FilterFields                []string           `json:"filter_fields" url:"filter_fields"`                                   // Filter out protected fields from logging
 	SkipLoggingPaths            []string           `json:"skip_logging_paths" url:"skip_logging_paths"`                         // Skip logging on these paths (IE: /health)
@@ -188,7 +187,7 @@ func (r *Router) Request(h httprouter.Handle) httprouter.Handle {
 		req = SetOnRequest(req, ipAddressKey, writer.IPAddress)
 		req = SetOnRequest(req, requestIDKey, writer.RequestID)
 
-		// Set cross origin on each request that goes through logging
+		// Set cross-origin on each request that goes through logging
 		r.SetCrossOriginHeaders(writer, req, ps)
 
 		// Set access control headers
@@ -258,7 +257,7 @@ func (r *Router) RequestNoLogging(h httprouter.Handle) httprouter.Handle {
 		req = SetOnRequest(req, ipAddressKey, writer.IPAddress)
 		req = SetOnRequest(req, requestIDKey, writer.RequestID)
 
-		// Set cross origin on each request that goes through logging
+		// Set cross-origin on each request that goes through logging
 		r.SetCrossOriginHeaders(writer, req, ps)
 
 		// Set access control headers

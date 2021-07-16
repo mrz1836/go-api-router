@@ -215,10 +215,7 @@ func TestSetUserData(t *testing.T) {
 
 	req = SetCustomData(req, testFakeUserData)
 
-	data, ok := GetCustomData(req)
-	if !ok {
-		t.Fatal("failed to get user data", data, ok)
-	}
+	data := GetCustomData(req)
 	newData := data.(*TestThis)
 	if newData.FieldTwo != testFakeUserData.FieldTwo {
 		t.Fatal("failed get the correct data", newData.FieldTwo, testFakeUserData.FieldTwo)
@@ -242,10 +239,8 @@ func TestGetUserData(t *testing.T) {
 
 	req = SetCustomData(req, testFakeUserData)
 
-	data, ok := GetCustomData(req)
-	if !ok {
-		t.Fatal("failed to get user data", data, ok)
-	}
+	data := GetCustomData(req)
+
 	newData := data.(*TestThis)
 	if newData.FieldName != testFakeUserData.FieldName {
 		t.Fatal("failed get the correct data", newData.FieldName, testFakeUserData.FieldName)

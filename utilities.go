@@ -172,8 +172,8 @@ func SetCustomData(req *http.Request, data interface{}) *http.Request {
 }
 
 // GetCustomData gets the stored custom data
-func GetCustomData(req *http.Request) (data interface{}, ok bool) {
-	data, ok = req.Context().Value(customDataKey).(interface{})
+func GetCustomData(req *http.Request) (data interface{}) {
+	data = req.Context().Value(customDataKey)
 	return
 }
 
