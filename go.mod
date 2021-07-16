@@ -9,4 +9,5 @@ require (
 	github.com/matryer/respond v1.0.1
 	github.com/mrz1836/go-logger v0.2.5
 	github.com/mrz1836/go-parameters v0.2.7
+	github.com/ugorji/go v1.2.6 // indirect
 )
