@@ -19,12 +19,12 @@ import (
 
 // Headers for CORs and Authentication
 const (
+	// connectionHeader       string = "Connection"
 	allowCredentialsHeader string = "Access-Control-Allow-Credentials"
 	allowHeadersHeader     string = "Access-Control-Allow-Headers"
 	allowMethodsHeader     string = "Access-Control-Allow-Methods"
 	allowOriginHeader      string = "Access-Control-Allow-Origin"
 	authenticateHeader     string = "WWW-Authenticate"
-	connectionHeader       string = "Connection"
 	contentTypeHeader      string = "Content-Type"
 	defaultHeaders         string = "Accept, Content-Type, Content-Length, Cache-Control, Pragma, Accept-Encoding, X-CSRF-Token, Authorization, X-Auth-Cookie"
 	defaultMethods         string = "POST, GET, OPTIONS, PUT, DELETE, HEAD"
