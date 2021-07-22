@@ -15,7 +15,7 @@ type AllowedKeys map[string]interface{}
 
 // ReturnResponse helps return a status code and message to the end user
 func ReturnResponse(w http.ResponseWriter, req *http.Request, code int, data interface{}) {
-	w.Header().Set(connectionHeader, "close")
+	// w.Header().Set(connectionHeader, "close")
 	respond.With(w, req, code, data)
 }
 
@@ -26,7 +26,7 @@ func ReturnJSONEncode(w http.ResponseWriter, code int, e *json.Encoder, objects 
 	w.Header().Set(contentTypeHeader, "application/json")
 
 	// Close the connection
-	w.Header().Set(connectionHeader, "close")
+	// w.Header().Set(connectionHeader, "close")
 
 	// Set the header status code
 	w.WriteHeader(code)
