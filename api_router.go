@@ -15,8 +15,8 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/mrz1836/go-logger"
 	"github.com/mrz1836/go-parameters"
-	newrelic "github.com/newrelic/go-agent"
-	"github.com/newrelic/go-agent/_integrations/nrhttprouter"
+	"github.com/newrelic/go-agent/v3/integrations/nrhttprouter"
+	"github.com/newrelic/go-agent/v3/newrelic"
 )
 
 // Headers for CORs and Authentication
@@ -88,7 +88,7 @@ type Router struct {
 }
 
 // NewWithNewRelic returns a router middleware configuration with NewRelic enabled
-func NewWithNewRelic(app newrelic.Application) (r *Router) {
+func NewWithNewRelic(app *newrelic.Application) (r *Router) {
 
 	// Start with the default router
 	r = defaultRouter()

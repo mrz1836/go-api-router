@@ -13,7 +13,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/mrz1836/go-logger"
-	newrelic "github.com/newrelic/go-agent"
+	"github.com/newrelic/go-agent/v3/newrelic"
 )
 
 // testStruct is for testing restricted fields
@@ -94,8 +94,10 @@ func TestRouter_Request(t *testing.T) {
 func TestNewWithNewRelic(t *testing.T) {
 	t.Parallel()
 
-	cfg := newrelic.NewConfig("httprouter-test-app", os.Getenv("NEW_RELIC_LICENSE_KEY"))
-	app, _ := newrelic.NewApplication(cfg)
+	app, _ := newrelic.NewApplication(
+		newrelic.ConfigAppName(""),
+		newrelic.ConfigLicense(os.Getenv("NEW_RELIC_LICENSE_KEY")),
+	)
 
 	router := NewWithNewRelic(app)
 
