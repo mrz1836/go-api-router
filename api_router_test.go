@@ -7,11 +7,13 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"strings"
 	"testing"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/mrz1836/go-logger"
+	newrelic "github.com/newrelic/go-agent"
 )
 
 // testStruct is for testing restricted fields
@@ -74,6 +76,29 @@ func TestRouter_Request(t *testing.T) {
 	t.Parallel()
 
 	router := New()
+	router.AccessControlExposeHeaders = "Authorization"
+	router.CrossOriginAllowCredentials = true
+
+	router.HTTPRouter.GET("/test", router.Request(indexTestJSON))
+
+	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/test?this=that&id=1234", nil)
+	rr := httptest.NewRecorder()
+
+	router.HTTPRouter.ServeHTTP(rr, req)
+	if status := rr.Code; status != http.StatusCreated {
+		t.Errorf("Wrong status %d", status)
+	}
+}
+
+// TestNewWithNewRelic tests creating a router with NewRelic
+func TestNewWithNewRelic(t *testing.T) {
+	t.Parallel()
+
+	cfg := newrelic.NewConfig("httprouter-test-app", os.Getenv("NEW_RELIC_LICENSE_KEY"))
+	app, _ := newrelic.NewApplication(cfg)
+
+	router := NewWithNewRelic(app)
+
 	router.AccessControlExposeHeaders = "Authorization"
 	router.CrossOriginAllowCredentials = true
 

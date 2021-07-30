@@ -40,9 +40,10 @@ View the generated [documentation](https://pkg.go.dev/github.com/mrz1836/go-api-
 
 ### Features
 - Uses the fastest router: Julien Schmidt's [httprouter](https://github.com/julienschmidt/httprouter)
-- Uses gofrs [uuid](https://github.com/gofrs/uuid) package to guarantee unique request ids
+- Uses gofr's [uuid](https://github.com/gofrs/uuid) package to guarantee unique request ids
 - Uses MrZ's [go-logger](https://github.com/mrz1836/go-logger) for either local or remote logging via [Log Entries (Rapid7)](https://www.rapid7.com/products/insightops/)
 - Uses MrZ's [go-parameters](https://github.com/mrz1836/go-parameters) for parsing any type of incoming parameter with ease
+- Optional: [NewRelic](https://docs.newrelic.com/docs/agents/go-agent/get-started/go-agent-compatibility-requirements/) support!
 - Added basic middleware support from Rileyr's [middleware](https://github.com/rileyr/middleware)
 - Added additional CORS functionality
 - Standardized error responses for API requests
@@ -61,6 +62,7 @@ View the generated [documentation](https://pkg.go.dev/github.com/mrz1836/go-api-
 - Rileyr's [middleware](https://github.com/rileyr/middleware) package
 - gofrs [uuid](https://github.com/gofrs/uuid) package
 - MrZ's [go-logger](https://github.com/mrz1836/go-logger) and [go-parameters](https://github.com/mrz1836/go-parameters) package
+- NewRelic's [go-agent](https://github.com/newrelic/go-agent)
 </details>
 
 <details>

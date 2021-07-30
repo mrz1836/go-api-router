@@ -3,6 +3,7 @@ package apirouter
 import (
 	"context"
 	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/mrz1836/go-parameters"
@@ -247,4 +248,28 @@ func TestGetUserData(t *testing.T) {
 	}
 }
 
-// todo: add test for NoCache()
+// TestNoCache test using the NoCache on a request
+func TestNoCache(t *testing.T) {
+	t.Parallel()
+
+	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/test?this=that&id=1234", nil)
+	w := httptest.NewRecorder()
+
+	for _, v := range etagHeaders {
+		req.Header.Set(v, "something")
+	}
+
+	NoCache(w, req)
+
+	for _, v := range etagHeaders {
+		if req.Header.Get(v) != "" {
+			t.Fatal("header should be removed", v)
+		}
+	}
+	for key := range noCacheHeaders {
+		if w.Header().Get(key) == "" {
+			t.Fatal("header should have been added", key)
+		}
+	}
+
+}

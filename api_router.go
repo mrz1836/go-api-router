@@ -15,6 +15,8 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/mrz1836/go-logger"
 	"github.com/mrz1836/go-parameters"
+	newrelic "github.com/newrelic/go-agent"
+	"github.com/newrelic/go-agent/_integrations/nrhttprouter"
 )
 
 // Headers for CORs and Authentication
@@ -64,6 +66,7 @@ var (
 		"password_confirmation",
 		"social_security_number",
 		"ssn",
+		"token",
 	}
 )
 
@@ -72,52 +75,66 @@ type paramRequestKey string
 
 // Router is the configuration for the middleware service
 type Router struct {
-	FilterFields                []string           `json:"filter_fields" url:"filter_fields"`                                   // Filter out protected fields from logging
-	SkipLoggingPaths            []string           `json:"skip_logging_paths" url:"skip_logging_paths"`                         // Skip logging on these paths (IE: /health)
-	AccessControlExposeHeaders  string             `json:"access_control_expose_headers" url:"access_control_expose_headers"`   // Allow specific headers for cors
-	CrossOriginAllowHeaders     string             `json:"cross_origin_allow_headers" url:"cross_origin_allow_headers"`         // Allowed headers
-	CrossOriginAllowMethods     string             `json:"cross_origin_allow_methods" url:"cross_origin_allow_methods"`         // Allowed methods
-	CrossOriginAllowOrigin      string             `json:"cross_origin_allow_origin" url:"cross_origin_allow_origin"`           // Custom value for allow origin
-	HTTPRouter                  *httprouter.Router `json:"-" url:"-"`                                                           // J Schmidt's httprouter
-	CrossOriginAllowCredentials bool               `json:"cross_origin_allow_credentials" url:"cross_origin_allow_credentials"` // Allow credentials for BasicAuth()
-	CrossOriginAllowOriginAll   bool               `json:"cross_origin_allow_origin_all" url:"cross_origin_allow_origin_all"`   // Allow all origins
-	CrossOriginEnabled          bool               `json:"cross_origin_enabled" url:"cross_origin_enabled"`                     // Enable or Disable CrossOrigin
+	FilterFields                []string             `json:"filter_fields" url:"filter_fields"`                                   // Filter out protected fields from logging
+	SkipLoggingPaths            []string             `json:"skip_logging_paths" url:"skip_logging_paths"`                         // Skip logging on these paths (IE: /health)
+	AccessControlExposeHeaders  string               `json:"access_control_expose_headers" url:"access_control_expose_headers"`   // Allow specific headers for cors
+	CrossOriginAllowHeaders     string               `json:"cross_origin_allow_headers" url:"cross_origin_allow_headers"`         // Allowed headers
+	CrossOriginAllowMethods     string               `json:"cross_origin_allow_methods" url:"cross_origin_allow_methods"`         // Allowed methods
+	CrossOriginAllowOrigin      string               `json:"cross_origin_allow_origin" url:"cross_origin_allow_origin"`           // Custom value for allow origin
+	HTTPRouter                  *nrhttprouter.Router `json:"-" url:"-"`                                                           // NewRelic wrapper for J Schmidt's httprouter
+	CrossOriginAllowCredentials bool                 `json:"cross_origin_allow_credentials" url:"cross_origin_allow_credentials"` // Allow credentials for BasicAuth()
+	CrossOriginAllowOriginAll   bool                 `json:"cross_origin_allow_origin_all" url:"cross_origin_allow_origin_all"`   // Allow all origins
+	CrossOriginEnabled          bool                 `json:"cross_origin_enabled" url:"cross_origin_enabled"`                     // Enable or Disable CrossOrigin
 }
 
-// New returns a router middleware configuration to use for all future requests
-func New() *Router {
+// NewWithNewRelic returns a router middleware configuration with NewRelic enabled
+func NewWithNewRelic(app newrelic.Application) (r *Router) {
+
+	// Start with the default router
+	r = defaultRouter()
+
+	// Enrich the router with the NewRelic integration
+	r.HTTPRouter = nrhttprouter.New(app)
+
+	return
+}
+
+// defaultRouter is the default settings of the Router/Config
+func defaultRouter() (r *Router) {
 
 	// Create new configuration
-	config := new(Router)
+	r = new(Router)
 
 	// Default is cross_origin = enabled
-	config.CrossOriginEnabled = true
+	r.CrossOriginEnabled = true
 
 	// Default is to allow credentials for BasicAuth()
-	config.CrossOriginAllowCredentials = true
+	r.CrossOriginAllowCredentials = true
 
 	// Default is to allow all (easier to get started)
-	config.CrossOriginAllowOriginAll = true
+	r.CrossOriginAllowOriginAll = true
 
 	// Default is defaultHeaders
-	config.CrossOriginAllowHeaders = defaultHeaders
+	r.CrossOriginAllowHeaders = defaultHeaders
 
 	// Default is for the common request methods
-	config.CrossOriginAllowMethods = defaultMethods
+	r.CrossOriginAllowMethods = defaultMethods
 
-	// Create the router
-	config.HTTPRouter = new(httprouter.Router)
+	// Create the router (default does NOT have a NewRelic application)
+	// r.HTTPRouter = new(httprouter.Router)
+	r.HTTPRouter = nrhttprouter.New(nil)
+	// r.HTTPRouter.Router = new(httprouter.Router)
 
 	// Turn on trailing slash redirect
-	config.HTTPRouter.RedirectTrailingSlash = true
-	config.HTTPRouter.RedirectFixedPath = true
+	r.HTTPRouter.RedirectTrailingSlash = true
+	r.HTTPRouter.RedirectFixedPath = true
 
 	// Turn on default CORs options handler
-	config.HTTPRouter.HandleOPTIONS = true
-	config.HTTPRouter.GlobalOPTIONS = http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+	r.HTTPRouter.HandleOPTIONS = true
+	r.HTTPRouter.GlobalOPTIONS = http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 
 		// Turned cross_origin off?
-		if !config.CrossOriginEnabled {
+		if !r.CrossOriginEnabled {
 			return
 		}
 
@@ -125,7 +142,7 @@ func New() *Router {
 		header := w.Header()
 
 		// On for all origins?
-		if config.CrossOriginAllowOriginAll {
+		if r.CrossOriginAllowOriginAll {
 
 			// Normal requests use the Origin header
 			originDomain := req.Header.Get(origin)
@@ -140,27 +157,31 @@ func New() *Router {
 			header.Set(allowOriginHeader, originDomain)
 			header.Set(varyHeaderString, origin)
 		} else { // Only the origin set by config
-			header.Set(allowOriginHeader, config.CrossOriginAllowOrigin)
+			header.Set(allowOriginHeader, r.CrossOriginAllowOrigin)
 		}
 
 		// Allow credentials (used for BasicAuth)
-		if config.CrossOriginAllowCredentials {
+		if r.CrossOriginAllowCredentials {
 			header.Set(allowCredentialsHeader, "true")
 		}
 
 		// Set access control
-		header.Set(allowMethodsHeader, config.CrossOriginAllowMethods)
-		header.Set(allowHeadersHeader, config.CrossOriginAllowHeaders)
+		header.Set(allowMethodsHeader, r.CrossOriginAllowMethods)
+		header.Set(allowHeadersHeader, r.CrossOriginAllowHeaders)
 
 		// Adjust status code to 204
 		w.WriteHeader(http.StatusNoContent)
 	})
 
 	// Set the filter fields to default
-	config.FilterFields = defaultFilterFields
+	r.FilterFields = defaultFilterFields
 
-	// return the default configuration
-	return config
+	return
+}
+
+// New returns a router middleware configuration to use for all future requests
+func New() *Router {
+	return defaultRouter()
 }
 
 // Request will write the request to the logs before and after calling the handler
@@ -241,7 +262,6 @@ func (r *Router) RequestNoLogging(h httprouter.Handle) httprouter.Handle {
 	return parameters.MakeHTTPRouterParsedReq(func(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 
 		// Start the custom response writer
-		// var writer *APIResponseWriter
 		guid, _ := uuid.NewV4()
 		writer := &APIResponseWriter{
 			IPAddress:      GetClientIPAddress(req),
