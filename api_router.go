@@ -88,19 +88,12 @@ type Router struct {
 }
 
 // NewWithNewRelic returns a router middleware configuration with NewRelic enabled
-func NewWithNewRelic(app *newrelic.Application) (r *Router) {
-
-	// Start with the default router
-	r = defaultRouter()
-
-	// Enrich the router with the NewRelic integration
-	r.HTTPRouter = nrhttprouter.New(app)
-
-	return
+func NewWithNewRelic(app *newrelic.Application) *Router {
+	return defaultRouter(app)
 }
 
 // defaultRouter is the default settings of the Router/Config
-func defaultRouter() (r *Router) {
+func defaultRouter(app *newrelic.Application) (r *Router) {
 
 	// Create new configuration
 	r = new(Router)
@@ -120,10 +113,20 @@ func defaultRouter() (r *Router) {
 	// Default is for the common request methods
 	r.CrossOriginAllowMethods = defaultMethods
 
-	// Create the router (default does NOT have a NewRelic application)
-	// r.HTTPRouter = new(httprouter.Router)
-	r.HTTPRouter = nrhttprouter.New(nil)
-	// r.HTTPRouter.Router = new(httprouter.Router)
+	// Create the router (nil if app is not set)
+	r.HTTPRouter = nrhttprouter.New(app)
+
+	// Set the defaults
+	r.setDefaults()
+
+	// Set the filter fields to default
+	r.FilterFields = defaultFilterFields
+
+	return
+}
+
+// setDefaults will set the router defaults
+func (r *Router) setDefaults() {
 
 	// Turn on trailing slash redirect
 	r.HTTPRouter.RedirectTrailingSlash = true
@@ -172,16 +175,11 @@ func defaultRouter() (r *Router) {
 		// Adjust status code to 204
 		w.WriteHeader(http.StatusNoContent)
 	})
-
-	// Set the filter fields to default
-	r.FilterFields = defaultFilterFields
-
-	return
 }
 
 // New returns a router middleware configuration to use for all future requests
 func New() *Router {
-	return defaultRouter()
+	return defaultRouter(nil)
 }
 
 // Request will write the request to the logs before and after calling the handler
