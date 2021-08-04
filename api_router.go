@@ -75,6 +75,7 @@ type paramRequestKey string
 
 // Router is the configuration for the middleware service
 type Router struct {
+	loadedNewRelic              bool
 	FilterFields                []string             `json:"filter_fields" url:"filter_fields"`                                   // Filter out protected fields from logging
 	SkipLoggingPaths            []string             `json:"skip_logging_paths" url:"skip_logging_paths"`                         // Skip logging on these paths (IE: /health)
 	AccessControlExposeHeaders  string               `json:"access_control_expose_headers" url:"access_control_expose_headers"`   // Allow specific headers for cors
@@ -115,6 +116,7 @@ func defaultRouter(app *newrelic.Application) (r *Router) {
 
 	// Create the router (nil if app is not set)
 	r.HTTPRouter = nrhttprouter.New(app)
+	r.loadedNewRelic = app != nil
 
 	// Set the defaults
 	r.setDefaults()
@@ -143,6 +145,12 @@ func (r *Router) setDefaults() {
 
 		// Set the header
 		header := w.Header()
+
+		// If we're using NewRelic - ignore options requests (default)
+		if r.loadedNewRelic {
+			txn := newrelic.FromContext(req.Context())
+			txn.Ignore()
+		}
 
 		// On for all origins?
 		if r.CrossOriginAllowOriginAll {
