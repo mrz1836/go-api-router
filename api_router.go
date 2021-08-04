@@ -138,8 +138,47 @@ func (r *Router) setDefaults() {
 	r.HTTPRouter.HandleOPTIONS = true
 	r.HTTPRouter.GlobalOPTIONS = http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 
-		// Use the default
-		r.defaultCrossOriginHeaders(w, req)
+		// Turned cross_origin off?
+		if !r.CrossOriginEnabled {
+			return
+		}
+
+		// Set the header
+		header := w.Header()
+
+		// If we're using NewRelic - ignore options requests (default)
+		if r.loadedNewRelic {
+			txn := newrelic.FromContext(req.Context())
+			txn.Ignore()
+		}
+
+		// On for all origins?
+		if r.CrossOriginAllowOriginAll {
+
+			// Normal requests use the Origin header
+			originDomain := req.Header.Get(origin)
+			if len(originDomain) == 0 {
+
+				// Maybe it's behind a proxy?
+				originDomain = req.Header.Get(forwardedHost)
+				if len(originDomain) > 0 {
+					originDomain = req.Header.Get(forwardedProtocol) + "//" + originDomain
+				}
+			}
+			header.Set(allowOriginHeader, originDomain)
+			header.Set(varyHeaderString, origin)
+		} else { // Only the origin set by config
+			header.Set(allowOriginHeader, r.CrossOriginAllowOrigin)
+		}
+
+		// Allow credentials (used for BasicAuth)
+		if r.CrossOriginAllowCredentials {
+			header.Set(allowCredentialsHeader, "true")
+		}
+
+		// Set access control
+		header.Set(allowMethodsHeader, r.CrossOriginAllowMethods)
+		header.Set(allowHeadersHeader, r.CrossOriginAllowHeaders)
 
 		// Adjust status code to 204
 		w.WriteHeader(http.StatusNoContent)
@@ -224,7 +263,7 @@ func (r *Router) Request(h httprouter.Handle) httprouter.Handle {
 }
 
 // RequestNoLogging will just call the handler without any logging
-// Used for API calls that do not require any logging overhead (IE: health)
+// Used for API calls that do not require any logging overhead
 func (r *Router) RequestNoLogging(h httprouter.Handle) httprouter.Handle {
 	return parameters.MakeHTTPRouterParsedReq(func(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 
@@ -276,8 +315,9 @@ func (r *Router) BasicAuth(h httprouter.Handle, requiredUser, requiredPassword s
 	}
 }
 
-// defaultCrossOriginHeaders sets the default headers for Options
-func (r *Router) defaultCrossOriginHeaders(w http.ResponseWriter, req *http.Request) {
+// SetCrossOriginHeaders sets the cross-origin headers if enabled
+// todo: combine this method and the GlobalOPTIONS  http.HandlerFunc() method (@mrz had an issue combining)
+func (r *Router) SetCrossOriginHeaders(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 
 	// Turned cross_origin off?
 	if !r.CrossOriginEnabled {
@@ -286,12 +326,6 @@ func (r *Router) defaultCrossOriginHeaders(w http.ResponseWriter, req *http.Requ
 
 	// Set the header
 	header := w.Header()
-
-	// If we're using NewRelic - ignore options requests (default)
-	if r.loadedNewRelic {
-		txn := newrelic.FromContext(req.Context())
-		txn.Ignore()
-	}
 
 	// On for all origins?
 	if r.CrossOriginAllowOriginAll {
@@ -320,13 +354,6 @@ func (r *Router) defaultCrossOriginHeaders(w http.ResponseWriter, req *http.Requ
 	// Set access control
 	header.Set(allowMethodsHeader, r.CrossOriginAllowMethods)
 	header.Set(allowHeadersHeader, r.CrossOriginAllowHeaders)
-}
-
-// SetCrossOriginHeaders sets the cross-origin headers if enabled
-func (r *Router) SetCrossOriginHeaders(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-
-	// Use the defaults
-	r.defaultCrossOriginHeaders(w, req)
 
 	// Adjust status code to 204 (Leaving this out, allowing customized response)
 	// w.WriteHeader(http.StatusNoContent)
