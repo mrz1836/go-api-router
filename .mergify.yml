@@ -52,11 +52,11 @@ pull_request_rules:
       comment:
         message: "[🆘] @{{author}}: unable to merge due to CI failure."
   - name: auto-assign author
-      conditions:
-        - "#assignee=0"
-      actions:
-        assign:
-          users: [ "{{author}}" ]
+    conditions:
+      - "#assignee=0"
+    actions:
+      assign:
+        users: [ "{{author}}" ]
 
   # ===============================================================================
   # LABELS
