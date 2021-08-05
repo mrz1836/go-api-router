@@ -148,6 +148,20 @@ pull_request_rules:
           We're delighted to have you onboard 💘
 
   # ===============================================================================
+  # STALE BRANCHES
+  # ===============================================================================
+
+  - name: Close stale pull request
+    conditions:
+      - base=master
+      - -closed
+      - updated-at<21 days ago
+    actions:
+      close:
+        message: |
+          This pull request looks stale. Feel free to reopen it if you think it's a mistake.
+
+  # ===============================================================================
   # BRANCHES
   # ===============================================================================
 
@@ -168,6 +182,7 @@ pull_request_rules:
   # ===============================================================================
   # CONVENTION
   # ===============================================================================
+  # https://www.conventionalcommits.org/en/v1.0.0/
 
   - name: Conventional Commit
     conditions:
