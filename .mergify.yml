@@ -1,4 +1,9 @@
 pull_request_rules:
+
+  # ===============================================================================
+  # DEPENDABOT
+  # ===============================================================================
+
   - name: Automatic Merge for Dependabot Pull Requests
     conditions:
       - author~=^dependabot(|-preview)\[bot\]$
@@ -9,9 +14,114 @@ pull_request_rules:
     actions:
       merge:
         method: merge
+
+  # ===============================================================================
+  # AUTOMATIC MERGE (APPROVALS
+  # ===============================================================================
+
   - name: Automatic merge ⬇️ on approval ✔
     conditions:
       - "#approved-reviews-by>=1"
     actions:
       merge:
         method: merge
+
+  # ===============================================================================
+  # ALERTS
+  # ===============================================================================
+
+  - name: notify on merge
+    conditions:
+      - merged
+      - label=automerge
+    actions:
+      comment:
+        message: "[✅] @{{author}}: **{{title}}** has been merged successfully."
+  - name: alert on merge conflict
+    conditions:
+      - conflict
+      - label=automerge
+    actions:
+      comment:
+        message: "[🆘] @{{author}}: `{{head}}` has conflicts with `{{base}}` that must be resolved."
+  - name: alert on tests failure for automerge
+    conditions:
+      - label=automerge
+      - status-failure=commit
+    actions:
+      comment:
+        message: "[🆘] @{{author}}: unable to merge due to CI failure."
+  - name: auto-assign author
+      conditions:
+        - "#assignee=0"
+      actions:
+        assign:
+          users: [ "{{author}}" ]
+
+  # ===============================================================================
+  # LABELS
+  # ===============================================================================
+  # Automatically add labels when PRs match certain patterns
+  #
+  # NOTE:
+  # - single quotes for regex to avoid accidental escapes
+  # - Mergify leverages Python regular expressions to match rules.
+  #
+  # Semantic commit messages
+  # - chore:     updating grunt tasks etc; no production code change
+  # - docs:      changes to the documentation
+  # - feat:      feature or story
+  # - feat:      new feature for the user, not a new feature for build script
+  # - fix:       bug fix for the user, not a fix to a build script
+  # - idea:      general idea or suggestion
+  # - test:      test related changes
+  # ===============================================================================
+
+  - name: hotfix label
+    conditions:
+      - "head~=(?i)^hotfix" # if the PR branch starts with hotfix/
+    actions:
+      label:
+        add: ["hot-fix"]
+  - name: fix label
+    conditions:
+      - "head~=(?i)^(bug)?fix" # if the PR branch starts with (bug)?fix/
+    actions:
+      label:
+        add: [ "bug-P3" ]
+  - name: documentation label
+    conditions:
+      - "head~=(?i)^docs" # if the PR branch starts with docs/
+    actions:
+      label:
+        add: [ "documentation" ]
+  - name: feature label
+    conditions:
+      - "head~=(?i)^feat(ure)?" # if the PR branch starts with feat(ure)?/
+    actions:
+      label:
+        add: ["feature"]
+  - name: chore label
+    conditions:
+      - "head~=(?i)^chore" # if the PR branch starts with feat(ure)?/
+    actions:
+      label:
+        add: ["update"]
+  - name: question label
+    conditions:
+      - "head~=(?i)^question" # if the PR branch starts with question/
+    actions:
+      label:
+        add: ["question"]
+  - name: test label
+    conditions:
+      - "head~=(?i)^test" # if the PR branch starts with test/
+    actions:
+      label:
+        add: ["test"]
+  - name: idea label
+    conditions:
+      - "head~=(?i)^idea" # if the PR branch starts with idea/
+    actions:
+      label:
+        add: ["idea"]
