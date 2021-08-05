@@ -10,6 +10,7 @@ pull_request_rules:
       - check-success='test (1.14.x, ubuntu-latest)'
       - check-success='test (1.15.x, ubuntu-latest)'
       - check-success='test (1.16.x, ubuntu-latest)'
+      - check-success='Analyze (go)'
       - title~=^Bump [^\s]+ from ([\d]+)\..+ to \1\.
     actions:
       merge:
@@ -25,6 +26,17 @@ pull_request_rules:
     actions:
       merge:
         method: merge
+
+  # ===============================================================================
+  # AUTHOR
+  # ===============================================================================
+
+  - name: auto-assign author
+    conditions:
+      - "#assignee=0"
+    actions:
+      assign:
+        users: [ "{{author}}" ]
 
   # ===============================================================================
   # ALERTS
@@ -51,12 +63,6 @@ pull_request_rules:
     actions:
       comment:
         message: "[🆘] @{{author}}: unable to merge due to CI failure."
-  - name: auto-assign author
-    conditions:
-      - "#assignee=0"
-    actions:
-      assign:
-        users: [ "{{author}}" ]
 
   # ===============================================================================
   # LABELS
@@ -103,7 +109,7 @@ pull_request_rules:
         add: ["feature"]
   - name: chore label
     conditions:
-      - "head~=(?i)^chore" # if the PR branch starts with feat(ure)?/
+      - "head~=(?i)^chore" # if the PR branch starts with chore/
     actions:
       label:
         add: ["update"]
