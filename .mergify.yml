@@ -217,5 +217,3 @@ pull_request_rules:
   #        {% if not check_succeed %}
   #        Your pull request title must follow [Conventional Commit](https://www.conventionalcommits.org/en/v1.0.0/).
   #        {% endif %}
-codecov:
-  yml:
