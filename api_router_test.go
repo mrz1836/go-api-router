@@ -81,7 +81,10 @@ func TestRouter_Request(t *testing.T) {
 
 	router.HTTPRouter.GET("/test", router.Request(indexTestJSON))
 
-	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/test?this=that&id=1234", nil)
+	req, _ := http.NewRequestWithContext(
+		context.Background(), http.MethodGet,
+		"/test?this=that&id=1234", strings.NewReader(""),
+	)
 	rr := httptest.NewRecorder()
 
 	router.HTTPRouter.ServeHTTP(rr, req)
@@ -106,7 +109,10 @@ func TestNewWithNewRelic(t *testing.T) {
 
 	router.HTTPRouter.GET("/test", router.Request(indexTestJSON))
 
-	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/test?this=that&id=1234", nil)
+	req, _ := http.NewRequestWithContext(
+		context.Background(), http.MethodGet,
+		"/test?this=that&id=1234", strings.NewReader(""),
+	)
 	rr := httptest.NewRecorder()
 
 	router.HTTPRouter.ServeHTTP(rr, req)
@@ -126,7 +132,10 @@ func TestRouter_RequestOptions(t *testing.T) {
 
 	router.HTTPRouter.OPTIONS("/test", router.Request(indexTestJSON))
 
-	req, _ := http.NewRequestWithContext(context.Background(), http.MethodOptions, "/test?this=that&id=1234", nil)
+	req, _ := http.NewRequestWithContext(
+		context.Background(), http.MethodOptions,
+		"/test?this=that&id=1234", strings.NewReader(""),
+	)
 	rr := httptest.NewRecorder()
 
 	router.HTTPRouter.ServeHTTP(rr, req)
@@ -143,7 +152,10 @@ func TestRouter_RequestFilterFields(t *testing.T) {
 
 	router.HTTPRouter.GET("/test", router.Request(indexTestJSON))
 
-	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/test?password=1234", nil)
+	req, _ := http.NewRequestWithContext(
+		context.Background(), http.MethodGet,
+		"/test?password=1234", strings.NewReader(""),
+	)
 	rr := httptest.NewRecorder()
 
 	router.HTTPRouter.ServeHTTP(rr, req)
@@ -161,7 +173,10 @@ func TestRouter_RequestSkipPath(t *testing.T) {
 
 	router.HTTPRouter.GET("/health", router.Request(indexTestJSON))
 
-	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/health", nil)
+	req, _ := http.NewRequestWithContext(
+		context.Background(), http.MethodGet,
+		"/health", strings.NewReader(""),
+	)
 	rr := httptest.NewRecorder()
 
 	router.HTTPRouter.ServeHTTP(rr, req)
@@ -178,7 +193,10 @@ func TestRouter_RequestNoLogging(t *testing.T) {
 
 	router.HTTPRouter.GET("/test", router.RequestNoLogging(indexTestJSON))
 
-	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/test?this=that&id=1234", nil)
+	req, _ := http.NewRequestWithContext(
+		context.Background(), http.MethodGet,
+		"/test?this=that&id=1234", strings.NewReader(""),
+	)
 	rr := httptest.NewRecorder()
 
 	router.HTTPRouter.ServeHTTP(rr, req)
@@ -193,7 +211,9 @@ func TestReturnJSONEncode(t *testing.T) {
 	t.Parallel()
 
 	// Create new test recorder
-	req := httptest.NewRequest(http.MethodGet, "/test?this=that&id=123", nil)
+	req := httptest.NewRequest(
+		http.MethodGet, "/test?this=that&id=123", strings.NewReader(""),
+	)
 	w := httptest.NewRecorder()
 
 	// Fire the index test
@@ -275,7 +295,7 @@ func TestReturnResponse_WithJSON(t *testing.T) {
 	t.Parallel()
 
 	// Create new test recorder
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequest(http.MethodGet, "/", strings.NewReader(""))
 	w := httptest.NewRecorder()
 
 	// Fire the index test
@@ -314,7 +334,7 @@ func TestRouter_SetCrossOriginHeaders(t *testing.T) {
 	t.Parallel()
 
 	// Create new test recorder
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequest(http.MethodGet, "/", strings.NewReader(""))
 	w := httptest.NewRecorder()
 
 	router := New()
@@ -367,7 +387,7 @@ func TestRouter_SetCrossOriginHeaders_Disabled(t *testing.T) {
 	t.Parallel()
 
 	// Create new test recorder
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequest(http.MethodGet, "/", strings.NewReader(""))
 	w := httptest.NewRecorder()
 
 	router := New()
@@ -421,7 +441,7 @@ func TestRouter_SetCrossOriginHeaders_CustomOrigin(t *testing.T) {
 	t.Parallel()
 
 	// Create new test recorder
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequest(http.MethodGet, "/", strings.NewReader(""))
 	w := httptest.NewRecorder()
 
 	router := New()
@@ -461,7 +481,10 @@ func TestPanic(t *testing.T) {
 
 	router.HTTPRouter.GET("/test", router.Request(indexTestPanic))
 
-	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/test?this=that&id=1234", nil)
+	req, _ := http.NewRequestWithContext(
+		context.Background(), http.MethodGet,
+		"/test?this=that&id=1234", strings.NewReader(""),
+	)
 	rr := httptest.NewRecorder()
 
 	router.HTTPRouter.ServeHTTP(rr, req)

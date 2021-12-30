@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/mrz1836/go-parameters"
@@ -59,9 +60,14 @@ func TestFindString(t *testing.T) {
 func TestGetParams(t *testing.T) {
 	t.Parallel()
 
-	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/test?this=that&id=1234", nil)
+	req, _ := http.NewRequestWithContext(
+		context.Background(), http.MethodGet,
+		"/test?this=that&id=1234", strings.NewReader(""),
+	)
 
-	req = req.WithContext(context.WithValue(req.Context(), parameters.ParamsKeyName, parameters.ParseParams(req)))
+	req = req.WithContext(
+		context.WithValue(req.Context(), parameters.ParamsKeyName, parameters.ParseParams(req)),
+	)
 
 	params := GetParams(req)
 	if params == nil {
@@ -82,7 +88,10 @@ func TestGetParams_BadKey(t *testing.T) {
 	type badParamKey string
 	const BadParamKey badParamKey = "bad_key"
 
-	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/test?this=that&id=1234", nil)
+	req, _ := http.NewRequestWithContext(
+		context.Background(), http.MethodGet,
+		"/test?this=that&id=1234", strings.NewReader(""),
+	)
 
 	req = req.WithContext(context.WithValue(req.Context(), BadParamKey, parameters.ParseParams(req)))
 
@@ -97,7 +106,10 @@ func TestGetParams_BadKey(t *testing.T) {
 func TestPermitParams(t *testing.T) {
 	t.Parallel()
 
-	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/test?this=that&id=1234&private=data", nil)
+	req, _ := http.NewRequestWithContext(
+		context.Background(), http.MethodGet,
+		"/test?this=that&id=1234&private=data", strings.NewReader(""),
+	)
 
 	req = req.WithContext(context.WithValue(req.Context(), parameters.ParamsKeyName, parameters.ParseParams(req)))
 
@@ -122,7 +134,10 @@ func TestGetIPFromRequest(t *testing.T) {
 
 	// Fake storing the ip address
 	testIP := "127.0.0.1"
-	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/test?this=that&id=1234", nil)
+	req, _ := http.NewRequestWithContext(
+		context.Background(), http.MethodGet,
+		"/test?this=that&id=1234", strings.NewReader(""),
+	)
 	req = SetOnRequest(req, ipAddressKey, testIP)
 
 	ip, ok := GetIPFromRequest(req)
@@ -139,7 +154,10 @@ func TestGetRequestID(t *testing.T) {
 
 	// Fake storing the request id
 	testFakeID := "ern8347t88e7zrhg8eh48e7hg8e"
-	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/test?this=that&id=1234", nil)
+	req, _ := http.NewRequestWithContext(
+		context.Background(), http.MethodGet,
+		"/test?this=that&id=1234", strings.NewReader(""),
+	)
 
 	req = SetOnRequest(req, requestIDKey, testFakeID)
 
@@ -155,7 +173,10 @@ func TestGetRequestID(t *testing.T) {
 func TestGetClientIPAddress(t *testing.T) {
 	t.Parallel()
 
-	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/test?this=that&id=1234", nil)
+	req, _ := http.NewRequestWithContext(
+		context.Background(), http.MethodGet, "/test?this=that&id=1234",
+		strings.NewReader(""),
+	)
 
 	ip := GetClientIPAddress(req)
 	if ip != "" {
@@ -169,7 +190,10 @@ func TestSetAuthToken(t *testing.T) {
 
 	// Fake storing the token
 	testFakeToken := "ern8347t88e7zrhg8eh48e7hg8e"
-	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/test?this=that&id=1234", nil)
+	req, _ := http.NewRequestWithContext(
+		context.Background(), http.MethodGet,
+		"/test?this=that&id=1234", strings.NewReader(""),
+	)
 
 	req = SetAuthToken(req, testFakeToken)
 
@@ -187,7 +211,10 @@ func TestGetAuthToken(t *testing.T) {
 
 	// Test getting the token
 	testFakeToken := "ern8347t88e7zrhg8eh48e7hg8e"
-	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/test?this=that&id=1234", nil)
+	req, _ := http.NewRequestWithContext(
+		context.Background(), http.MethodGet,
+		"/test?this=that&id=1234", strings.NewReader(""),
+	)
 
 	req = SetAuthToken(req, testFakeToken)
 
@@ -212,7 +239,10 @@ func TestSetUserData(t *testing.T) {
 	testFakeUserData := new(TestThis)
 	testFakeUserData.FieldName = "this"
 	testFakeUserData.FieldTwo = "that"
-	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/test?this=that&id=1234", nil)
+	req, _ := http.NewRequestWithContext(
+		context.Background(), http.MethodGet,
+		"/test?this=that&id=1234", strings.NewReader(""),
+	)
 
 	req = SetCustomData(req, testFakeUserData)
 
@@ -236,7 +266,10 @@ func TestGetUserData(t *testing.T) {
 	testFakeUserData := new(TestThis)
 	testFakeUserData.FieldName = "this"
 	testFakeUserData.FieldTwo = "that"
-	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/test?this=that&id=1234", nil)
+	req, _ := http.NewRequestWithContext(
+		context.Background(), http.MethodGet,
+		"/test?this=that&id=1234", strings.NewReader(""),
+	)
 
 	req = SetCustomData(req, testFakeUserData)
 
@@ -252,7 +285,10 @@ func TestGetUserData(t *testing.T) {
 func TestNoCache(t *testing.T) {
 	t.Parallel()
 
-	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/test?this=that&id=1234", nil)
+	req, _ := http.NewRequestWithContext(
+		context.Background(), http.MethodGet,
+		"/test?this=that&id=1234", strings.NewReader(""),
+	)
 	w := httptest.NewRecorder()
 
 	for _, v := range etagHeaders {
