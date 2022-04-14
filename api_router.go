@@ -39,10 +39,10 @@ const (
 
 // Log formats for the request
 const (
-	logErrorFormat  string = "request_id=\"%s\" ip_address=\"%s\" type=\"%s\" internal_message=\"%s\" code=%d\n"
-	logPanicFormat  string = "request_id=\"%s\" method=\"%s\" path=\"%s\" type=\"%s\" error_message=\"%s\" stack_trace=\"%s\"\n"
-	logParamsFormat string = "request_id=\"%s\" method=\"%s\" path=\"%s\" ip_address=\"%s\" user_agent=\"%s\" params=\"%v\"\n"
-	logTimeFormat   string = "request_id=\"%s\" method=\"%s\" path=\"%s\" ip_address=\"%s\" user_agent=\"%s\" service=%dms status=%d\n"
+	LogErrorFormat  string = "request_id=\"%s\" ip_address=\"%s\" type=\"%s\" internal_message=\"%s\" code=%d\n"
+	LogPanicFormat  string = "request_id=\"%s\" method=\"%s\" path=\"%s\" type=\"%s\" error_message=\"%s\" stack_trace=\"%s\"\n"
+	LogParamsFormat string = "request_id=\"%s\" method=\"%s\" path=\"%s\" ip_address=\"%s\" user_agent=\"%s\" params=\"%v\"\n"
+	LogTimeFormat   string = "request_id=\"%s\" method=\"%s\" path=\"%s\" ip_address=\"%s\" user_agent=\"%s\" service=%dms status=%d\n"
 )
 
 // Package variables
@@ -240,12 +240,12 @@ func (r *Router) Request(h httprouter.Handle) httprouter.Handle {
 			// Capture the panics and log
 			defer func() {
 				if err := recover(); err != nil {
-					logger.NoFilePrintf(logPanicFormat, writer.RequestID, writer.Method, writer.URL, "error", err.(error).Error(), strings.Replace(string(debug.Stack()), "\n", ";", -1))
+					logger.NoFilePrintf(LogPanicFormat, writer.RequestID, writer.Method, writer.URL, "error", err.(error).Error(), strings.Replace(string(debug.Stack()), "\n", ";", -1))
 				}
 			}()
 
 			// Start the log (timer)
-			logger.NoFilePrintf(logParamsFormat, writer.RequestID, writer.Method, writer.URL, writer.IPAddress, writer.UserAgent, FilterMap(params, r.FilterFields).Values)
+			logger.NoFilePrintf(LogParamsFormat, writer.RequestID, writer.Method, writer.URL, writer.IPAddress, writer.UserAgent, FilterMap(params, r.FilterFields).Values)
 			start := time.Now()
 
 			// Fire the request
@@ -253,7 +253,7 @@ func (r *Router) Request(h httprouter.Handle) httprouter.Handle {
 
 			// Complete the timer and final log
 			elapsed := time.Since(start)
-			logger.NoFilePrintf(logTimeFormat, writer.RequestID, writer.Method, writer.URL, writer.IPAddress, writer.UserAgent, int64(elapsed/time.Millisecond), writer.Status)
+			logger.NoFilePrintf(LogTimeFormat, writer.RequestID, writer.Method, writer.URL, writer.IPAddress, writer.UserAgent, int64(elapsed/time.Millisecond), writer.Status)
 
 		} else {
 			// Fire the request (no logging)
