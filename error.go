@@ -94,7 +94,7 @@ func logError(statusCode int, internalMessage, requestID, ipAddress string) {
 	}
 
 	// Show the login a standard way
-	logger.NoFilePrintf(logErrorFormat, requestID, ipAddress, logLevel, internalMessage, statusCode)
+	logger.NoFilePrintf(LogErrorFormat, requestID, ipAddress, logLevel, internalMessage, statusCode)
 }
 
 // Error returns the string error message (only public message)
