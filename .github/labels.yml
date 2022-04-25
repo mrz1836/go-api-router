@@ -50,5 +50,5 @@
   description: "Used for denoting a WIP, stops auto-merge"
   name: "work-in-progress"
 - color: c2e0c6
-  description: "Old, stale, unused"
+  description: "Old, stale, unused, not needed"
   name: "stale"
