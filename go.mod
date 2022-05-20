@@ -9,7 +9,7 @@ require (
 	github.com/matryer/respond v1.0.1
 	github.com/mrz1836/go-logger v0.2.5
 	github.com/mrz1836/go-parameters v0.2.8
-	github.com/newrelic/go-agent/v3 v3.15.2
+	github.com/newrelic/go-agent/v3 v3.16.0
 	github.com/newrelic/go-agent/v3/integrations/nrhttprouter v1.0.1
 	github.com/ugorji/go v1.2.7 // indirect
 	golang.org/x/net v0.0.0-20220421235706-1d1ef9303861 // indirect
