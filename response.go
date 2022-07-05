@@ -151,7 +151,7 @@ func jsonMap(obj interface{}) map[string]interface{} {
 		s = stringPointer.Elem()
 	} else {
 		s = reflect.ValueOf(obj)
-		stringPointer = reflect.ValueOf(&obj)
+		// stringPointer = reflect.ValueOf(&obj)
 	}
 
 	typeOfT := s.Type()
