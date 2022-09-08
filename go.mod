@@ -11,7 +11,8 @@ require (
 	github.com/mrz1836/go-parameters v0.2.9
 	github.com/newrelic/go-agent/v3 v3.18.2
 	github.com/newrelic/go-agent/v3/integrations/nrhttprouter v1.0.1
-	golang.org/x/net v0.0.0-20220728211354-c7608f3a8462 // indirect
-	google.golang.org/genproto v0.0.0-20220728213248-dd149ef739b9 // indirect
-	google.golang.org/protobuf v1.28.1 // indirect
+	golang.org/x/net v0.0.0-20220907135653-1e95f45603a7 // indirect
+	golang.org/x/sys v0.0.0-20220907062415-87db552b00fd // indirect
+	google.golang.org/genproto v0.0.0-20220902135211-223410557253 // indirect
+	google.golang.org/grpc v1.49.0 // indirect
 )
