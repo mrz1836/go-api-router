@@ -1,9 +1,8 @@
 module github.com/mrz1836/go-api-router
 
-go 1.16
+go 1.17
 
 require (
-	github.com/cheekybits/is v0.0.0-20150225183255-68e9c0620927 // indirect
 	github.com/gofrs/uuid v4.3.1+incompatible
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/matryer/respond v1.0.1
@@ -11,7 +10,17 @@ require (
 	github.com/mrz1836/go-parameters v0.2.9
 	github.com/newrelic/go-agent/v3 v3.20.1
 	github.com/newrelic/go-agent/v3/integrations/nrhttprouter v1.0.1
-	golang.org/x/net v0.0.0-20220907135653-1e95f45603a7 // indirect
-	golang.org/x/sys v0.0.0-20220907062415-87db552b00fd // indirect
-	google.golang.org/genproto v0.0.0-20220902135211-223410557253 // indirect
+)
+
+require (
+	github.com/cheekybits/is v0.0.0-20150225183255-68e9c0620927 // indirect
+	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/gorilla/mux v1.8.0 // indirect
+	github.com/ugorji/go/codec v1.2.7 // indirect
+	golang.org/x/net v0.2.0 // indirect
+	golang.org/x/sys v0.2.0 // indirect
+	golang.org/x/text v0.4.0 // indirect
+	google.golang.org/genproto v0.0.0-20221118155620-16455021b5e6 // indirect
+	google.golang.org/grpc v1.51.0 // indirect
+	google.golang.org/protobuf v1.28.1 // indirect
 )
