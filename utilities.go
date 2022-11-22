@@ -181,10 +181,11 @@ func GetCustomData(req *http.Request) (data interface{}) {
 // a router (or subrouter) from being cached by an upstream proxy and/or client.
 //
 // As per http://wiki.nginx.org/HttpProxyModule - NoCache sets:
-//      Expires: Thu, 01 Jan 1970 00:00:00 UTC
-//      Cache-Control: no-cache, private, max-age=0
-//      X-Accel-Expires: 0
-//      Pragma: no-cache (for HTTP/1.0 proxies/clients)
+//
+//	Expires: Thu, 01 Jan 1970 00:00:00 UTC
+//	Cache-Control: no-cache, private, max-age=0
+//	X-Accel-Expires: 0
+//	Pragma: no-cache (for HTTP/1.0 proxies/clients)
 func NoCache(w http.ResponseWriter, req *http.Request) {
 
 	// Delete any ETag headers that may have been set
