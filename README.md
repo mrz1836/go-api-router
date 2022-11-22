@@ -47,6 +47,7 @@ View the generated [documentation](https://pkg.go.dev/github.com/mrz1836/go-api-
 - Uses MrZ's [go-parameters](https://github.com/mrz1836/go-parameters) for parsing any type of incoming parameter with ease
 - Optional: [NewRelic](https://docs.newrelic.com/docs/agents/go-agent/get-started/go-agent-compatibility-requirements/) support!
 - Added basic middleware support from Rileyr's [middleware](https://github.com/rileyr/middleware)
+- Optional: [JWT Authentication](https://github.com/golang-jwt/jwt) (middleware)
 - Added additional CORS functionality
 - Standardized error responses for API requests
 - Centralized logging on all requests (requesting user info & request time)
@@ -65,6 +66,7 @@ View the generated [documentation](https://pkg.go.dev/github.com/mrz1836/go-api-
 - gofrs [uuid](https://github.com/gofrs/uuid) package
 - MrZ's [go-logger](https://github.com/mrz1836/go-logger) and [go-parameters](https://github.com/mrz1836/go-parameters) package
 - NewRelic's [go-agent](https://github.com/newrelic/go-agent)
+- Golang's [golang-jwt](https://github.com/golang-jwt/jwt)
 </details>
 
 <details>
