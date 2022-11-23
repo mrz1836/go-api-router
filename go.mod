@@ -11,7 +11,7 @@ require (
 	github.com/mrz1836/go-parameters v0.2.9
 	github.com/newrelic/go-agent/v3 v3.20.1
 	github.com/newrelic/go-agent/v3/integrations/nrhttprouter v1.0.1
-	github.com/stretchr/testify v1.8.0
+	github.com/stretchr/testify v1.8.1
 )
 
 require (
