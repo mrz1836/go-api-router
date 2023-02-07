@@ -212,4 +212,4 @@ or by making a [**bitcoin donation**](https://mrz1818.com/?tab=tips&utm_source=g
 <br/>
 
 ## License
-[![License](https://img.shields.io/github/license/mrz1836/go-api-router.svg?style=flat)](LICENSE)
+[![License](https://img.shields.io/github/license/mrz1836/go-api-router.svg?style=flat&v=1)](LICENSE)
