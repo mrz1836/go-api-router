@@ -7,7 +7,7 @@ require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/matryer/respond v1.0.1
-	github.com/mrz1836/go-logger v0.3.1
+	github.com/mrz1836/go-logger v0.3.2
 	github.com/mrz1836/go-parameters v0.3.1
 	github.com/newrelic/go-agent/v3 v3.20.3
 	github.com/newrelic/go-agent/v3/integrations/nrhttprouter v1.0.1
