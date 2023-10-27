@@ -353,6 +353,7 @@ linters:
     - testpackage
     - nestif
     - nlreturn
+    - testifylint
   disable-all: false
   presets:
     - bugs
