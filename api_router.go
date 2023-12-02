@@ -75,17 +75,18 @@ type paramRequestKey string
 
 // Router is the configuration for the middleware service
 type Router struct {
-	loadedNewRelic              bool
-	FilterFields                []string             `json:"filter_fields" url:"filter_fields"`                                   // Filter out protected fields from logging
-	SkipLoggingPaths            []string             `json:"skip_logging_paths" url:"skip_logging_paths"`                         // Skip logging on these paths (IE: /health)
 	AccessControlExposeHeaders  string               `json:"access_control_expose_headers" url:"access_control_expose_headers"`   // Allow specific headers for cors
+	CrossOriginAllowCredentials bool                 `json:"cross_origin_allow_credentials" url:"cross_origin_allow_credentials"` // Allow credentials for BasicAuth()
 	CrossOriginAllowHeaders     string               `json:"cross_origin_allow_headers" url:"cross_origin_allow_headers"`         // Allowed headers
 	CrossOriginAllowMethods     string               `json:"cross_origin_allow_methods" url:"cross_origin_allow_methods"`         // Allowed methods
 	CrossOriginAllowOrigin      string               `json:"cross_origin_allow_origin" url:"cross_origin_allow_origin"`           // Custom value for allow origin
-	HTTPRouter                  *nrhttprouter.Router `json:"-" url:"-"`                                                           // NewRelic wrapper for J Schmidt's httprouter
-	CrossOriginAllowCredentials bool                 `json:"cross_origin_allow_credentials" url:"cross_origin_allow_credentials"` // Allow credentials for BasicAuth()
 	CrossOriginAllowOriginAll   bool                 `json:"cross_origin_allow_origin_all" url:"cross_origin_allow_origin_all"`   // Allow all origins
 	CrossOriginEnabled          bool                 `json:"cross_origin_enabled" url:"cross_origin_enabled"`                     // Enable or Disable CrossOrigin
+	FilterFields                []string             `json:"filter_fields" url:"filter_fields"`                                   // Filter out protected fields from logging
+	HTTPRouter                  *nrhttprouter.Router `json:"-" url:"-"`                                                           // NewRelic wrapper for J Schmidt's httprouter
+	Logger                      LoggerInterface      `json:"-" url:"-"`                                                           // Logger interface
+	SkipLoggingPaths            []string             `json:"skip_logging_paths" url:"skip_logging_paths"`                         // Skip logging on these paths (IE: /health)
+	loadedNewRelic              bool
 }
 
 // NewWithNewRelic returns a router middleware configuration with NewRelic enabled
@@ -123,6 +124,9 @@ func defaultRouter(app *newrelic.Application) (r *Router) {
 
 	// Set the filter fields to default
 	r.FilterFields = defaultFilterFields
+
+	// Set the default implementation (which can now be overridden)
+	r.Logger = logger.GetImplementation()
 
 	return
 }
@@ -240,12 +244,12 @@ func (r *Router) Request(h httprouter.Handle) httprouter.Handle {
 			// Capture the panics and log
 			defer func() {
 				if err := recover(); err != nil {
-					logger.NoFilePrintf(LogPanicFormat, writer.RequestID, writer.Method, writer.URL, "error", err.(error).Error(), strings.Replace(string(debug.Stack()), "\n", ";", -1))
+					r.Logger.Printf(LogPanicFormat, writer.RequestID, writer.Method, writer.URL, "error", err.(error).Error(), strings.Replace(string(debug.Stack()), "\n", ";", -1))
 				}
 			}()
 
 			// Start the log (timer)
-			logger.NoFilePrintf(LogParamsFormat, writer.RequestID, writer.Method, writer.URL, writer.IPAddress, writer.UserAgent, FilterMap(params, r.FilterFields).Values)
+			r.Logger.Printf(LogParamsFormat, writer.RequestID, writer.Method, writer.URL, writer.IPAddress, writer.UserAgent, FilterMap(params, r.FilterFields).Values)
 			start := time.Now()
 
 			// Fire the request
@@ -253,7 +257,7 @@ func (r *Router) Request(h httprouter.Handle) httprouter.Handle {
 
 			// Complete the timer and final log
 			elapsed := time.Since(start)
-			logger.NoFilePrintf(LogTimeFormat, writer.RequestID, writer.Method, writer.URL, writer.IPAddress, writer.UserAgent, int64(elapsed/time.Millisecond), writer.Status)
+			r.Logger.Printf(LogTimeFormat, writer.RequestID, writer.Method, writer.URL, writer.IPAddress, writer.UserAgent, int64(elapsed/time.Millisecond), writer.Status)
 
 		} else {
 			// Fire the request (no logging)
