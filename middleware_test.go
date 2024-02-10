@@ -43,7 +43,7 @@ func TestWrap(t *testing.T) {
 	s.Use(mw)
 
 	var handlerCalled bool
-	hn := func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	hn := func(_ http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
 		handlerCalled = true
 	}
 
@@ -109,7 +109,7 @@ func TestWrap_Ordering(t *testing.T) {
 	s.Use(third)
 	s.Use(fourth)
 
-	hn := func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	hn := func(_ http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
 		ts := time.Now()
 		handlerCallAt = &ts
 	}
@@ -142,7 +142,7 @@ func TestWrap_WhenEmpty(t *testing.T) {
 	t.Parallel()
 
 	s := NewStack()
-	hn := func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {}
+	hn := func(_ http.ResponseWriter, _ *http.Request, _ httprouter.Params) {}
 	w := s.Wrap(hn)
 
 	if reflect.ValueOf(hn).Pointer() != reflect.ValueOf(w).Pointer() {

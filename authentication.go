@@ -141,7 +141,7 @@ func Check(w http.ResponseWriter, r *http.Request, sessionSecret, issuer string,
 
 	// Parse the JWT token
 	var token *jwt.Token
-	if token, err = jwt.ParseWithClaims(jwtToken, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+	if token, err = jwt.ParseWithClaims(jwtToken, &Claims{}, func(_ *jwt.Token) (interface{}, error) {
 		// This error NEVER occurs since we are using our own signing method
 		/*if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			// return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])

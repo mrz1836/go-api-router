@@ -131,7 +131,7 @@ func TestClearToken(t *testing.T) {
 		})
 	})
 
-	t.Run("empty token", func(t *testing.T) {
+	t.Run("empty token", func(_ *testing.T) {
 		w := httptest.NewRecorder()
 		ClearToken(w, nil)
 	})

@@ -72,15 +72,15 @@ func (s *InternalStack) Wrap(fn httprouter.Handle) httprouter.Handle {
 
 // StandardHandlerToHandle converts a standard middleware to Julien handle version
 func StandardHandlerToHandle(next http.Handler) httprouter.Handle {
-	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		next.ServeHTTP(w, r)
 	}
 }
 
 // StandardHandlerToMiddleware converts a standard middleware to type Middleware
 func StandardHandlerToMiddleware(next http.Handler) Middleware {
-	return func(fn httprouter.Handle) httprouter.Handle {
-		return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	return func(_ httprouter.Handle) httprouter.Handle {
+		return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 			next.ServeHTTP(w, r)
 		}
 	}
