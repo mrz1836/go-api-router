@@ -9,7 +9,7 @@ require (
 	github.com/matryer/respond v1.0.1
 	github.com/mrz1836/go-logger v0.3.3
 	github.com/mrz1836/go-parameters v0.4.1
-	github.com/newrelic/go-agent/v3 v3.31.0
+	github.com/newrelic/go-agent/v3 v3.32.0
 	github.com/newrelic/go-agent/v3/integrations/nrhttprouter v1.0.2
 	github.com/stretchr/testify v1.9.0
 )
