@@ -10,7 +10,7 @@ require (
 	github.com/mrz1836/go-logger v0.3.3
 	github.com/mrz1836/go-parameters v0.4.1
 	github.com/newrelic/go-agent/v3 v3.33.1
-	github.com/newrelic/go-agent/v3/integrations/nrhttprouter v1.1.0
+	github.com/newrelic/go-agent/v3/integrations/nrhttprouter v1.1.1
 	github.com/stretchr/testify v1.9.0
 )
 

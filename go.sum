@@ -21,8 +21,8 @@ github.com/mrz1836/go-parameters v0.4.1 h1:8ElvGs8hzk0/hz2t5an2FmS9SPfWozGn2nXUv
 github.com/mrz1836/go-parameters v0.4.1/go.mod h1:r9EPPPb1XfSNtTbIvkbc77jvji8vjVNLZCj5ewrjTZs=
 github.com/newrelic/go-agent/v3 v3.33.1 h1:eWOtty43cyxrMKws4VNPdebgEB6ujFTf0yxPsgB0M80=
 github.com/newrelic/go-agent/v3 v3.33.1/go.mod h1:SMdqPzE/ghkWdY0rYGSD7Clw2daK/XH6pUnVd4albg4=
-github.com/newrelic/go-agent/v3/integrations/nrhttprouter v1.1.0 h1:ZdDuEN09mALwmDfQUgbnWYJu3n7x9KshN6VSfFXvx8M=
-github.com/newrelic/go-agent/v3/integrations/nrhttprouter v1.1.0/go.mod h1:1en44UKBNZeNryHUO7uzjlbJ3k5u+X3n41k261ZmT54=
+github.com/newrelic/go-agent/v3/integrations/nrhttprouter v1.1.1 h1:xaF6z/4Xi544X5buJx51gvRGg5rWhIBSHFW8AtFrKto=
+github.com/newrelic/go-agent/v3/integrations/nrhttprouter v1.1.1/go.mod h1:zCwXQ8lEjV6Bw+J4a4pmlRZ1Uza48Q8CYR0Beg5O5wo=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stretchr/testify v1.9.0 h1:HtqpIVDClZ4nwg75+f6Lvsy/wHu+3BoSGCbBAcpTsTg=
