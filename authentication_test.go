@@ -34,7 +34,7 @@ func TestSetTokenHeader(t *testing.T) {
 	t.Run("writer, req, no token", func(t *testing.T) {
 		w := httptest.NewRecorder()
 		req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "https://domain.com", nil)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.NotNil(t, req)
 		SetTokenHeader(w, req, "", 3*time.Minute)
 	})
@@ -42,7 +42,7 @@ func TestSetTokenHeader(t *testing.T) {
 	t.Run("writer, req, valid token", func(t *testing.T) {
 		w := httptest.NewRecorder()
 		req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "https://domain.com", nil)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.NotNil(t, req)
 		SetTokenHeader(w, req, "token", 3*time.Minute)
 		assert.Equal(t, AuthorizationBearer+" token", w.Header().Get(AuthorizationHeader))
@@ -76,7 +76,7 @@ func TestGetTokenFromHeader(t *testing.T) {
 	t.Run("get valid token", func(t *testing.T) {
 		w := httptest.NewRecorder()
 		req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "https://domain.com", nil)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.NotNil(t, req)
 		SetTokenHeader(w, req, "token", 3*time.Minute)
 		token := GetTokenFromHeader(w)
@@ -97,7 +97,7 @@ func TestGetTokenFromResponse(t *testing.T) {
 
 	t.Run("empty token", func(t *testing.T) {
 		w := httptest.NewRecorder()
-		res := w.Result()
+		res := w.Result() //nolint:bodyclose // body is closed in the method
 		defer func(Body io.ReadCloser) {
 			_ = Body.Close()
 		}(res.Body)
@@ -109,10 +109,10 @@ func TestGetTokenFromResponse(t *testing.T) {
 		w := httptest.NewRecorder()
 		req, err := http.NewRequestWithContext(
 			context.Background(), http.MethodGet, "https://domain.com", nil)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.NotNil(t, req)
 		SetTokenHeader(w, req, "token", 3*time.Minute)
-		res := w.Result()
+		res := w.Result() //nolint:bodyclose // body is closed in the method
 		defer func(Body io.ReadCloser) {
 			_ = Body.Close()
 		}(res.Body)
@@ -139,7 +139,7 @@ func TestClearToken(t *testing.T) {
 	t.Run("clear valid token", func(t *testing.T) {
 		w := httptest.NewRecorder()
 		req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "https://domain.com", nil)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.NotNil(t, req)
 		SetTokenHeader(w, req, "token", 3*time.Minute)
 
@@ -178,11 +178,11 @@ func TestClaims_CreateToken(t *testing.T) {
 	t.Parallel()
 
 	sessionID, err := randomHex(32)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	var secret string
 	secret, err = randomHex(16)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.NotEqual(t, "", secret)
 
 	t.Run("valid token", func(t *testing.T) {
@@ -195,15 +195,15 @@ func TestClaims_CreateToken(t *testing.T) {
 
 		var token string
 		token, err = claims.CreateToken(5*time.Minute, secret)
-		assert.NoError(t, err)
-		assert.NotEqual(t, 0, len(token))
+		require.NoError(t, err)
+		assert.NotEmpty(t, token)
 
 		var valid bool
 		valid, err = claims.Verify("web-server-test")
-		assert.NoError(t, err)
-		assert.Equal(t, true, valid)
+		require.NoError(t, err)
+		assert.True(t, valid)
 
-		assert.Equal(t, false, claims.IsEmpty())
+		assert.False(t, claims.IsEmpty())
 	})
 
 	t.Run("user id is empty", func(t *testing.T) {
@@ -216,10 +216,10 @@ func TestClaims_CreateToken(t *testing.T) {
 
 		var token string
 		token, err = claims.CreateToken(5*time.Minute, secret)
-		assert.NoError(t, err)
-		assert.NotEqual(t, 0, len(token))
+		require.NoError(t, err)
+		assert.NotEmpty(t, token)
 
-		assert.Equal(t, true, claims.IsEmpty())
+		assert.True(t, claims.IsEmpty())
 	})
 
 	t.Run("missing user id", func(t *testing.T) {
@@ -232,13 +232,13 @@ func TestClaims_CreateToken(t *testing.T) {
 
 		var token string
 		token, err = claims.CreateToken(5*time.Minute, secret)
-		assert.NoError(t, err)
-		assert.NotEqual(t, 0, len(token))
+		require.NoError(t, err)
+		assert.NotEmpty(t, token)
 
 		var valid bool
 		valid, err = claims.Verify("web-server-test")
-		assert.Error(t, err)
-		assert.Equal(t, false, valid)
+		require.Error(t, err)
+		assert.False(t, valid)
 	})
 
 	t.Run("wrong issuer", func(t *testing.T) {
@@ -251,13 +251,13 @@ func TestClaims_CreateToken(t *testing.T) {
 
 		var token string
 		token, err = claims.CreateToken(5*time.Minute, secret)
-		assert.NoError(t, err)
-		assert.NotEqual(t, 0, len(token))
+		require.NoError(t, err)
+		assert.NotEmpty(t, token)
 
 		var valid bool
 		valid, err = claims.Verify("web-server-wrong")
-		assert.Error(t, err)
-		assert.Equal(t, false, valid)
+		require.Error(t, err)
+		assert.False(t, valid)
 	})
 
 	t.Run("missing session id", func(t *testing.T) {
@@ -270,13 +270,13 @@ func TestClaims_CreateToken(t *testing.T) {
 
 		var token string
 		token, err = claims.CreateToken(5*time.Minute, secret)
-		assert.NoError(t, err)
-		assert.NotEqual(t, 0, len(token))
+		require.NoError(t, err)
+		assert.NotEmpty(t, token)
 
 		var valid bool
 		valid, err = claims.Verify("web-server-test")
-		assert.Error(t, err)
-		assert.Equal(t, false, valid)
+		require.Error(t, err)
+		assert.False(t, valid)
 	})
 
 	t.Run("valid - empty expiration, set default", func(t *testing.T) {
@@ -289,13 +289,13 @@ func TestClaims_CreateToken(t *testing.T) {
 
 		var token string
 		token, err = claims.CreateToken(5*time.Minute, secret)
-		assert.NoError(t, err)
-		assert.NotEqual(t, 0, len(token))
+		require.NoError(t, err)
+		assert.NotEmpty(t, token)
 
 		var valid bool
 		valid, err = claims.Verify("web-server-test")
-		assert.NoError(t, err)
-		assert.Equal(t, true, valid)
+		require.NoError(t, err)
+		assert.True(t, valid)
 	})
 
 }
@@ -305,11 +305,11 @@ func TestCreateToken(t *testing.T) {
 	t.Parallel()
 
 	sessionID, err := randomHex(16)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	var secret string
 	secret, err = randomHex(16)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.NotEqual(t, "", secret)
 
 	t.Run("valid token", func(t *testing.T) {
@@ -322,8 +322,8 @@ func TestCreateToken(t *testing.T) {
 			sessionID,
 			5*time.Minute,
 		)
-		assert.NoError(t, err)
-		assert.NotEqual(t, 0, len(token))
+		require.NoError(t, err)
+		assert.NotEmpty(t, token)
 	})
 
 	t.Run("missing user id", func(t *testing.T) {
@@ -336,8 +336,8 @@ func TestCreateToken(t *testing.T) {
 			sessionID,
 			5*time.Minute,
 		)
-		assert.NoError(t, err)
-		assert.NotEqual(t, 0, len(token))
+		require.NoError(t, err)
+		assert.NotEmpty(t, token)
 	})
 
 	t.Run("missing issuer", func(t *testing.T) {
@@ -350,8 +350,8 @@ func TestCreateToken(t *testing.T) {
 			sessionID,
 			5*time.Minute,
 		)
-		assert.NoError(t, err)
-		assert.NotEqual(t, 0, len(token))
+		require.NoError(t, err)
+		assert.NotEmpty(t, token)
 	})
 
 	t.Run("missing session id", func(t *testing.T) {
@@ -364,8 +364,8 @@ func TestCreateToken(t *testing.T) {
 			"",
 			5*time.Minute,
 		)
-		assert.NoError(t, err)
-		assert.NotEqual(t, 0, len(token))
+		require.NoError(t, err)
+		assert.NotEmpty(t, token)
 	})
 
 	t.Run("missing secret", func(t *testing.T) {
@@ -378,8 +378,8 @@ func TestCreateToken(t *testing.T) {
 			sessionID,
 			5*time.Minute,
 		)
-		assert.NoError(t, err)
-		assert.NotEqual(t, 0, len(token))
+		require.NoError(t, err)
+		assert.NotEmpty(t, token)
 	})
 
 	t.Run("create token - verify", func(t *testing.T) {
@@ -392,23 +392,23 @@ func TestCreateToken(t *testing.T) {
 			sessionID,
 			5*time.Minute,
 		)
-		assert.NoError(t, err)
-		assert.NotEqual(t, 0, len(token))
+		require.NoError(t, err)
+		assert.NotEmpty(t, token)
 
 		w := httptest.NewRecorder()
 
 		var req *http.Request
 		req, err = http.NewRequestWithContext(context.Background(), http.MethodGet, "https://domain.com", nil)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.NotNil(t, req)
 
 		req.Header.Add(AuthorizationHeader, AuthorizationBearer+" "+token)
 
 		var authenticated bool
 		authenticated, req, err = Check(w, req, secret, "web-server-test", 10)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.NotNil(t, req)
-		assert.Equal(t, true, authenticated)
+		assert.True(t, authenticated)
 
 		reqClaims := GetClaims(req)
 		assert.Equal(t, "123", reqClaims.UserID)
@@ -427,21 +427,21 @@ func TestCreateToken(t *testing.T) {
 			sessionID,
 			5*time.Minute,
 		)
-		assert.NoError(t, err)
-		assert.NotEqual(t, 0, len(token))
+		require.NoError(t, err)
+		assert.NotEmpty(t, token)
 
 		w := httptest.NewRecorder()
 
 		var req *http.Request
 		req, err = http.NewRequestWithContext(context.Background(), http.MethodGet, "https://domain.com", nil)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.NotNil(t, req)
 
 		var authenticated bool
 		authenticated, req, err = Check(w, req, secret, "web-server-test", 10)
-		assert.Error(t, err)
+		require.Error(t, err)
 		assert.Nil(t, req)
-		assert.Equal(t, false, authenticated)
+		assert.False(t, authenticated)
 	})
 
 	t.Run("verify - invalid token", func(t *testing.T) {
@@ -454,23 +454,23 @@ func TestCreateToken(t *testing.T) {
 			sessionID,
 			5*time.Minute,
 		)
-		assert.NoError(t, err)
-		assert.NotEqual(t, 0, len(token))
+		require.NoError(t, err)
+		assert.NotEmpty(t, token)
 
 		w := httptest.NewRecorder()
 
 		var req *http.Request
 		req, err = http.NewRequestWithContext(context.Background(), http.MethodGet, "https://domain.com", nil)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.NotNil(t, req)
 
 		req.Header.Add(AuthorizationHeader, AuthorizationBearer+" "+token+"-invalid")
 
 		var authenticated bool
 		authenticated, req, err = Check(w, req, secret, "web-server-test", 10)
-		assert.Error(t, err)
+		require.Error(t, err)
 		assert.Nil(t, req)
-		assert.Equal(t, false, authenticated)
+		assert.False(t, authenticated)
 	})
 
 	t.Run("verify - invalid issuer", func(t *testing.T) {
@@ -483,23 +483,23 @@ func TestCreateToken(t *testing.T) {
 			sessionID,
 			5*time.Minute,
 		)
-		assert.NoError(t, err)
-		assert.NotEqual(t, 0, len(token))
+		require.NoError(t, err)
+		assert.NotEmpty(t, token)
 
 		w := httptest.NewRecorder()
 
 		var req *http.Request
 		req, err = http.NewRequestWithContext(context.Background(), http.MethodGet, "https://domain.com", nil)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.NotNil(t, req)
 
 		req.Header.Add(AuthorizationHeader, AuthorizationBearer+" "+token)
 
 		var authenticated bool
 		authenticated, req, err = Check(w, req, secret, "web-server-wrong", 10)
-		assert.Error(t, err)
+		require.Error(t, err)
 		assert.Nil(t, req)
-		assert.Equal(t, false, authenticated)
+		assert.False(t, authenticated)
 	})
 
 	t.Run("verify - invalid expiration time", func(t *testing.T) {
@@ -512,14 +512,14 @@ func TestCreateToken(t *testing.T) {
 			sessionID,
 			1*time.Nanosecond,
 		)
-		assert.NoError(t, err)
-		assert.NotEqual(t, 0, len(token))
+		require.NoError(t, err)
+		assert.NotEmpty(t, token)
 
 		w := httptest.NewRecorder()
 
 		var req *http.Request
 		req, err = http.NewRequestWithContext(context.Background(), http.MethodGet, "https://domain.com", nil)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.NotNil(t, req)
 
 		req.Header.Add(AuthorizationHeader, AuthorizationBearer+" "+token)
@@ -528,10 +528,10 @@ func TestCreateToken(t *testing.T) {
 
 		var authenticated bool
 		authenticated, req, err = Check(w, req, secret, "web-server-test", 10)
-		assert.Error(t, err)
+		require.Error(t, err)
 		assert.Contains(t, err.Error(), "token is expired by")
 		assert.Nil(t, req)
-		assert.Equal(t, false, authenticated)
+		assert.False(t, authenticated)
 	})
 }
 
@@ -540,7 +540,7 @@ func TestGetClaims(t *testing.T) {
 	req := httptest.NewRequest(http.MethodConnect, "/", nil)
 	claims := GetClaims(req)
 	assert.NotNil(t, claims)
-	assert.Equal(t, true, claims.IsEmpty())
+	assert.True(t, claims.IsEmpty())
 }
 
 // randomHex returns a random hex string, or an error and empty string

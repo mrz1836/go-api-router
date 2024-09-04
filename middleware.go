@@ -19,14 +19,14 @@ type Stack interface {
 		timing middleware.
 	*/
 	// Use for adding new middlewares
-	Use(Middleware)
+	Use(m Middleware)
 
 	/*
 		Wraps a given handle with the current InternalStack
 		from the result of Use() calls.
 	*/
 	// Wrap wraps the router
-	Wrap(httprouter.Handle) httprouter.Handle
+	Wrap(h httprouter.Handle) httprouter.Handle
 }
 
 // Middleware is the Handle implementation

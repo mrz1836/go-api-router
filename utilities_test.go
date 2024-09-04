@@ -189,7 +189,7 @@ func TestSetAuthToken(t *testing.T) {
 	t.Parallel()
 
 	// Fake storing the token
-	testFakeToken := "ern8347t88e7zrhg8eh48e7hg8e"
+	testFakeToken := "ern8347t88e7zrhg8eh48e7hg8e" //nolint:gosec // this is a fake token
 	req, _ := http.NewRequestWithContext(
 		context.Background(), http.MethodGet,
 		"/test?this=that&id=1234", strings.NewReader(""),
@@ -210,7 +210,7 @@ func TestGetAuthToken(t *testing.T) {
 	t.Parallel()
 
 	// Test getting the token
-	testFakeToken := "ern8347t88e7zrhg8eh48e7hg8e"
+	testFakeToken := "ern8347t88e7zrhg8eh48e7hg8e" //nolint:gosec // this is a fake token
 	req, _ := http.NewRequestWithContext(
 		context.Background(), http.MethodGet,
 		"/test?this=that&id=1234", strings.NewReader(""),
