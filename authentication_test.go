@@ -97,7 +97,7 @@ func TestGetTokenFromResponse(t *testing.T) {
 
 	t.Run("empty token", func(t *testing.T) {
 		w := httptest.NewRecorder()
-		res := w.Result() //nolint:bodyclose // body is closed in the method
+		res := w.Result()
 		defer func(Body io.ReadCloser) {
 			_ = Body.Close()
 		}(res.Body)
@@ -112,7 +112,7 @@ func TestGetTokenFromResponse(t *testing.T) {
 		require.NoError(t, err)
 		assert.NotNil(t, req)
 		SetTokenHeader(w, req, "token", 3*time.Minute)
-		res := w.Result() //nolint:bodyclose // body is closed in the method
+		res := w.Result()
 		defer func(Body io.ReadCloser) {
 			_ = Body.Close()
 		}(res.Body)
