@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 const (
@@ -23,15 +23,15 @@ const (
 
 // Claims is our custom JWT claims
 type Claims struct {
-	jwt.StandardClaims        // The standard JWT fields
-	UserID             string `json:"user_id"` // The user ID set on the claims
+	jwt.RegisteredClaims        // Updated to use RegisteredClaims
+	UserID               string `json:"user_id"` // The user ID set on the claims
 }
 
 // CreateToken will make a token from claims
 func (c Claims) CreateToken(expiration time.Duration, sessionSecret string) (string, error) {
 
 	// Create a new token object, specifying signing method, and the claims
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, createClaims(c.UserID, c.Issuer, c.Id, expiration))
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, createClaims(c.UserID, c.Issuer, c.ID, expiration))
 
 	// Sign and get the complete encoded token as a string using the secret
 	return token.SignedString([]byte(sessionSecret))
@@ -46,7 +46,7 @@ func (c Claims) Verify(issuer string) (bool, error) {
 	}
 
 	// Valid Session ID
-	if len(c.Id) == 0 {
+	if len(c.ID) == 0 {
 		return false, ErrInvalidSessionID
 	}
 
@@ -70,12 +70,12 @@ func createClaims(userID, issuer, sessionID string, expiration time.Duration) Cl
 		expiration = defaultExpiration
 	}
 	return Claims{
-		jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(expiration).UTC().Unix(),
-			Id:        sessionID,
-			IssuedAt:  time.Now().UTC().Unix(),
+		jwt.RegisteredClaims{ // Updated to use RegisteredClaims
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(expiration).UTC()),
+			ID:        sessionID,
+			IssuedAt:  jwt.NewNumericDate(time.Now().UTC()),
 			Issuer:    issuer,
-			NotBefore: time.Now().UTC().Unix(),
+			NotBefore: jwt.NewNumericDate(time.Now().UTC()),
 		},
 		userID,
 	}
@@ -141,39 +141,24 @@ func Check(w http.ResponseWriter, r *http.Request, sessionSecret, issuer string,
 
 	// Parse the JWT token
 	var token *jwt.Token
-	if token, err = jwt.ParseWithClaims(jwtToken, &Claims{}, func(_ *jwt.Token) (interface{}, error) {
-		// This error NEVER occurs since we are using our own signing method
-		/*if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			// return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-			return nil, ErrUnexpectedSigningMethod
-		}*/
+	if token, err = jwt.ParseWithClaims(jwtToken, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+		// Ensure the signing method is HMAC
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, ErrInvalidSigningMethod
+		}
 		return []byte(sessionSecret), nil
 	}); err != nil {
 		return
 	}
-
-	// This NEVER occurs, so far all errors have been returned first so the above case would get hit
-	/* else if token == nil {
-		// err = fmt.Errorf("token was nil from: %s", jwtToken)
-		err = ErrTokenNil
-		return
-	}*/
 
 	// Check we have claims and validity of token
 	if claims, ok := token.Claims.(*Claims); ok && token.Valid {
 
 		// Now verify the claims are good
 		if _, claimErr := claims.Verify(issuer); claimErr != nil {
-			// err = fmt.Errorf("claims failed validation: %w", claimErr)
 			err = ErrClaimsValidationFailed
 			return
 		}
-
-		// This case is NEVER hit since there is always a corresponding error
-		/* else if !verified {
-			err = ErrClaimsValidationFailed
-			return
-		}*/
 
 		// Create new token
 		var newToken string
@@ -181,7 +166,7 @@ func Check(w http.ResponseWriter, r *http.Request, sessionSecret, issuer string,
 			sessionSecret,
 			claims.UserID,
 			issuer,
-			claims.Id,
+			claims.ID,
 			sessionAge,
 		); err != nil {
 			return
@@ -193,7 +178,7 @@ func Check(w http.ResponseWriter, r *http.Request, sessionSecret, issuer string,
 		// Add the claims to the request for future use in router actions
 		req = SetCustomData(r, claims)
 		authenticated = true
-	} else { // Not sure how or why this error would be triggered...
+	} else {
 		err = ErrJWTInvalid
 	}
 

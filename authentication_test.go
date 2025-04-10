@@ -63,14 +63,14 @@ func TestGetTokenFromHeader(t *testing.T) {
 	t.Run("nil writer, panic", func(t *testing.T) {
 		assert.Panics(t, func() {
 			token := GetTokenFromHeader(nil)
-			assert.Equal(t, "", token)
+			assert.Empty(t, token)
 		})
 	})
 
 	t.Run("empty token", func(t *testing.T) {
 		w := httptest.NewRecorder()
 		token := GetTokenFromHeader(w)
-		assert.Equal(t, "", token)
+		assert.Empty(t, token)
 	})
 
 	t.Run("get valid token", func(t *testing.T) {
@@ -91,7 +91,7 @@ func TestGetTokenFromResponse(t *testing.T) {
 	t.Run("nil writer, panic", func(t *testing.T) {
 		assert.Panics(t, func() {
 			token := GetTokenFromResponse(nil)
-			assert.Equal(t, "", token)
+			assert.Empty(t, token)
 		})
 	})
 
@@ -102,7 +102,7 @@ func TestGetTokenFromResponse(t *testing.T) {
 			_ = Body.Close()
 		}(res.Body)
 		token := GetTokenFromResponse(res)
-		assert.Equal(t, "", token)
+		assert.Empty(t, token)
 	})
 
 	t.Run("get valid token", func(t *testing.T) {
@@ -160,16 +160,16 @@ func TestClearToken(t *testing.T) {
 		ClearToken(w, req)
 
 		token = GetTokenFromHeader(w)
-		assert.Equal(t, "", token)
+		assert.Empty(t, token)
 
 		token2 = GetTokenFromHeaderFromRequest(req)
-		assert.Equal(t, "", token2)
+		assert.Empty(t, token2)
 
 		cookie, err = req.Cookie(CookieName)
 		require.NotNil(t, cookie)
 		require.NoError(t, err)
 		token3 = cookie.Value
-		assert.Equal(t, "", token3)
+		assert.Empty(t, token3)
 	})
 }
 
@@ -183,7 +183,7 @@ func TestClaims_CreateToken(t *testing.T) {
 	var secret string
 	secret, err = randomHex(16)
 	require.NoError(t, err)
-	assert.NotEqual(t, "", secret)
+	assert.NotEmpty(t, secret)
 
 	t.Run("valid token", func(t *testing.T) {
 		claims := createClaims(
@@ -310,7 +310,7 @@ func TestCreateToken(t *testing.T) {
 	var secret string
 	secret, err = randomHex(16)
 	require.NoError(t, err)
-	assert.NotEqual(t, "", secret)
+	assert.NotEmpty(t, secret)
 
 	t.Run("valid token", func(t *testing.T) {
 
@@ -412,9 +412,9 @@ func TestCreateToken(t *testing.T) {
 
 		reqClaims := GetClaims(req)
 		assert.Equal(t, "123", reqClaims.UserID)
-		assert.Equal(t, sessionID, reqClaims.Id)
+		assert.Equal(t, sessionID, reqClaims.ID)
 		assert.Equal(t, "web-server-test", reqClaims.Issuer)
-		assert.WithinDuration(t, time.Now().UTC().Add(5*time.Minute), time.Unix(reqClaims.ExpiresAt, 0), 5*time.Second)
+		assert.WithinDuration(t, time.Now().UTC().Add(5*time.Minute), reqClaims.ExpiresAt.Time, 5*time.Second) // Fixed line 415
 	})
 
 	t.Run("verify - missing token in header", func(t *testing.T) {
@@ -529,7 +529,7 @@ func TestCreateToken(t *testing.T) {
 		var authenticated bool
 		authenticated, req, err = Check(w, req, secret, "web-server-test", 10)
 		require.Error(t, err)
-		assert.Contains(t, err.Error(), "token is expired by")
+		assert.Contains(t, err.Error(), "token is expired")
 		assert.Nil(t, req)
 		assert.False(t, authenticated)
 	})

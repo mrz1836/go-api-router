@@ -19,3 +19,6 @@ var ErrInvalidSessionID = errors.New("invalid session id detected")
 
 // ErrInvalidUserID is when the user ID is invalid or missing
 var ErrInvalidUserID = errors.New("invalid user id detected")
+
+// ErrInvalidSigningMethod is when the signing method is invalid
+var ErrInvalidSigningMethod = errors.New("invalid signing method")
