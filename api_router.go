@@ -244,7 +244,7 @@ func (r *Router) Request(h httprouter.Handle) httprouter.Handle {
 			// Capture the panics and log
 			defer func() {
 				if err := recover(); err != nil {
-					r.Logger.Printf(LogPanicFormat, writer.RequestID, writer.Method, writer.URL, "error", err.(error).Error(), strings.Replace(string(debug.Stack()), "\n", ";", -1))
+					r.Logger.Printf(LogPanicFormat, writer.RequestID, writer.Method, writer.URL, "error", err.(error).Error(), strings.ReplaceAll(string(debug.Stack()), "\n", ";"))
 				}
 			}()
 

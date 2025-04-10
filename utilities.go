@@ -41,7 +41,7 @@ func SnakeCase(str string) string {
 	words := camelCaseRe.FindAllString(str, -1)
 
 	for i := 0; i < len(words); i++ {
-		words[i] = strings.ToLower(strings.Replace(words[i], "_", "", -1))
+		words[i] = strings.ToLower(strings.ReplaceAll(words[i], "_", ""))
 	}
 
 	return strings.Join(words, "_")

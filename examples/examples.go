@@ -34,7 +34,7 @@ func main() {
 
 	// Logout the loading of the API
 	logger.Data(2, logger.DEBUG, "starting API server...", logger.MakeParameter("port", port))
-	logger.Fatalln(http.ListenAndServe(":"+port, router.HTTPRouter))
+	logger.Fatalln(http.ListenAndServe(":"+port, router.HTTPRouter)) //nolint:gosec // G114
 }
 
 // index basic request to /
@@ -53,7 +53,7 @@ func passThrough(fn httprouter.Handle) httprouter.Handle {
 
 // StdHandler is an example standard handler
 func StdHandler() http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {
 		logger.Data(2, logger.DEBUG, "standard handler hit!")
 	})
 }
