@@ -1,6 +1,7 @@
 package apirouter
 
 import (
+	"bytes"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -39,35 +40,59 @@ func ReturnJSONEncode(w http.ResponseWriter, code int, e *json.Encoder, objects 
 
 // JSONEncodeHierarchy will execute JSONEncode for multiple nested objects
 func JSONEncodeHierarchy(w io.Writer, objects interface{}, allowed interface{}) error {
+	if allowed == nil {
+		return json.NewEncoder(w).Encode(objects)
+	}
+
 	if slice, ok := allowed.([]string); ok {
 		return JSONEncode(json.NewEncoder(w), objects, slice)
-	} else if obj, ok := allowed.(AllowedKeys); ok {
-		data := reflect.ValueOf(objects).Elem().Interface()
+	} else if obj, found := allowed.(AllowedKeys); found {
+		val := reflect.ValueOf(objects)
+		if val.Kind() == reflect.Ptr {
+			val = val.Elem()
+		}
+		data := val.Interface()
 		t := reflect.TypeOf(data)
 		v := reflect.ValueOf(data)
 		numFields := t.NumField()
-		_, _ = w.Write([]byte{'{'})
+
+		fieldOutputs := make([]string, 0, numFields)
+
 		for i := 0; i < numFields; i++ {
 			field := t.Field(i)
 			jsonTag := field.Tag.Get("json")
-			if len(jsonTag) == 0 {
+			if jsonTag == "" {
 				jsonTag = field.Name
 			}
-			keys := obj[jsonTag]
-			if keys != nil {
-				_, _ = w.Write([]byte("\""))
-				_, _ = w.Write([]byte(jsonTag))
-				_, _ = w.Write([]byte("\": "))
-				err := JSONEncodeHierarchy(w, v.Field(i).Interface(), keys)
-				if err != nil {
-					return err
-				}
-				if i != numFields-1 {
-					_, _ = w.Write([]byte{','})
-				}
+			keys, good := obj[jsonTag]
+			if !good {
+				continue
 			}
+
+			var buf bytes.Buffer
+			buf.WriteString(`"`)
+			buf.WriteString(jsonTag)
+			buf.WriteString(`": `)
+
+			fieldValue := v.Field(i)
+			fieldInterface := fieldValue.Interface()
+			if fieldValue.Kind() == reflect.Struct && fieldValue.CanAddr() {
+				fieldInterface = fieldValue.Addr().Interface()
+			}
+
+			var sub bytes.Buffer
+			err := JSONEncodeHierarchy(&sub, fieldInterface, keys)
+			if err != nil {
+				return err
+			}
+			buf.Write(sub.Bytes())
+
+			fieldOutputs = append(fieldOutputs, buf.String())
 		}
-		_, _ = w.Write([]byte{'}'})
+
+		_, _ = w.Write([]byte("{"))
+		_, _ = w.Write([]byte(strings.Join(fieldOutputs, ",")))
+		_, _ = w.Write([]byte("}"))
 	}
 	return nil
 }
