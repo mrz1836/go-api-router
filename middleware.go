@@ -9,8 +9,8 @@ import (
 // Stack is the interface for middleware
 type Stack interface {
 	/*
-		Adds a middleware to the InternalStack. MWs will be
-		called in the same order that they are added,
+		Adds middleware to the InternalStack. MWs will be
+		called in the same order that they are added
 		such that:
 			Use(Request ID Middleware)
 			Use(Request Timing Middleware)
@@ -44,7 +44,7 @@ func NewStack() *InternalStack {
 	}
 }
 
-// Use adds the middle ware to the list
+// Use adds the middleware to the list
 func (s *InternalStack) Use(mw Middleware) {
 	s.middlewares = append(s.middlewares, mw)
 }
@@ -77,7 +77,7 @@ func StandardHandlerToHandle(next http.Handler) httprouter.Handle {
 	}
 }
 
-// StandardHandlerToMiddleware converts a standard middleware to type Middleware
+// StandardHandlerToMiddleware converts standard middleware to type Middleware
 func StandardHandlerToMiddleware(next http.Handler) Middleware {
 	return func(_ httprouter.Handle) httprouter.Handle {
 		return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
