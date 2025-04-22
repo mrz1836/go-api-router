@@ -1,7 +1,7 @@
 # go-api-router
 > Lightweight API [httprouter](https://github.com/julienschmidt/httprouter) middleware: cors, logging, and standardized error handling.
 
-[![Release](https://img.shields.io/github/release/mrz1836/go-api-router.svg?logo=github&style=flat&v=4)](https://github.com/mrz1836/go-api-router/releases)
+[![Release](https://img.shields.io/github/v/release/mrz1836/go-api-router?logo=github&style=flat&v=4)](https://github.com/mrz1836/go-api-router/releases)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/mrz1836/go-api-router/run-tests.yml?branch=master&logo=github&v=4)](https://github.com/mrz1836/go-api-router/actions)
 [![Report](https://goreportcard.com/badge/github.com/mrz1836/go-api-router?style=flat&v=4)](https://goreportcard.com/report/github.com/mrz1836/go-api-router)
 [![codecov](https://codecov.io/gh/mrz1836/go-api-router/branch/master/graph/badge.svg?v=4)](https://codecov.io/gh/mrz1836/go-api-router)
