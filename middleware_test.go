@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/stretchr/testify/require"
 )
 
 // TestUse test the use method
@@ -155,4 +156,59 @@ func plainHandler(fn httprouter.Handle) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		fn(w, r, httprouter.Params{})
 	}
+}
+
+// TestStandardHandlerToHandle tests the conversion of a standard http.Handler to httprouter.Handle
+func TestStandardHandlerToHandle(t *testing.T) {
+	var wasCalled bool
+
+	// Standard handler that sets a flag when called
+	standardHandler := http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		wasCalled = true
+		w.WriteHeader(http.StatusOK)
+	})
+
+	// Convert to httprouter.Handle
+	routerHandle := StandardHandlerToHandle(standardHandler)
+
+	// Create a test request and response
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rr := httptest.NewRecorder()
+
+	// Call the handler
+	routerHandle(rr, req, httprouter.Params{})
+
+	require.True(t, wasCalled, "Expected the standard handler to be called")
+	require.Equal(t, http.StatusOK, rr.Code)
+}
+
+// TestStandardHandlerToMiddleware tests the conversion of a standard http.Handler to apirouter.Middleware
+func TestStandardHandlerToMiddleware(t *testing.T) {
+	var wasMiddlewareCalled bool
+
+	// Standard middleware that sets a flag
+	standardMiddleware := http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		wasMiddlewareCalled = true
+		w.WriteHeader(http.StatusAccepted)
+	})
+
+	// Convert to apirouter.Middleware
+	middleware := StandardHandlerToMiddleware(standardMiddleware)
+
+	// Final handler (wrapped by middleware)
+	finalHandler := func(_ http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
+		t.Fatal("Final handler should not be called directly")
+	}
+
+	// Wrap the final handler using the middleware
+	wrappedHandler := middleware(finalHandler)
+
+	// Execute the handler
+	req := httptest.NewRequest(http.MethodGet, "/middleware-test", nil)
+	rr := httptest.NewRecorder()
+
+	wrappedHandler(rr, req, httprouter.Params{})
+
+	require.True(t, wasMiddlewareCalled, "Expected the standard middleware to be called")
+	require.Equal(t, http.StatusAccepted, rr.Code)
 }
