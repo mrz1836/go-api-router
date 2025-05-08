@@ -11,16 +11,16 @@ import (
 	"github.com/mrz1836/go-logger"
 )
 
-// main fires on load (go run examples.go)
+// main fires on-load (go run examples.go)
 func main() {
-	// Load the router & middleware
+	// Load the router and middleware
 	router := apirouter.New()
 	port := "3000"
 
 	// Create a middleware stack
 	s := apirouter.NewStack()
 
-	// Use a Julien middleware
+	// Use Julien middleware
 	s.Use(passThrough)
 
 	// Set the main index page (navigating to slash)
@@ -29,7 +29,7 @@ func main() {
 	// Set a test method (testing converting a standard handler to a handle)
 	router.HTTPRouter.GET("/test", s.Wrap(router.Request(apirouter.StandardHandlerToHandle(StdHandler()))))
 
-	// Set the options request on slash for CrossOrigin
+	// Set the option request on slash for CrossOrigin
 	router.HTTPRouter.OPTIONS("/", router.SetCrossOriginHeaders)
 
 	// Logout the loading of the API
@@ -40,10 +40,10 @@ func main() {
 // index basic request to /
 func index(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	var welcomeMessageJSON = map[string]interface{}{"message": "Welcome to this simple API example!"}
-	apirouter.ReturnResponse(w, req, http.StatusOK, welcomeMessageJSON)
+	apirouter.RespondWith(w, req, http.StatusOK, welcomeMessageJSON)
 }
 
-// passThrough is an example middleware
+// passThrough is example middleware
 func passThrough(fn httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		logger.Data(2, logger.DEBUG, "middleware method hit!")
