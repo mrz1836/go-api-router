@@ -1,7 +1,7 @@
 /*
-Package apirouter is a lightweight API router middleware for CORS, logging, and standardized error handling.
+Package apirouter provides lightweight HTTP middleware for CORS handling, structured logging, and standardized API response formatting.
 
-This package is intended to be used with Julien Schmidt's httprouter and uses MrZ's go-logger package.
+It is designed to integrate seamlessly with Julien Schmidt's httprouter and leverages the go-logger package by MrZ for consistent logging across services.
 */
 package apirouter
 
@@ -70,7 +70,7 @@ var (
 	}
 )
 
-// paramRequestKey for context key
+// paramRequestKey for a context key
 type paramRequestKey string
 
 // Router is the configuration for the middleware service
@@ -97,16 +97,16 @@ func NewWithNewRelic(app *newrelic.Application) *Router {
 // defaultRouter is the default settings of the Router/Config
 func defaultRouter(app *newrelic.Application) (r *Router) {
 
-	// Create new configuration
+	// Create a new configuration
 	r = new(Router)
 
 	// Default is cross_origin = enabled
 	r.CrossOriginEnabled = true
 
-	// Default is to allow credentials for BasicAuth()
+	// The default is to allow credentials for BasicAuth()
 	r.CrossOriginAllowCredentials = true
 
-	// Default is to allow all (easier to get started)
+	// The default is to allow all (easier to get started)
 	r.CrossOriginAllowOriginAll = true
 
 	// Default is defaultHeaders
@@ -138,7 +138,7 @@ func (r *Router) setDefaults() {
 	r.HTTPRouter.RedirectTrailingSlash = true
 	r.HTTPRouter.RedirectFixedPath = true
 
-	// Turn on default CORs options handler
+	// Turn on the default CORs options handler
 	r.HTTPRouter.HandleOPTIONS = true
 	r.HTTPRouter.GlobalOPTIONS = http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 
@@ -309,12 +309,12 @@ func (r *Router) BasicAuth(h httprouter.Handle, requiredUser, requiredPassword s
 		user, password, hasAuth := req.BasicAuth()
 
 		if hasAuth && user == requiredUser && password == requiredPassword {
-			// Delegate request to the given handle
+			// Delegate a request to the given handle
 			h(w, req, ps)
 		} else {
 			// Request Basic Authentication otherwise
 			w.Header().Set(authenticateHeader, "Basic realm=Restricted")
-			ReturnResponse(w, req, http.StatusUnauthorized, errorResponse)
+			RespondWith(w, req, http.StatusUnauthorized, errorResponse)
 		}
 	}
 }
