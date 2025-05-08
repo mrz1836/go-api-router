@@ -3,12 +3,16 @@ package apirouter
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
+	"net/http"
+	"net/http/httptest"
+	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 )
 
-// TestJSONEncode_Basic tests the json encoder removes fields that are not approved
+// TestJSONEncode_Basic tests the JSON encoder removes fields that are not approved
 func TestJSONEncode_Basic(t *testing.T) {
 	t.Parallel()
 
@@ -54,7 +58,7 @@ func TestJSONEncode_Basic(t *testing.T) {
 	}
 }
 
-// TestJsonEncode_SubStruct tests the json encoder removes fields that are not approved
+// TestJsonEncode_SubStruct tests the JSON encoder removes fields that are not approved
 func TestJsonEncode_SubStruct(t *testing.T) {
 	t.Parallel()
 
@@ -371,4 +375,253 @@ func TestJSONEncode(t *testing.T) {
 		require.JSONEq(t, `{}`, buf.String())
 	})
 
+}
+
+// TestRespondWith tests the RespondWith function
+func TestRespondWith(t *testing.T) {
+	tests := []struct {
+		name         string
+		status       int
+		data         interface{}
+		expectedCode int
+		expectedBody string
+	}{
+		{
+			name:         "Struct data success",
+			status:       http.StatusOK,
+			data:         map[string]string{"hello": "world"},
+			expectedCode: http.StatusOK,
+			expectedBody: `{"hello":"world"}`,
+		},
+		{
+			name:         "Error data with client error status",
+			status:       http.StatusBadRequest,
+			data:         errors.New("invalid input"),
+			expectedCode: http.StatusBadRequest,
+			expectedBody: `{"error":"invalid input"}`,
+		},
+		{
+			name:         "Nil data with error status",
+			status:       http.StatusNotFound,
+			data:         nil,
+			expectedCode: http.StatusNotFound,
+			expectedBody: `{"error":"Not Found","code":404}`,
+		},
+		{
+			name:         "Nil data with no content status",
+			status:       http.StatusNoContent,
+			data:         nil,
+			expectedCode: http.StatusNoContent,
+			expectedBody: "",
+		},
+		{
+			name:         "Nil data with success status",
+			status:       http.StatusOK,
+			data:         nil,
+			expectedCode: http.StatusOK,
+			expectedBody: "null",
+		},
+		{
+			name:         "Unencodable data triggers internal error",
+			status:       http.StatusOK,
+			data:         make(chan int), // not JSON-encodable
+			expectedCode: http.StatusInternalServerError,
+			expectedBody: `{"error":"failed to encode response"}`,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := httptest.NewRequest(http.MethodGet, "/", nil)
+			rr := httptest.NewRecorder()
+
+			RespondWith(rr, req, tt.status, tt.data)
+
+			// Verify the status code matches expectation
+			require.Equal(t, tt.expectedCode, rr.Code, "HTTP status code mismatch")
+
+			// Verify Content-Type header (should be set for all responses with a body)
+			if tt.expectedCode != http.StatusNoContent && tt.expectedCode != http.StatusNotModified {
+				require.Equal(t, "application/json; charset=utf-8", rr.Header().Get("Content-Type"))
+			} else {
+				require.Empty(t, rr.Header().Get("Content-Type"), "Content-Type should be empty for status %d", tt.expectedCode)
+			}
+
+			// Verify response body content
+			bodyStr := rr.Body.String()
+			if tt.expectedBody == "" {
+				// For no-content responses, the body should be empty
+				require.Zero(t, rr.Body.Len(), "Expected no body for status %d", tt.expectedCode)
+			} else {
+				// Use JSONEq to ignore key order or formatting differences in JSON
+				require.JSONEq(t, tt.expectedBody, bodyStr, "Response body JSON mismatch")
+				// If Content-Length is set, verify it matches the body length
+				if cl := rr.Header().Get("Content-Length"); cl != "" {
+					require.Equal(t, strconv.Itoa(len(bodyStr)), cl, "Content-Length header mismatch")
+				}
+			}
+		})
+	}
+}
+
+// TestRespondWith_Expanded tests the RespondWith function with various data types
+func TestRespondWith_Expanded(t *testing.T) {
+	type customStruct struct {
+		Message string `json:"message"`
+		Value   int    `json:"value"`
+	}
+	type pointerStruct struct {
+		ID int `json:"id"`
+	}
+
+	tests := []struct {
+		name         string
+		status       int
+		data         interface{}
+		expectedCode int
+		expectedJSON string // leave empty when the body should be empty
+	}{
+		{
+			name:         "Map success",
+			status:       http.StatusOK,
+			data:         map[string]interface{}{"foo": "bar"},
+			expectedCode: http.StatusOK,
+			expectedJSON: `{"foo":"bar"}`,
+		},
+		{
+			name:         "Struct success",
+			status:       http.StatusCreated,
+			data:         customStruct{Message: "created", Value: 42},
+			expectedCode: http.StatusCreated,
+			expectedJSON: `{"message":"created","value":42}`,
+		},
+		{
+			name:         "Slice success",
+			status:       http.StatusOK,
+			data:         []string{"a", "b", "c"},
+			expectedCode: http.StatusOK,
+			expectedJSON: `["a","b","c"]`,
+		},
+		{
+			name:         "Primitive string",
+			status:       http.StatusOK,
+			data:         "hello world",
+			expectedCode: http.StatusOK,
+			expectedJSON: `"hello world"`,
+		},
+		{
+			name:         "Primitive int",
+			status:       http.StatusOK,
+			data:         123,
+			expectedCode: http.StatusOK,
+			expectedJSON: `123`,
+		},
+		{
+			name:         "Pointer to struct",
+			status:       http.StatusOK,
+			data:         &pointerStruct{ID: 7},
+			expectedCode: http.StatusOK,
+			expectedJSON: `{"id":7}`,
+		},
+		{
+			name:         "Error value with 400",
+			status:       http.StatusBadRequest,
+			data:         errors.New("bad input"),
+			expectedCode: http.StatusBadRequest,
+			expectedJSON: `{"error":"bad input"}`,
+		},
+		{
+			name:         "Nil payload with 404",
+			status:       http.StatusNotFound,
+			data:         nil,
+			expectedCode: http.StatusNotFound,
+			expectedJSON: `{"error":"Not Found","code":404}`,
+		},
+		{
+			name:         "Nil payload with 200 (explicit null)",
+			status:       http.StatusOK,
+			data:         nil,
+			expectedCode: http.StatusOK,
+			expectedJSON: `null`,
+		},
+		{
+			name:         "No‑content 204",
+			status:       http.StatusNoContent,
+			data:         nil,
+			expectedCode: http.StatusNoContent,
+			expectedJSON: ``,
+		},
+		{
+			name:         "Unencodable channel",
+			status:       http.StatusOK,
+			data:         make(chan int),
+			expectedCode: http.StatusInternalServerError,
+			expectedJSON: `{"error":"failed to encode response"}`,
+		},
+		{
+			name:         "Error status 422 with struct payload",
+			status:       http.StatusUnprocessableEntity,
+			data:         map[string]string{"reason": "validation failed"},
+			expectedCode: http.StatusUnprocessableEntity,
+			expectedJSON: `{"reason":"validation failed"}`,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// New request/recorder per sub‑test to avoid cross‑contamination
+			req := httptest.NewRequest(http.MethodGet, "/", nil)
+			rr := httptest.NewRecorder()
+
+			RespondWith(rr, req, tt.status, tt.data)
+
+			// --- Status code ---
+			require.Equal(t, tt.expectedCode, rr.Code, "status code")
+
+			// --- Body / headers ---
+			if tt.expectedJSON == "" {
+				// Expect empty body for 204 & 304
+				require.Zero(t, rr.Body.Len(), "body should be empty")
+				require.Empty(t, rr.Header().Get("Content-Type"))
+				return
+			}
+
+			require.Equal(t, "application/json; charset=utf-8", rr.Header().Get("Content-Type"))
+			require.JSONEq(t, tt.expectedJSON, rr.Body.String(), "body JSON mismatch")
+
+			// Content‑Length should match body length when set
+			if cl := rr.Header().Get("Content-Length"); cl != "" {
+				require.Equal(t, strconv.Itoa(len(rr.Body.Bytes())), cl, "Content-Length mismatch")
+			}
+		})
+	}
+}
+
+// ----------   Benchmarks   ----------
+
+// Note: ReturnResponse is assumed to be the legacy wrapper that still calls matryer/respond.With.
+// If its signature differs, adjust the benchmark accordingly.
+
+// BenchmarkRespondWith tests the performance of RespondWith
+func BenchmarkRespondWith(b *testing.B) {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	payload := map[string]string{"hello": "world"}
+
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		rr := httptest.NewRecorder()
+		RespondWith(rr, req, http.StatusOK, payload)
+	}
+}
+
+// BenchmarkReturnResponse tests the performance of ReturnResponse
+func BenchmarkReturnResponse(b *testing.B) {
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	payload := map[string]string{"hello": "world"}
+
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		rr := httptest.NewRecorder()
+		ReturnResponse(rr, req, http.StatusOK, payload)
+	}
 }

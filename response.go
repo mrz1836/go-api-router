@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"reflect"
+	"strconv"
 	"strings"
 
 	"github.com/matryer/respond"
@@ -15,6 +16,7 @@ import (
 type AllowedKeys map[string]interface{}
 
 // ReturnResponse helps return a status code and message to the end user
+// deprecated: use RespondWith instead
 func ReturnResponse(w http.ResponseWriter, req *http.Request, code int, data interface{}) {
 	// w.Header().Set(connectionHeader, "close")
 	respond.With(w, req, code, data)
@@ -212,4 +214,49 @@ func jsonMap(obj interface{}) map[string]interface{} {
 	}
 
 	return fieldValues
+}
+
+// RespondWith writes a JSON response with the specified status code and data to the ResponseWriter.
+// It sets the "Content-Type" header to "application/json; charset=utf-8". The data is serialized to JSON.
+//
+// If data is an error, it responds with a JSON object {"error": <error message>}.
+// If data is nil and the status is an error (>= 400), it responds with {"error": <StatusText>, "code": <status>}.
+// If the status is 204 (No Content) or 304 (Not Modified), no response body is sent.
+//
+// This function ensures a single response per request and is safe for use in HTTP handlers.
+func RespondWith(w http.ResponseWriter, _ *http.Request, status int, data interface{}) {
+
+	// If no content is expected, send just the status and no "body"
+	if status == http.StatusNoContent || status == http.StatusNotModified {
+		w.WriteHeader(status)
+		return
+	}
+
+	// Convert error to a JSON error payload for better readability
+	if err, ok := data.(error); ok && err != nil {
+		data = map[string]interface{}{"error": err.Error()}
+	}
+	// Provide a default body for error status codes with no data
+	if data == nil && status >= 400 {
+		data = map[string]interface{}{
+			"error": http.StatusText(status),
+			"code":  status,
+		}
+	}
+
+	// Serialize data to JSON
+	responseBody, err := json.Marshal(data)
+	if err != nil {
+		// If serialization fails, respond with a generic error message
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(http.StatusInternalServerError)
+		_, _ = w.Write([]byte(`{"error":"failed to encode response"}`))
+		return
+	}
+
+	// Set headers and write the response
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("Content-Length", strconv.Itoa(len(responseBody)))
+	w.WriteHeader(status)
+	_, _ = w.Write(responseBody)
 }
