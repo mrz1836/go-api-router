@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -13,7 +13,10 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/mrz1836/go-logger"
+	"github.com/newrelic/go-agent/v3/integrations/nrhttprouter"
 	"github.com/newrelic/go-agent/v3/newrelic"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 // testStruct is for testing restricted fields
@@ -210,7 +213,7 @@ func TestRouter_RequestNoLogging(t *testing.T) {
 func TestReturnJSONEncode(t *testing.T) {
 	t.Parallel()
 
-	// Create new test recorder
+	// Create a new test recorder
 	req := httptest.NewRequest(
 		http.MethodGet, "/test?this=that&id=123", strings.NewReader(""),
 	)
@@ -232,7 +235,7 @@ func TestReturnJSONEncode(t *testing.T) {
 	}()
 
 	// read body
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Fatal("got an error", err.Error())
 	}
@@ -254,7 +257,7 @@ func TestReturnJSONEncode(t *testing.T) {
 func TestReturnResponse(t *testing.T) {
 	t.Parallel()
 
-	// Create new test recorder
+	// Create a new test recorder
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	w := httptest.NewRecorder()
 
@@ -272,7 +275,7 @@ func TestReturnResponse(t *testing.T) {
 	defer func() {
 		_ = resp.Body.Close()
 	}()
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Fatal("got an error", err.Error())
 	}
@@ -294,7 +297,7 @@ func TestReturnResponse(t *testing.T) {
 func TestReturnResponse_WithJSON(t *testing.T) {
 	t.Parallel()
 
-	// Create new test recorder
+	// Create a new test recorder
 	req := httptest.NewRequest(http.MethodGet, "/", strings.NewReader(""))
 	w := httptest.NewRecorder()
 
@@ -312,7 +315,7 @@ func TestReturnResponse_WithJSON(t *testing.T) {
 	defer func() {
 		_ = resp.Body.Close()
 	}()
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Fatal("got an error", err.Error())
 	}
@@ -333,7 +336,7 @@ func TestReturnResponse_WithJSON(t *testing.T) {
 func TestRouter_SetCrossOriginHeaders(t *testing.T) {
 	t.Parallel()
 
-	// Create new test recorder
+	// Create a new test recorder
 	req := httptest.NewRequest(http.MethodGet, "/", strings.NewReader(""))
 	w := httptest.NewRecorder()
 
@@ -377,7 +380,7 @@ func TestRouter_SetCrossOriginHeaders(t *testing.T) {
 	defer func() {
 		_ = resp.Body.Close()
 	}()
-	if _, err := ioutil.ReadAll(resp.Body); err != nil {
+	if _, err := io.ReadAll(resp.Body); err != nil {
 		t.Fatal("got an error", err.Error())
 	}
 }
@@ -386,7 +389,7 @@ func TestRouter_SetCrossOriginHeaders(t *testing.T) {
 func TestRouter_SetCrossOriginHeaders_Disabled(t *testing.T) {
 	t.Parallel()
 
-	// Create new test recorder
+	// Create a new test recorder
 	req := httptest.NewRequest(http.MethodGet, "/", strings.NewReader(""))
 	w := httptest.NewRecorder()
 
@@ -431,7 +434,7 @@ func TestRouter_SetCrossOriginHeaders_Disabled(t *testing.T) {
 	defer func() {
 		_ = resp.Body.Close()
 	}()
-	if _, err := ioutil.ReadAll(resp.Body); err != nil {
+	if _, err := io.ReadAll(resp.Body); err != nil {
 		t.Fatal("got an error", err.Error())
 	}
 }
@@ -440,7 +443,7 @@ func TestRouter_SetCrossOriginHeaders_Disabled(t *testing.T) {
 func TestRouter_SetCrossOriginHeaders_CustomOrigin(t *testing.T) {
 	t.Parallel()
 
-	// Create new test recorder
+	// Create a new test recorder
 	req := httptest.NewRequest(http.MethodGet, "/", strings.NewReader(""))
 	w := httptest.NewRecorder()
 
@@ -468,7 +471,7 @@ func TestRouter_SetCrossOriginHeaders_CustomOrigin(t *testing.T) {
 	defer func() {
 		_ = resp.Body.Close()
 	}()
-	if _, err := ioutil.ReadAll(resp.Body); err != nil {
+	if _, err := io.ReadAll(resp.Body); err != nil {
 		t.Fatal("got an error", err.Error())
 	}
 }
@@ -519,4 +522,54 @@ func indexTestReturnJSONEncode(w http.ResponseWriter, _ *http.Request, _ httprou
 	if err != nil {
 		logger.Data(2, logger.ERROR, err.Error())
 	}
+}
+
+// TestRouter_setDefaults tests the setDefaults() method
+func TestRouter_setDefaults(t *testing.T) {
+	t.Run("sets defaults when fields are unset", func(t *testing.T) {
+		// Load the router and middleware
+		// router := New()
+
+		r := &Router{}
+		r.HTTPRouter = nrhttprouter.New(nil)
+		r.setDefaults()
+		r.CrossOriginEnabled = true
+
+		require.NotNil(t, r.HTTPRouter, "HTTPRouter should be initialized")
+		assert.True(t, r.HTTPRouter.RedirectTrailingSlash, "RedirectTrailingSlash should be initialized")
+		assert.True(t, r.HTTPRouter.RedirectFixedPath, "RedirectFixedPath should be initialized")
+		assert.True(t, r.HTTPRouter.HandleOPTIONS, "HandleOPTIONS should be initialized")
+		assert.NotNil(t, r.HTTPRouter.GlobalOPTIONS)
+	})
+}
+
+// TestRouter_GlobalOPTIONSHandler tests the GlobalOPTIONSHandler
+func TestRouter_GlobalOPTIONSHandler(t *testing.T) {
+	t.Run("sets correct headers for CORS preflight", func(t *testing.T) {
+		r := &Router{
+			CrossOriginEnabled:          true,
+			CrossOriginAllowOriginAll:   true,
+			CrossOriginAllowMethods:     http.MethodGet + ", " + http.MethodPost,
+			CrossOriginAllowHeaders:     "Content-Type, Authorization",
+			CrossOriginAllowCredentials: true,
+		}
+		r.HTTPRouter = nrhttprouter.New(nil)
+		r.setDefaults()
+
+		req := httptest.NewRequest(http.MethodOptions, "/test", nil)
+		req.Header.Set("Origin", "https://example.com")
+
+		rr := httptest.NewRecorder()
+		r.HTTPRouter.GlobalOPTIONS.ServeHTTP(rr, req)
+
+		// Check status code
+		require.Equal(t, http.StatusNoContent, rr.Code)
+
+		// Check headers
+		require.Equal(t, "https://example.com", rr.Header().Get("Access-Control-Allow-Origin"))
+		require.Equal(t, "true", rr.Header().Get("Access-Control-Allow-Credentials"))
+		require.Equal(t, http.MethodGet+", "+http.MethodPost, rr.Header().Get("Access-Control-Allow-Methods"))
+		require.Equal(t, "Content-Type, Authorization", rr.Header().Get("Access-Control-Allow-Headers"))
+		require.Equal(t, "Origin", rr.Header().Get("Vary"))
+	})
 }
