@@ -8,7 +8,7 @@ require (
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/matryer/respond v1.0.1
 	github.com/mrz1836/go-logger v0.3.6
-	github.com/mrz1836/go-parameters v0.6.1
+	github.com/mrz1836/go-parameters v0.6.2
 	github.com/newrelic/go-agent/v3 v3.39.0
 	github.com/newrelic/go-agent/v3/integrations/nrhttprouter v1.1.3
 	github.com/stretchr/testify v1.10.0
@@ -20,7 +20,7 @@ require (
 	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
-	github.com/ugorji/go/codec v1.2.12 // indirect
+	github.com/ugorji/go/codec v1.2.13 // indirect
 	golang.org/x/net v0.40.0 // indirect
 	golang.org/x/sys v0.33.0 // indirect
 	golang.org/x/text v0.25.0 // indirect
