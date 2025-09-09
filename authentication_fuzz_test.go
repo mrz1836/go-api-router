@@ -105,7 +105,7 @@ func FuzzGetTokenFromHeader(f *testing.F) {
 		"Bearer multiple words in token",
 		"Token without-bearer-prefix",
 		"Bearer token.with.dots.like.jwt",
-		"Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ", // Real JWT
+		"Bearer fake.jwt.token", // JWT-like format
 		"Multiple Bearer tokens Bearer second-token",
 		" Bearer token-with-leading-space",
 		"Bearer token-with-trailing-space ",

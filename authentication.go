@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strings"
 	"time"
+	"unicode/utf8"
 
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -194,8 +195,12 @@ func GetClaims(req *http.Request) Claims {
 // GetTokenFromHeaderFromRequest will get the token value from the request
 func GetTokenFromHeaderFromRequest(req *http.Request) string {
 	headerVal := req.Header.Get(AuthorizationHeader)
-	if parts := strings.Split(headerVal, " "); len(parts) > 1 {
-		return parts[1]
+	headerVal = strings.TrimSpace(headerVal)
+	if len(headerVal) > 7 && strings.EqualFold(headerVal[:6], "Bearer") && headerVal[6] == ' ' {
+		token := strings.TrimSpace(headerVal[7:])
+		if utf8.ValidString(token) {
+			return token
+		}
 	}
 	return ""
 }
@@ -203,8 +208,12 @@ func GetTokenFromHeaderFromRequest(req *http.Request) string {
 // GetTokenFromHeader will get the token value from the header
 func GetTokenFromHeader(w http.ResponseWriter) string {
 	headerVal := w.Header().Get(AuthorizationHeader)
-	if parts := strings.Split(headerVal, " "); len(parts) > 1 {
-		return parts[1]
+	headerVal = strings.TrimSpace(headerVal)
+	if len(headerVal) > 7 && strings.EqualFold(headerVal[:6], "Bearer") && headerVal[6] == ' ' {
+		token := strings.TrimSpace(headerVal[7:])
+		if utf8.ValidString(token) {
+			return token
+		}
 	}
 	return ""
 }
@@ -212,8 +221,12 @@ func GetTokenFromHeader(w http.ResponseWriter) string {
 // GetTokenFromResponse will get the token value from the HTTP response
 func GetTokenFromResponse(res *http.Response) string {
 	headerVal := res.Header.Get(AuthorizationHeader)
-	if parts := strings.Split(headerVal, " "); len(parts) > 1 {
-		return parts[1]
+	headerVal = strings.TrimSpace(headerVal)
+	if len(headerVal) > 7 && strings.EqualFold(headerVal[:6], "Bearer") && headerVal[6] == ' ' {
+		token := strings.TrimSpace(headerVal[7:])
+		if utf8.ValidString(token) {
+			return token
+		}
 	}
 	return ""
 }
