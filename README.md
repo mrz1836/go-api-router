@@ -118,7 +118,7 @@ update-linter        Update the golangci-lint package (macOS only)
 vet                  Run the Go vet application
 ```
 </details>
- 
+
 <br/>
 
 ## Examples & Tests
@@ -201,9 +201,9 @@ func index(w http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
 View the [contributing guidelines](.github/CONTRIBUTING.md) and please follow the [code of conduct](.github/CODE_OF_CONDUCT.md).
 
 ### How can I help?
-All kinds of contributions are welcome :raised_hands:! 
-The most basic way to show your support is to star :star2: the project, or to raise issues :speech_balloon:. 
-You can also support this project by [becoming a sponsor on GitHub](https://github.com/sponsors/mrz1836) :clap: 
+All kinds of contributions are welcome :raised_hands:!
+The most basic way to show your support is to star :star2: the project, or to raise issues :speech_balloon:.
+You can also support this project by [becoming a sponsor on GitHub](https://github.com/sponsors/mrz1836) :clap:
 or by making a [**bitcoin donation**](https://mrz1818.com/?tab=tips&utm_source=github&utm_medium=sponsor-link&utm_campaign=go-api-router&utm_term=go-api-router&utm_content=go-api-router) to ensure this journey continues indefinitely! :rocket:
 
 [![Stars](https://img.shields.io/github/stars/mrz1836/go-api-router?label=Please%20like%20us&style=social)](https://github.com/mrz1836/go-api-router/stargazers)
