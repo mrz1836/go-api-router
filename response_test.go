@@ -12,6 +12,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// Static test errors
+var (
+	errInvalidInput = errors.New("invalid input")
+	errBadInput     = errors.New("bad input")
+)
+
 // TestJSONEncode_Basic tests the JSON encoder removes fields that are not approved
 func TestJSONEncode_Basic(t *testing.T) {
 	t.Parallel()
@@ -24,9 +30,9 @@ func TestJSONEncode_Basic(t *testing.T) {
 	}
 
 	// Base model and test model
-	var model = new(TestStruct)
-	var modelTest = new(TestStruct)
-	var allowedFields = []string{"test_key", "test_key_two"} // notice omitted: notAllowed
+	model := new(TestStruct)
+	modelTest := new(TestStruct)
+	allowedFields := []string{"test_key", "test_key_two"} // notice omitted: notAllowed
 
 	// Set the testing data
 	model.TestKey = "TestValue1"
@@ -74,9 +80,9 @@ func TestJsonEncode_SubStruct(t *testing.T) {
 	}
 
 	// Base model and test model
-	var model = new(TestStruct)
-	var modelTest = new(TestStruct)
-	var allowedFields = []string{"test_key", "test_key_two"} // notice omitted: notAllowed
+	model := new(TestStruct)
+	modelTest := new(TestStruct)
+	allowedFields := []string{"test_key", "test_key_two"} // notice omitted: notAllowed
 
 	// Set the testing data
 	model.TestKey = "TestValue1"
@@ -106,7 +112,6 @@ func TestJsonEncode_SubStruct(t *testing.T) {
 	} else if modelTest.NotAllowed == "PrivateValue" {
 		t.Fatal("Field not removed! notAllowed does not have the right value! Encoding failed.", modelTest.NotAllowed)
 	}
-
 }
 
 // TestJSONEncodeHierarchy tests the JSONEncodeHierarchy function
@@ -304,8 +309,9 @@ func TestJSONEncode(t *testing.T) {
 			InnerField string `json:"inner_field"`
 		}
 		type Outer struct {
-			ID int `json:"id"`
 			Inner
+
+			ID int `json:"id"`
 		}
 
 		input := Outer{ID: 1, Inner: Inner{InnerField: "nested"}}
@@ -374,7 +380,6 @@ func TestJSONEncode(t *testing.T) {
 		require.NoError(t, err)
 		require.JSONEq(t, `{}`, buf.String())
 	})
-
 }
 
 // TestRespondWith tests the RespondWith function
@@ -396,7 +401,7 @@ func TestRespondWith(t *testing.T) {
 		{
 			name:         "Error data with client error status",
 			status:       http.StatusBadRequest,
-			data:         errors.New("invalid input"),
+			data:         errInvalidInput,
 			expectedCode: http.StatusBadRequest,
 			expectedBody: `{"error":"invalid input"}`,
 		},
@@ -526,7 +531,7 @@ func TestRespondWith_Expanded(t *testing.T) {
 		{
 			name:         "Error value with 400",
 			status:       http.StatusBadRequest,
-			data:         errors.New("bad input"),
+			data:         errBadInput,
 			expectedCode: http.StatusBadRequest,
 			expectedJSON: `{"error":"bad input"}`,
 		},
@@ -599,7 +604,7 @@ func TestRespondWith_Expanded(t *testing.T) {
 
 // ----------   Benchmarks   ----------
 
-// Note: ReturnResponse is assumed to be the legacy wrapper that still calls matryer/respond.With.
+// ReturnResponse is assumed to be the legacy wrapper that still calls matryer/respond.With.
 // If its signature differs, adjust the benchmark accordingly.
 
 // BenchmarkRespondWith tests the performance of RespondWith

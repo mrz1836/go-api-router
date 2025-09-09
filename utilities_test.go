@@ -15,7 +15,7 @@ func TestSnakeCase(t *testing.T) {
 	t.Parallel()
 
 	// Create the list of tests
-	var tests = []struct {
+	tests := []struct {
 		input    string
 		expected string
 	}{
@@ -53,7 +53,6 @@ func TestFindString(t *testing.T) {
 	if index := FindString("wrong", haystack); index >= 0 {
 		t.Fatal("FindString does not work correctly!")
 	}
-
 }
 
 // TestGetParams test getting params
@@ -307,5 +306,4 @@ func TestNoCache(t *testing.T) {
 			t.Fatal("header should have been added", key)
 		}
 	}
-
 }

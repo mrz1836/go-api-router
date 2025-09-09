@@ -27,14 +27,15 @@ type testStruct struct {
 	RestrictedField string `json:"restricted_field"`
 }
 
-var (
-	// All fields that can be displayed
-	testRestrictedFields = []string{
-		"id",
-		"field_one",
-		"field_two",
-	}
-)
+// All fields that can be displayed
+var testRestrictedFields = []string{
+	"id",
+	"field_one",
+	"field_two",
+}
+
+// Static test error for panic tests
+var errTestPanic = fmt.Errorf("error occurred")
 
 // TestNew tests the New() method
 func TestNew(t *testing.T) {
@@ -495,24 +496,23 @@ func TestPanic(t *testing.T) {
 
 // indexTestPanic basic request to trigger a panic
 func indexTestPanic(_ http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
-	panic(fmt.Errorf("error occurred"))
+	panic(errTestPanic)
 }
 
 // indexTestNoJSON basic request to /
 func indexTestNoJSON(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	var testDataJSON = map[string]interface{}{"message": "Welcome to this simple API example!"}
+	testDataJSON := map[string]interface{}{"message": "Welcome to this simple API example!"}
 	ReturnResponse(w, req, http.StatusOK, testDataJSON)
 }
 
 // indexTestNoJSON basic request to /
 func indexTestJSON(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	var testDataJSON = map[string]interface{}{"message": "test"}
+	testDataJSON := map[string]interface{}{"message": "test"}
 	ReturnResponse(w, req, http.StatusCreated, testDataJSON)
 }
 
 // indexTestNoJSON basic request to /
 func indexTestReturnJSONEncode(w http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
-
 	testFields := new(testStruct)
 	testFields.ID = 123
 	testFields.FieldOne = "this"

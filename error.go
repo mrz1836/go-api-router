@@ -30,7 +30,6 @@ type APIError struct {
 
 // ErrorFromResponse generates a new error struct using CustomResponseWriter from LogRequest()
 func ErrorFromResponse(w *APIResponseWriter, internalMessage, publicMessage string, errorCode, statusCode int, data interface{}) *APIError {
-
 	// Log the error
 	logError(statusCode, internalMessage, w.RequestID, w.IPAddress)
 
@@ -50,7 +49,6 @@ func ErrorFromResponse(w *APIResponseWriter, internalMessage, publicMessage stri
 
 // ErrorFromRequest gives an error without a response writer using the request
 func ErrorFromRequest(req *http.Request, internalMessage, publicMessage string, errorCode, statusCode int, data interface{}) *APIError {
-
 	// Get values from req if available
 	ip, _ := GetIPFromRequest(req)
 	id, _ := GetRequestID(req)
@@ -74,7 +72,6 @@ func ErrorFromRequest(req *http.Request, internalMessage, publicMessage string, 
 
 // logError will log the internal message and code for diagnosing
 func logError(statusCode int, internalMessage, requestID, ipAddress string) {
-
 	// Skip non-error codes
 	if statusCode < http.StatusBadRequest || statusCode == http.StatusNotFound {
 		return

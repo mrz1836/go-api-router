@@ -9,7 +9,6 @@ import (
 
 // setupTest creates the foundation for each error test
 func setupTest() *APIResponseWriter {
-
 	var w http.ResponseWriter
 
 	// Start the custom response writer

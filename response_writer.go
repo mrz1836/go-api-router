@@ -10,6 +10,7 @@ import (
 // It is used by the LogRequest middleware
 type APIResponseWriter struct {
 	http.ResponseWriter
+
 	Buffer          bytes.Buffer  `json:"-" url:"-"`
 	CacheIdentifier []string      `json:"cache_identifier" url:"cache_identifier"`
 	CacheTTL        time.Duration `json:"cache_ttl" url:"cache_ttl"`

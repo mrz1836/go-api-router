@@ -21,6 +21,7 @@ var noCacheHeaders = map[string]string{
 	"Pragma":          "no-cache",
 	"X-Accel-Expires": "0",
 }
+
 var etagHeaders = []string{
 	"ETag",
 	"If-Match",
@@ -59,7 +60,6 @@ func FindString(needle string, haystack []string) int {
 
 // FilterMap will filter the parameters and not log parameters with sensitive data. To add more parameters - see the if in the loop.
 func FilterMap(params *parameters.Params, filterOutFields []string) (filtered *parameters.Params) {
-
 	// Filtered parameters
 	filtered = new(parameters.Params)
 
@@ -124,7 +124,6 @@ func GetClientIPAddress(req *http.Request) string {
 
 		// Do we have more than one?
 		if strings.Contains(ip, ",") {
-
 			// Set the first ip address (from AWS)
 			ip = strings.Split(ip, ",")[0]
 		}
@@ -135,7 +134,7 @@ func GetClientIPAddress(req *http.Request) string {
 		// Remove bracket if local host
 		ip = strings.Replace(ip, "[", "", 1)
 
-		// Hack if no ip is found
+		// Fallback for missing IP address (commented out)
 		// if len(ip) == 0 {
 		//	ip = "localhost"
 		// }
@@ -187,7 +186,6 @@ func GetCustomData(req *http.Request) (data interface{}) {
 //	X-Accel-Expires: 0
 //	Pragma: no-cache (for HTTP/1.0 proxies/clients)
 func NoCache(w http.ResponseWriter, req *http.Request) {
-
 	// Delete any ETag headers that may have been set
 	for _, v := range etagHeaders {
 		if req.Header.Get(v) != "" {

@@ -7,7 +7,7 @@ import (
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/mrz1836/go-api-router"
+	apirouter "github.com/mrz1836/go-api-router"
 	"github.com/mrz1836/go-logger"
 )
 
@@ -39,7 +39,7 @@ func main() {
 
 // index basic request to /
 func index(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	var welcomeMessageJSON = map[string]interface{}{"message": "Welcome to this simple API example!"}
+	welcomeMessageJSON := map[string]interface{}{"message": "Welcome to this simple API example!"}
 	apirouter.RespondWith(w, req, http.StatusOK, welcomeMessageJSON)
 }
 

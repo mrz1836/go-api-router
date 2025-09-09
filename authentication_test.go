@@ -297,7 +297,6 @@ func TestClaims_CreateToken(t *testing.T) {
 		require.NoError(t, err)
 		assert.True(t, valid)
 	})
-
 }
 
 // TestCreateToken will test the method CreateToken()
@@ -313,7 +312,6 @@ func TestCreateToken(t *testing.T) {
 	assert.NotEmpty(t, secret)
 
 	t.Run("valid token", func(t *testing.T) {
-
 		var token string
 		token, err = CreateToken(
 			secret,
@@ -327,7 +325,6 @@ func TestCreateToken(t *testing.T) {
 	})
 
 	t.Run("missing user id", func(t *testing.T) {
-
 		var token string
 		token, err = CreateToken(
 			secret,
@@ -341,7 +338,6 @@ func TestCreateToken(t *testing.T) {
 	})
 
 	t.Run("missing issuer", func(t *testing.T) {
-
 		var token string
 		token, err = CreateToken(
 			secret,
@@ -355,7 +351,6 @@ func TestCreateToken(t *testing.T) {
 	})
 
 	t.Run("missing session id", func(t *testing.T) {
-
 		var token string
 		token, err = CreateToken(
 			secret,
@@ -369,7 +364,6 @@ func TestCreateToken(t *testing.T) {
 	})
 
 	t.Run("missing secret", func(t *testing.T) {
-
 		var token string
 		token, err = CreateToken(
 			"",
@@ -383,7 +377,6 @@ func TestCreateToken(t *testing.T) {
 	})
 
 	t.Run("create token - verify", func(t *testing.T) {
-
 		var token string
 		token, err = CreateToken(
 			secret,
@@ -418,7 +411,6 @@ func TestCreateToken(t *testing.T) {
 	})
 
 	t.Run("verify - missing token in header", func(t *testing.T) {
-
 		var token string
 		token, err = CreateToken(
 			secret,
@@ -445,7 +437,6 @@ func TestCreateToken(t *testing.T) {
 	})
 
 	t.Run("verify - invalid token", func(t *testing.T) {
-
 		var token string
 		token, err = CreateToken(
 			secret,
@@ -474,7 +465,6 @@ func TestCreateToken(t *testing.T) {
 	})
 
 	t.Run("verify - invalid issuer", func(t *testing.T) {
-
 		var token string
 		token, err = CreateToken(
 			secret,
@@ -503,7 +493,6 @@ func TestCreateToken(t *testing.T) {
 	})
 
 	t.Run("verify - invalid expiration time", func(t *testing.T) {
-
 		var token string
 		token, err = CreateToken(
 			secret,

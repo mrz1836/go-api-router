@@ -24,7 +24,6 @@ func ReturnResponse(w http.ResponseWriter, req *http.Request, code int, data int
 
 // ReturnJSONEncode is a mixture of ReturnResponse and JSONEncode
 func ReturnJSONEncode(w http.ResponseWriter, code int, e *json.Encoder, objects interface{}, allowed []string) (err error) {
-
 	// Set the content if JSON
 	w.Header().Set(contentTypeHeader, "application/json")
 
@@ -41,7 +40,7 @@ func ReturnJSONEncode(w http.ResponseWriter, code int, e *json.Encoder, objects 
 }
 
 // JSONEncodeHierarchy will execute JSONEncode for multiple nested objects
-func JSONEncodeHierarchy(w io.Writer, objects interface{}, allowed interface{}) error {
+func JSONEncodeHierarchy(w io.Writer, objects, allowed interface{}) error {
 	if allowed == nil {
 		return json.NewEncoder(w).Encode(objects)
 	}
@@ -225,7 +224,6 @@ func jsonMap(obj interface{}) map[string]interface{} {
 //
 // This function ensures a single response per request and is safe for use in HTTP handlers.
 func RespondWith(w http.ResponseWriter, _ *http.Request, status int, data interface{}) {
-
 	// If no content is expected, send just the status and no "body"
 	if status == http.StatusNoContent || status == http.StatusNotModified {
 		w.WriteHeader(status)

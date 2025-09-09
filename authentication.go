@@ -23,13 +23,13 @@ const (
 
 // Claims is our custom JWT claims
 type Claims struct {
-	jwt.RegisteredClaims        // Updated to use RegisteredClaims
-	UserID               string `json:"user_id"` // The user ID set on the claims
+	jwt.RegisteredClaims // Updated to use RegisteredClaims
+
+	UserID string `json:"user_id"` // The user ID set on the claims
 }
 
 // CreateToken will make a token from claims
 func (c Claims) CreateToken(expiration time.Duration, sessionSecret string) (string, error) {
-
 	// Create a new token object, specifying signing method, and the claims
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, createClaims(c.UserID, c.Issuer, c.ID, expiration))
 
@@ -39,7 +39,6 @@ func (c Claims) CreateToken(expiration time.Duration, sessionSecret string) (str
 
 // Verify will check the claims against known verifications
 func (c Claims) Verify(issuer string) (bool, error) {
-
 	// Invalid issuer
 	if c.Issuer != issuer {
 		return false, ErrIssuerMismatch
@@ -83,8 +82,8 @@ func createClaims(userID, issuer, sessionID string, expiration time.Duration) Cl
 
 // CreateToken will make the claims, and then make/sign the token
 func CreateToken(sessionSecret, userID, issuer, sessionID string,
-	expiration time.Duration) (string, error) {
-
+	expiration time.Duration,
+) (string, error) {
 	// Create a new token object, specifying signing method, and the claims
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, createClaims(userID, issuer, sessionID, expiration))
 
@@ -94,7 +93,6 @@ func CreateToken(sessionSecret, userID, issuer, sessionID string,
 
 // ClearToken will remove the token from the response and request
 func ClearToken(w http.ResponseWriter, req *http.Request) {
-
 	// Remove from response
 	w.Header().Del(AuthorizationHeader)
 
@@ -119,8 +117,8 @@ func ClearToken(w http.ResponseWriter, req *http.Request) {
 
 // Check will check if the JWT is present and valid in the request and then extend the token
 func Check(w http.ResponseWriter, r *http.Request, sessionSecret, issuer string,
-	sessionAge time.Duration) (authenticated bool, req *http.Request, err error) {
-
+	sessionAge time.Duration,
+) (authenticated bool, req *http.Request, err error) {
 	var jwtToken string
 
 	// Look for a cookie value first
@@ -133,7 +131,7 @@ func Check(w http.ResponseWriter, r *http.Request, sessionSecret, issuer string,
 		authHeader := strings.Split(authHeaderValue, AuthorizationBearer+" ")
 		if len(authHeader) != 2 {
 			err = ErrHeaderInvalid
-			return
+			return authenticated, req, err
 		}
 		// Set the token value
 		jwtToken = authHeader[1]
@@ -148,7 +146,7 @@ func Check(w http.ResponseWriter, r *http.Request, sessionSecret, issuer string,
 		}
 		return []byte(sessionSecret), nil
 	}); err != nil {
-		return
+		return authenticated, req, err
 	}
 
 	// Check we have claims and validity of token
@@ -157,7 +155,7 @@ func Check(w http.ResponseWriter, r *http.Request, sessionSecret, issuer string,
 		// Now verify the claims are good
 		if _, claimErr := claims.Verify(issuer); claimErr != nil {
 			err = ErrClaimsValidationFailed
-			return
+			return authenticated, req, err
 		}
 
 		// Create new token
@@ -169,7 +167,7 @@ func Check(w http.ResponseWriter, r *http.Request, sessionSecret, issuer string,
 			claims.ID,
 			sessionAge,
 		); err != nil {
-			return
+			return authenticated, req, err
 		}
 
 		// Set the token in the writer (response)
@@ -182,7 +180,7 @@ func Check(w http.ResponseWriter, r *http.Request, sessionSecret, issuer string,
 		err = ErrJWTInvalid
 	}
 
-	return
+	return authenticated, req, err
 }
 
 // GetClaims will return the current claims from the request
@@ -222,7 +220,6 @@ func GetTokenFromResponse(res *http.Response) string {
 
 // SetTokenHeader will set the authentication token on the response and set a cookie
 func SetTokenHeader(w http.ResponseWriter, r *http.Request, token string, expiration time.Duration) {
-
 	// Set on the response
 	w.Header().Set(AuthorizationHeader, AuthorizationBearer+" "+token)
 
