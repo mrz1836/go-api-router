@@ -210,10 +210,14 @@ jobs:
                   }
                 " fuzz-output.log)
 
-                # Get package name from go.mod or use default
-                PACKAGE_NAME="github.com/mrz1836/go-api-router"
+                # Get package name from go.mod or use git context fallback
+                PACKAGE_NAME="${{ github.repository }}"
                 if [[ -f go.mod ]]; then
                   PACKAGE_NAME=$(head -1 go.mod | awk '{print $2}')
+                elif [[ -n "${{ github.server_url }}" && -n "${{ github.repository }}" ]]; then
+                  # Use GitHub context as fallback
+                  PACKAGE_NAME="${{ github.server_url }}/${{ github.repository }}"
+                  PACKAGE_NAME=${PACKAGE_NAME#https://}
                 fi
 
                 # Calculate elapsed time from the failure line (extract from parentheses)
@@ -251,16 +255,23 @@ jobs:
             if [[ -f fuzz-failures-signatures.json ]] && [[ $(jq 'length' fuzz-failures-signatures.json 2>/dev/null || echo "0") -eq 0 ]]; then
               echo "📝 Updating empty signatures file with fuzz test failures..."
 
-              # Get package name
-              PACKAGE_NAME="github.com/mrz1836/go-api-router"
+              # Get package name from go.mod or use git context fallback
+              PACKAGE_NAME="${{ github.repository }}"
               if [[ -f go.mod ]]; then
                 PACKAGE_NAME=$(head -1 go.mod | awk '{print $2}')
+              elif [[ -n "${{ github.server_url }}" && -n "${{ github.repository }}" ]]; then
+                # Use GitHub context as fallback
+                PACKAGE_NAME="${{ github.server_url }}/${{ github.repository }}"
+                PACKAGE_NAME=${PACKAGE_NAME#https://}
               fi
 
               # Create signature entries from the failures
               SIGNATURE_ENTRIES='[]'
               if [[ -f test-failures-summary.json ]] && [[ $(jq 'length' test-failures-summary.json 2>/dev/null || echo "0") -gt 0 ]]; then
-                SIGNATURE_ENTRIES=$(jq '[
+                # Store GitHub Actions values in bash variable for proper escaping
+                MATRIX_JOB_ID="fuzz-${{ inputs.primary-runner }}-${{ inputs.go-primary-version }}"
+
+                SIGNATURE_ENTRIES=$(jq --arg matrix_job "$MATRIX_JOB_ID" '[
                   .[] as $parent | $parent.failures[] | {
                     type: "test",
                     package: $parent.Package,
@@ -268,7 +279,7 @@ jobs:
                     output: .Output,
                     signature: ($parent.Package + ":" + .Test),
                     unique_id: (($parent.Package + ":" + .Test) | gsub("[^a-zA-Z0-9_/.-]"; "_")),
-                    matrix_job: "fuzz-${{ inputs.primary-runner }}-${{ inputs.go-primary-version }}"
+                    matrix_job: $matrix_job
                   }
                 ]' test-failures-summary.json)
               fi
@@ -288,9 +299,14 @@ jobs:
             echo "⚠️ No fuzz-output.log found, creating minimal failure entry"
 
             # Create minimal entry when output log is missing
-            PACKAGE_NAME="github.com/mrz1836/go-api-router"
+            # Get package name from go.mod or use git context fallback
+            PACKAGE_NAME="${{ github.repository }}"
             if [[ -f go.mod ]]; then
               PACKAGE_NAME=$(head -1 go.mod | awk '{print $2}')
+            elif [[ -n "${{ github.server_url }}" && -n "${{ github.repository }}" ]]; then
+              # Use GitHub context as fallback
+              PACKAGE_NAME="${{ github.server_url }}/${{ github.repository }}"
+              PACKAGE_NAME=${PACKAGE_NAME#https://}
             fi
 
             jq -n --arg pkg "$PACKAGE_NAME" '[{
