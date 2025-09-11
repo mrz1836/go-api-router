@@ -55,29 +55,42 @@ func FuzzCreateAndParseToken(f *testing.F) {
 
 		token, err := CreateToken(sessionSecret, userID, issuer, sessionID, expiration)
 
+		// Check if inputs exceed validation limits
+		userIDTooLong := len(userID) > 1000
+		issuerTooLong := len(issuer) > 1000
+		sessionIDTooLong := len(sessionID) > 1000
+		hasOversizedInput := userIDTooLong || issuerTooLong || sessionIDTooLong
+
 		// If inputs are reasonable, token creation should succeed
 		if sessionSecret != "" && utf8.ValidString(sessionSecret) &&
 			utf8.ValidString(userID) && utf8.ValidString(issuer) && utf8.ValidString(sessionID) {
 
 			if err != nil {
-				// Only log error for reasonable inputs
-				if len(sessionSecret) < 10000 && len(userID) < 10000 && len(issuer) < 10000 && len(sessionID) < 10000 {
+				// If we have oversized inputs, we should expect validation errors
+				if !hasOversizedInput && len(sessionSecret) < 10000 && len(userID) < 1000 && len(issuer) < 1000 && len(sessionID) < 1000 {
+					// Only log error for reasonable inputs that should have succeeded
 					t.Logf("CreateToken returned error with reasonable inputs: %v", err)
 				}
 			} else {
-				// Token should be valid UTF-8
-				if !utf8.ValidString(token) {
-					t.Errorf("CreateToken produced invalid UTF-8 token")
-				}
+				// If we have oversized inputs but no error, this is unexpected
+				if hasOversizedInput {
+					t.Errorf("CreateToken should have returned validation error for oversized inputs (userID:%d, issuer:%d, sessionID:%d)",
+						len(userID), len(issuer), len(sessionID))
+				} else {
+					// Token should be valid UTF-8
+					if !utf8.ValidString(token) {
+						t.Errorf("CreateToken produced invalid UTF-8 token")
+					}
 
-				// Token should have reasonable length (JWT tokens are typically < 2KB)
-				if len(token) > 5000 {
-					t.Errorf("CreateToken produced unexpectedly long token: %d bytes", len(token))
-				}
+					// Token should have reasonable length (JWT tokens are typically < 2KB)
+					if len(token) > 5000 {
+						t.Errorf("CreateToken produced unexpectedly long token: %d bytes", len(token))
+					}
 
-				// Token should contain dots (JWT format)
-				if !strings.Contains(token, ".") {
-					t.Errorf("CreateToken produced token without JWT format markers")
+					// Token should contain dots (JWT format)
+					if !strings.Contains(token, ".") {
+						t.Errorf("CreateToken produced token without JWT format markers")
+					}
 				}
 			}
 		}

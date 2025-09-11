@@ -20,6 +20,11 @@ const (
 
 	// CookieName is for the secure cookie that also has the JWT token
 	CookieName = "jwt_token"
+
+	// Validation limits for JWT token inputs to prevent excessively large tokens
+	maxUserIDLength    = 1000
+	maxIssuerLength    = 1000
+	maxSessionIDLength = 1000
 )
 
 // Claims is our custom JWT claims
@@ -31,6 +36,11 @@ type Claims struct {
 
 // CreateToken will make a token from claims
 func (c Claims) CreateToken(expiration time.Duration, sessionSecret string) (string, error) {
+	// Validate inputs to prevent excessively large tokens
+	if err := validateTokenInputs(c.UserID, c.Issuer, c.ID); err != nil {
+		return "", err
+	}
+
 	// Create a new token object, specifying signing method, and the claims
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, createClaims(c.UserID, c.Issuer, c.ID, expiration))
 
@@ -63,6 +73,20 @@ func (c Claims) IsEmpty() bool {
 	return len(c.UserID) <= 0
 }
 
+// validateTokenInputs validates the inputs for token creation to prevent excessively large tokens
+func validateTokenInputs(userID, issuer, sessionID string) error {
+	if len(userID) > maxUserIDLength {
+		return ErrUserIDTooLong
+	}
+	if len(issuer) > maxIssuerLength {
+		return ErrIssuerTooLong
+	}
+	if len(sessionID) > maxSessionIDLength {
+		return ErrSessionIDTooLong
+	}
+	return nil
+}
+
 // createClaims will make a new set of claims for JWT
 func createClaims(userID, issuer, sessionID string, expiration time.Duration) Claims {
 	// Set default if not set
@@ -85,6 +109,11 @@ func createClaims(userID, issuer, sessionID string, expiration time.Duration) Cl
 func CreateToken(sessionSecret, userID, issuer, sessionID string,
 	expiration time.Duration,
 ) (string, error) {
+	// Validate inputs to prevent excessively large tokens
+	if err := validateTokenInputs(userID, issuer, sessionID); err != nil {
+		return "", err
+	}
+
 	// Create a new token object, specifying signing method, and the claims
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, createClaims(userID, issuer, sessionID, expiration))
 

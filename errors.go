@@ -22,3 +22,12 @@ var ErrInvalidUserID = errors.New("invalid user id detected")
 
 // ErrInvalidSigningMethod is when the signing method is invalid
 var ErrInvalidSigningMethod = errors.New("invalid signing method")
+
+// ErrUserIDTooLong is when the user ID exceeds the maximum length
+var ErrUserIDTooLong = errors.New("user id exceeds maximum length")
+
+// ErrIssuerTooLong is when the issuer exceeds the maximum length
+var ErrIssuerTooLong = errors.New("issuer exceeds maximum length")
+
+// ErrSessionIDTooLong is when the session ID exceeds the maximum length
+var ErrSessionIDTooLong = errors.New("session id exceeds maximum length")
