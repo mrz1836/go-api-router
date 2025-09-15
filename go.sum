@@ -24,8 +24,8 @@ github.com/matryer/respond v1.0.1 h1:RSG07jdn32pH46t4UO1TnpnKlR/ayIpEa4aiK2f9k1U
 github.com/matryer/respond v1.0.1/go.mod h1:XHpqRsK4LZQgk6twGA/CrtxNBaayoYiKUqj0Mjkj3Hg=
 github.com/mrz1836/go-logger v1.0.0 h1:p1oENepUxxFWzuBtCf0MeXU7Zt/meO5svIF3RsLR2zk=
 github.com/mrz1836/go-logger v1.0.0/go.mod h1:4OX+yIkLiY4rcM26gZJZjly/f7fyhOEiRVHecZSyTTs=
-github.com/mrz1836/go-parameters v0.8.1 h1:TT/JinD2rASzHiGao8gdOMpKi+tbldZEFU+VC3OxSWg=
-github.com/mrz1836/go-parameters v0.8.1/go.mod h1:/sIa5M40Q/g+yIx1Qsypf4ON1cAeuDKyTjWxfk9oeVQ=
+github.com/mrz1836/go-parameters v1.0.0 h1:mVOn2TCrmyJl7WJa0s9P46Mj4mdZaHOoEgi0xnNGEuA=
+github.com/mrz1836/go-parameters v1.0.0/go.mod h1:/sIa5M40Q/g+yIx1Qsypf4ON1cAeuDKyTjWxfk9oeVQ=
 github.com/newrelic/go-agent/v3 v3.40.1 h1:8nb4R252Fpuc3oySvlHpDwqySqaPWL5nf7ZVEhqtUeA=
 github.com/newrelic/go-agent/v3 v3.40.1/go.mod h1:X0TLXDo+ttefTIue1V96Y5seb8H6wqf6uUq4UpPsYj8=
 github.com/newrelic/go-agent/v3/integrations/nrhttprouter v1.1.5 h1:6EIg2dgBc1hMGN9NhhwCyVoy6yG3lprMDTFR1b4t/AY=
