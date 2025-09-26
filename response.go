@@ -36,7 +36,7 @@ func ReturnJSONEncode(w http.ResponseWriter, code int, e *json.Encoder, objects 
 	// Attempt to encode the objects
 	err = JSONEncode(e, objects, allowed)
 
-	return
+	return err
 }
 
 // JSONEncodeHierarchy will execute JSONEncode for multiple nested objects

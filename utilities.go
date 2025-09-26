@@ -75,7 +75,7 @@ func FilterMap(params *parameters.Params, filterOutFields []string) (filtered *p
 		}
 	}
 
-	return
+	return filtered
 }
 
 // isInList checks if string is known or not
@@ -103,13 +103,13 @@ func PermitParams(params *parameters.Params, allowedKeys []string) {
 // GetIPFromRequest gets the stored ip from the request if found
 func GetIPFromRequest(req *http.Request) (ip string, ok bool) {
 	ip, ok = req.Context().Value(ipAddressKey).(string)
-	return
+	return ip, ok
 }
 
 // GetRequestID gets the stored request id from the request
 func GetRequestID(req *http.Request) (id string, ok bool) {
 	id, ok = req.Context().Value(requestIDKey).(string)
-	return
+	return id, ok
 }
 
 // GetClientIPAddress gets the client ip address
@@ -162,7 +162,7 @@ func SetAuthToken(req *http.Request, authToken string) *http.Request {
 // GetAuthToken gets the stored authentication token from the request
 func GetAuthToken(req *http.Request) (token string, ok bool) {
 	token, ok = req.Context().Value(authTokenKey).(string)
-	return
+	return token, ok
 }
 
 // SetCustomData set the custom data / user profile / permissions / etc
@@ -173,7 +173,7 @@ func SetCustomData(req *http.Request, data interface{}) *http.Request {
 // GetCustomData gets the stored custom data
 func GetCustomData(req *http.Request) (data interface{}) {
 	data = req.Context().Value(customDataKey)
-	return
+	return data
 }
 
 // NoCache is a simple piece of middleware that sets a number of HTTP headers to prevent
