@@ -26,8 +26,8 @@ github.com/mrz1836/go-logger v1.0.0 h1:p1oENepUxxFWzuBtCf0MeXU7Zt/meO5svIF3RsLR2
 github.com/mrz1836/go-logger v1.0.0/go.mod h1:4OX+yIkLiY4rcM26gZJZjly/f7fyhOEiRVHecZSyTTs=
 github.com/mrz1836/go-parameters v1.0.0 h1:mVOn2TCrmyJl7WJa0s9P46Mj4mdZaHOoEgi0xnNGEuA=
 github.com/mrz1836/go-parameters v1.0.0/go.mod h1:/sIa5M40Q/g+yIx1Qsypf4ON1cAeuDKyTjWxfk9oeVQ=
-github.com/newrelic/go-agent/v3 v3.40.1 h1:8nb4R252Fpuc3oySvlHpDwqySqaPWL5nf7ZVEhqtUeA=
-github.com/newrelic/go-agent/v3 v3.40.1/go.mod h1:X0TLXDo+ttefTIue1V96Y5seb8H6wqf6uUq4UpPsYj8=
+github.com/newrelic/go-agent/v3 v3.41.0 h1:kc1Y8HRe1sZe5/ZkgOYIsClo1Jc+2fcdJ4+NlrxDmSg=
+github.com/newrelic/go-agent/v3 v3.41.0/go.mod h1:sCgxDCVydoKD/C4S8BFxDtmFHvdWHtaIz/a3kiyNB/k=
 github.com/newrelic/go-agent/v3/integrations/nrhttprouter v1.1.5 h1:6EIg2dgBc1hMGN9NhhwCyVoy6yG3lprMDTFR1b4t/AY=
 github.com/newrelic/go-agent/v3/integrations/nrhttprouter v1.1.5/go.mod h1:+DF0n8/aH4HyUwv9hOWf/v4Fg89M1pGI76IC5c75t8M=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
