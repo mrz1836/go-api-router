@@ -193,9 +193,19 @@ func FuzzGetTokenFromHeader(f *testing.F) {
 				t.Logf("Note: Token contains control characters: %q", token1)
 			}
 
-			// Token should not be excessively long
-			if len(token1) > 2000 {
-				t.Errorf("Extracted token is unexpectedly long: %d bytes", len(token1))
+			// Token should never exceed the length of the trimmed header portion it was derived from
+			trimmedHeader := strings.TrimSpace(headerValue)
+			if len(token1) > len(trimmedHeader) {
+				t.Errorf("Extracted token length %d exceeds trimmed header length %d for header %q", len(token1), len(trimmedHeader), headerValue)
+			}
+
+			if len(trimmedHeader) > len(AuthorizationBearer)+1 &&
+				strings.EqualFold(trimmedHeader[:len(AuthorizationBearer)], AuthorizationBearer) &&
+				trimmedHeader[len(AuthorizationBearer)] == ' ' {
+				maxTokenLength := len(strings.TrimSpace(trimmedHeader[len(AuthorizationBearer)+1:]))
+				if len(token1) > maxTokenLength {
+					t.Errorf("Extracted token length %d exceeds available token characters %d for header %q", len(token1), maxTokenLength, headerValue)
+				}
 			}
 		}
 
