@@ -7,8 +7,9 @@ import (
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
-	apirouter "github.com/mrz1836/go-api-router"
 	"github.com/mrz1836/go-logger"
+
+	apirouter "github.com/mrz1836/go-api-router"
 )
 
 // main fires on-load (go run examples.go)
