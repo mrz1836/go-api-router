@@ -62,13 +62,13 @@
 <table align="center">
   <tr>
     <td align="center" width="33%">
-       🤖&nbsp;<a href="#-ai-compliance"><code>AI Compliance</code></a>
+       🚀&nbsp;<a href="#-installation"><code>Installation</code></a>
     </td>
     <td align="center" width="33%">
-       ⚡&nbsp;<a href="#-benchmarks"><code>Benchmarks</code></a>
+       🧪&nbsp;<a href="#-examples--tests"><code>Examples&nbsp;&&nbsp;Tests</code></a>
     </td>
     <td align="center" width="33%">
-       🛠️&nbsp;<a href="#-code-standards"><code>Code Standards</code></a>
+       📚&nbsp;<a href="#-documentation"><code>Documentation</code></a>
     </td>
   </tr>
   <tr>
@@ -76,15 +76,15 @@
        🤝&nbsp;<a href="#-contributing"><code>Contributing</code></a>
     </td>
     <td align="center">
-       📚&nbsp;<a href="#-documentation"><code>Documentation</code></a>
+      🛠️&nbsp;<a href="#-code-standards"><code>Code&nbsp;Standards</code></a>
     </td>
     <td align="center">
-       🧪&nbsp;<a href="#-examples--tests"><code>Examples&nbsp;&&nbsp;Tests</code></a>
+      ⚡&nbsp;<a href="#-benchmarks"><code>Benchmarks</code></a>
     </td>
   </tr>
   <tr>
     <td align="center">
-       🚀&nbsp;<a href="#-installation"><code>Installation</code></a>
+      🤖&nbsp;<a href="#-ai-compliance"><code>AI&nbsp;Compliance</code></a>
     </td>
     <td align="center">
        ⚖️&nbsp;<a href="#-license"><code>License</code></a>
@@ -95,6 +95,7 @@
   </tr>
 </table>
 <br/>
+
 ## 📦 Installation
 
 **go-api-router** requires a [supported release of Go](https://golang.org/doc/devel/release.html#policy).
