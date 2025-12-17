@@ -128,10 +128,12 @@ func ClearToken(w http.ResponseWriter, req *http.Request) {
 
 	// Create empty cookie
 	cookie := &http.Cookie{
-		Path:    "/",
-		Name:    CookieName,
-		Value:   "",
-		Expires: time.Now().Add(-24 * time.Hour),
+		Path:     "/",
+		Name:     CookieName,
+		Value:    "",
+		Expires:  time.Now().Add(-24 * time.Hour),
+		HttpOnly: true,
+		Secure:   true,
 	}
 
 	// Remove from request
@@ -270,11 +272,12 @@ func SetTokenHeader(w http.ResponseWriter, r *http.Request, token string, expira
 
 	// Create the cookie
 	cookie := &http.Cookie{
-		Path:    "/",
-		Name:    CookieName,
-		Value:   token,
-		Expires: time.Now().UTC().Add(expiration),
-		// todo: secure / http only etc
+		Path:     "/",
+		Name:     CookieName,
+		Value:    token,
+		Expires:  time.Now().UTC().Add(expiration),
+		HttpOnly: true,
+		Secure:   true,
 	}
 
 	// Set the cookie on the request
