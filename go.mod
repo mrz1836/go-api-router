@@ -8,7 +8,7 @@ require (
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/matryer/respond v1.0.1
 	github.com/mrz1836/go-logger v1.0.2
-	github.com/mrz1836/go-parameters v1.0.4
+	github.com/mrz1836/go-parameters v1.0.5
 	github.com/newrelic/go-agent/v3 v3.42.0
 	github.com/newrelic/go-agent/v3/integrations/nrhttprouter v1.1.5
 	github.com/stretchr/testify v1.11.1
