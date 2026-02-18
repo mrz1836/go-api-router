@@ -16,8 +16,8 @@ type TestStruct struct {
 	ID          int                    `json:"id"`
 	Name        string                 `json:"name"`
 	Email       string                 `json:"email"`
-	Password    string                 `json:"password"`
-	APIKey      string                 `json:"api_key"`
+	Password    string                 `json:"password"` //nolint:gosec // test struct field, not real credentials
+	APIKey      string                 `json:"api_key"`  //nolint:gosec // test struct field, not real credentials
 	IsActive    bool                   `json:"is_active"`
 	Description string                 `json:"description"`
 	Tags        []string               `json:"tags"`
