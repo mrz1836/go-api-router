@@ -2,6 +2,7 @@ package apirouter
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http/httptest"
 	"strings"
@@ -16,8 +17,8 @@ type TestStruct struct {
 	ID          int                    `json:"id"`
 	Name        string                 `json:"name"`
 	Email       string                 `json:"email"`
-	Password    string                 `json:"password"` //nolint:gosec // test struct field, not real credentials
-	APIKey      string                 `json:"api_key"`  //nolint:gosec // test struct field, not real credentials
+	Password    string                 `json:"password"`
+	APIKey      string                 `json:"api_key"`
 	IsActive    bool                   `json:"is_active"`
 	Description string                 `json:"description"`
 	Tags        []string               `json:"tags"`
@@ -320,7 +321,7 @@ func FuzzRespondWith(f *testing.F) {
 		}
 
 		w := httptest.NewRecorder()
-		req := httptest.NewRequest("GET", "/test", nil)
+		req := httptest.NewRequestWithContext(context.Background(), "GET", "/test", nil)
 
 		// Convert dataStr to appropriate data type
 		var data interface{}

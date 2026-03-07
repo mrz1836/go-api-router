@@ -526,7 +526,7 @@ func TestCreateToken(t *testing.T) {
 
 // TestGetClaims will test the method GetClaims()
 func TestGetClaims(t *testing.T) {
-	req := httptest.NewRequest(http.MethodConnect, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodConnect, "/", nil)
 	claims := GetClaims(req)
 	assert.NotNil(t, claims)
 	assert.True(t, claims.IsEmpty())

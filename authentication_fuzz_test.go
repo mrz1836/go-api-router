@@ -1,6 +1,7 @@
 package apirouter
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -131,7 +132,7 @@ func FuzzGetTokenFromHeader(f *testing.F) {
 
 	f.Fuzz(func(t *testing.T, headerValue string) {
 		// Test GetTokenFromHeaderFromRequest
-		req := httptest.NewRequest("GET", "/test", nil)
+		req := httptest.NewRequestWithContext(context.Background(), "GET", "/test", nil)
 		if headerValue != "" {
 			req.Header.Set(AuthorizationHeader, headerValue)
 		}
