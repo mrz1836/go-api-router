@@ -2,6 +2,7 @@ package apirouter
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -437,7 +438,7 @@ func TestRespondWith(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			req := httptest.NewRequest(http.MethodGet, "/", nil)
+			req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 			rr := httptest.NewRecorder()
 
 			RespondWith(rr, req, tt.status, tt.data)
@@ -575,7 +576,7 @@ func TestRespondWith_Expanded(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// New request/recorder per sub‑test to avoid cross‑contamination
-			req := httptest.NewRequest(http.MethodGet, "/", nil)
+			req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 			rr := httptest.NewRecorder()
 
 			RespondWith(rr, req, tt.status, tt.data)
@@ -609,7 +610,7 @@ func TestRespondWith_Expanded(t *testing.T) {
 
 // BenchmarkRespondWith tests the performance of RespondWith
 func BenchmarkRespondWith(b *testing.B) {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	payload := map[string]string{"hello": "world"}
 
 	b.ReportAllocs()
@@ -621,7 +622,7 @@ func BenchmarkRespondWith(b *testing.B) {
 
 // BenchmarkReturnResponse tests the performance of ReturnResponse
 func BenchmarkReturnResponse(b *testing.B) {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	payload := map[string]string{"hello": "world"}
 
 	b.ReportAllocs()

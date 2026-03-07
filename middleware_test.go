@@ -1,6 +1,7 @@
 package apirouter
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -49,7 +50,7 @@ func TestWrap(t *testing.T) {
 	}
 
 	wrapped := s.Wrap(hn)
-	req := httptest.NewRequest("GET", "/example", nil)
+	req := httptest.NewRequestWithContext(context.Background(), "GET", "/example", nil)
 	w := httptest.NewRecorder()
 	handler := plainHandler(wrapped)
 	handler.ServeHTTP(w, req)
@@ -116,7 +117,7 @@ func TestWrap_Ordering(t *testing.T) {
 	}
 
 	wrapped := s.Wrap(hn)
-	req := httptest.NewRequest("GET", "/example", nil)
+	req := httptest.NewRequestWithContext(context.Background(), "GET", "/example", nil)
 	w := httptest.NewRecorder()
 	handler := plainHandler(wrapped)
 	handler.ServeHTTP(w, req)
@@ -172,7 +173,7 @@ func TestStandardHandlerToHandle(t *testing.T) {
 	routerHandle := StandardHandlerToHandle(standardHandler)
 
 	// Create a test request and response
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rr := httptest.NewRecorder()
 
 	// Call the handler
@@ -204,7 +205,7 @@ func TestStandardHandlerToMiddleware(t *testing.T) {
 	wrappedHandler := middleware(finalHandler)
 
 	// Execute the handler
-	req := httptest.NewRequest(http.MethodGet, "/middleware-test", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/middleware-test", nil)
 	rr := httptest.NewRecorder()
 
 	wrappedHandler(rr, req, httprouter.Params{})

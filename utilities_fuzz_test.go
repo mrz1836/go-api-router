@@ -1,6 +1,7 @@
 package apirouter
 
 import (
+	"context"
 	"net/http/httptest"
 	"strings"
 	"testing"
@@ -122,7 +123,7 @@ func FuzzGetClientIPAddress(f *testing.F) {
 
 	f.Fuzz(func(t *testing.T, xForwardedFor, remoteAddr string) {
 		// Create a test request
-		req := httptest.NewRequest("GET", "/test", nil)
+		req := httptest.NewRequestWithContext(context.Background(), "GET", "/test", nil)
 
 		// Set headers based on fuzz inputs
 		if xForwardedFor != "" {

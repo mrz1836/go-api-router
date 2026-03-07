@@ -215,8 +215,8 @@ func TestReturnJSONEncode(t *testing.T) {
 	t.Parallel()
 
 	// Create a new test recorder
-	req := httptest.NewRequest(
-		http.MethodGet, "/test?this=that&id=123", strings.NewReader(""),
+	req := httptest.NewRequestWithContext(
+		context.Background(), http.MethodGet, "/test?this=that&id=123", strings.NewReader(""),
 	)
 	w := httptest.NewRecorder()
 
@@ -259,7 +259,7 @@ func TestReturnResponse(t *testing.T) {
 	t.Parallel()
 
 	// Create a new test recorder
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	w := httptest.NewRecorder()
 
 	// Fire the index test
@@ -299,7 +299,7 @@ func TestReturnResponse_WithJSON(t *testing.T) {
 	t.Parallel()
 
 	// Create a new test recorder
-	req := httptest.NewRequest(http.MethodGet, "/", strings.NewReader(""))
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", strings.NewReader(""))
 	w := httptest.NewRecorder()
 
 	// Fire the index test
@@ -338,7 +338,7 @@ func TestRouter_SetCrossOriginHeaders(t *testing.T) {
 	t.Parallel()
 
 	// Create a new test recorder
-	req := httptest.NewRequest(http.MethodGet, "/", strings.NewReader(""))
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", strings.NewReader(""))
 	w := httptest.NewRecorder()
 
 	router := New()
@@ -391,7 +391,7 @@ func TestRouter_SetCrossOriginHeaders_Disabled(t *testing.T) {
 	t.Parallel()
 
 	// Create a new test recorder
-	req := httptest.NewRequest(http.MethodGet, "/", strings.NewReader(""))
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", strings.NewReader(""))
 	w := httptest.NewRecorder()
 
 	router := New()
@@ -445,7 +445,7 @@ func TestRouter_SetCrossOriginHeaders_CustomOrigin(t *testing.T) {
 	t.Parallel()
 
 	// Create a new test recorder
-	req := httptest.NewRequest(http.MethodGet, "/", strings.NewReader(""))
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", strings.NewReader(""))
 	w := httptest.NewRecorder()
 
 	router := New()
@@ -556,7 +556,7 @@ func TestRouter_GlobalOPTIONSHandler(t *testing.T) {
 		r.HTTPRouter = nrhttprouter.New(nil)
 		r.setDefaults()
 
-		req := httptest.NewRequest(http.MethodOptions, "/test", nil)
+		req := httptest.NewRequestWithContext(context.Background(), http.MethodOptions, "/test", nil)
 		req.Header.Set("Origin", "https://example.com")
 
 		rr := httptest.NewRecorder()
