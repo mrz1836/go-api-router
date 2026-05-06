@@ -134,6 +134,7 @@ func ClearToken(w http.ResponseWriter, req *http.Request) {
 		Expires:  time.Now().Add(-24 * time.Hour),
 		HttpOnly: true,
 		Secure:   true,
+		SameSite: http.SameSiteStrictMode,
 	}
 
 	// Remove from request
@@ -278,6 +279,7 @@ func SetTokenHeader(w http.ResponseWriter, r *http.Request, token string, expira
 		Expires:  time.Now().UTC().Add(expiration),
 		HttpOnly: true,
 		Secure:   true,
+		SameSite: http.SameSiteStrictMode,
 	}
 
 	// Set the cookie on the request

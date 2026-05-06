@@ -21,22 +21,22 @@ func FuzzCreateAndParseToken(f *testing.F) {
 		sessionID     string
 		expiration    int64 // seconds
 	}{
-		{"secret123", "user123", "test-issuer", "session123", 3600},
-		{"", "user123", "test-issuer", "session123", 3600},
-		{"secret123", "", "test-issuer", "session123", 3600},
-		{"secret123", "user123", "", "session123", 3600},
-		{"secret123", "user123", "test-issuer", "", 3600},
-		{"secret123", "user123", "test-issuer", "session123", 0},
-		{"secret123", "user123", "test-issuer", "session123", -1},
-		{"very-long-secret-key-that-should-still-work", "user123", "test-issuer", "session123", 3600},
-		{"🔑", "user123", "test-issuer", "session123", 3600},
-		{"secret123", "user🆔", "issuer🏢", "session📝", 3600},
-		{"secret123", "user\nwith\nnewlines", "issuer\twith\ttabs", "session\rwith\rreturns", 3600},
-		{"secret123", "user\x00null", "issuer\x00null", "session\x00null", 3600},
-		{strings.Repeat("a", 1000), "user123", "test-issuer", "session123", 3600},
-		{"secret123", strings.Repeat("u", 1000), "test-issuer", "session123", 3600},
-		{"secret123", "user123", strings.Repeat("i", 1000), "session123", 3600},
-		{"secret123", "user123", "test-issuer", strings.Repeat("s", 1000), 3600},
+		{testSecret123, testUserID123, testIssuer, testSession123, 3600},
+		{"", testUserID123, testIssuer, testSession123, 3600},
+		{testSecret123, "", testIssuer, testSession123, 3600},
+		{testSecret123, testUserID123, "", testSession123, 3600},
+		{testSecret123, testUserID123, testIssuer, "", 3600},
+		{testSecret123, testUserID123, testIssuer, testSession123, 0},
+		{testSecret123, testUserID123, testIssuer, testSession123, -1},
+		{"very-long-secret-key-that-should-still-work", testUserID123, testIssuer, testSession123, 3600},
+		{"🔑", testUserID123, testIssuer, testSession123, 3600},
+		{testSecret123, "user🆔", "issuer🏢", "session📝", 3600},
+		{testSecret123, "user\nwith\nnewlines", "issuer\twith\ttabs", "session\rwith\rreturns", 3600},
+		{testSecret123, "user\x00null", "issuer\x00null", "session\x00null", 3600},
+		{strings.Repeat("a", 1000), testUserID123, testIssuer, testSession123, 3600},
+		{testSecret123, strings.Repeat("u", 1000), testIssuer, testSession123, 3600},
+		{testSecret123, testUserID123, strings.Repeat("i", 1000), testSession123, 3600},
+		{testSecret123, testUserID123, testIssuer, strings.Repeat("s", 1000), 3600},
 	}
 
 	for _, tc := range testCases {
@@ -235,18 +235,18 @@ func FuzzJWTClaims(f *testing.F) {
 		claimID     string
 		checkIssuer string
 	}{
-		{"user123", "test-issuer", "claim123", "test-issuer"},
-		{"", "test-issuer", "claim123", "test-issuer"},
-		{"user123", "", "claim123", "test-issuer"},
-		{"user123", "test-issuer", "", "test-issuer"},
-		{"user123", "test-issuer", "claim123", "different-issuer"},
-		{"user123", "test-issuer", "claim123", ""},
+		{testUserID123, testIssuer, "claim123", testIssuer},
+		{"", testIssuer, "claim123", testIssuer},
+		{testUserID123, "", "claim123", testIssuer},
+		{testUserID123, testIssuer, "", testIssuer},
+		{testUserID123, testIssuer, "claim123", "different-issuer"},
+		{testUserID123, testIssuer, "claim123", ""},
 		{"user🆔", "issuer🏢", "claim📝", "issuer🏢"},
 		{"user\nwith\nnewlines", "issuer\twith\ttabs", "claim\rwith\rreturns", "issuer\twith\ttabs"},
 		{"user\x00null", "issuer\x00null", "claim\x00null", "issuer\x00null"},
-		{strings.Repeat("u", 1000), "test-issuer", "claim123", "test-issuer"},
-		{"user123", strings.Repeat("i", 1000), "claim123", strings.Repeat("i", 1000)},
-		{"user123", "test-issuer", strings.Repeat("c", 1000), "test-issuer"},
+		{strings.Repeat("u", 1000), testIssuer, "claim123", testIssuer},
+		{testUserID123, strings.Repeat("i", 1000), "claim123", strings.Repeat("i", 1000)},
+		{testUserID123, testIssuer, strings.Repeat("c", 1000), testIssuer},
 	}
 
 	for _, tc := range testCases {

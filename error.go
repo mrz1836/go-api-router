@@ -13,6 +13,9 @@ const (
 
 	// StatusCodeUnknown unknown HTTP status code (example)
 	StatusCodeUnknown int = 600
+
+	// logLevelError is the log level string used for error-level messages.
+	logLevelError = "error"
 )
 
 // APIError is the enriched error message for API related errors
@@ -78,7 +81,7 @@ func logError(statusCode int, internalMessage, requestID, ipAddress string) {
 	}
 
 	// Start with error
-	logLevel := "error"
+	logLevel := logLevelError
 
 	// Switch based on known statuses
 	if statusCode == http.StatusBadRequest ||

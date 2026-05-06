@@ -12,6 +12,9 @@ import (
 	"github.com/matryer/respond"
 )
 
+// errorJSONField is the JSON field name used when serializing an error payload.
+const errorJSONField = "error"
+
 // AllowedKeys is for allowed keys
 type AllowedKeys map[string]interface{}
 
@@ -49,7 +52,7 @@ func JSONEncodeHierarchy(w io.Writer, objects, allowed interface{}) error {
 		return JSONEncode(json.NewEncoder(w), objects, slice)
 	} else if obj, found := allowed.(AllowedKeys); found {
 		val := reflect.ValueOf(objects)
-		if val.Kind() == reflect.Ptr {
+		if val.Kind() == reflect.Pointer {
 			val = val.Elem()
 		}
 		data := val.Interface()
@@ -172,7 +175,7 @@ func jsonMap(obj interface{}) map[string]interface{} {
 	var s, stringPointer reflect.Value
 
 	// Dereference the obj if it is a pointer
-	if reflect.ValueOf(obj).Kind() == reflect.Ptr {
+	if reflect.ValueOf(obj).Kind() == reflect.Pointer {
 		stringPointer = reflect.ValueOf(obj)
 		s = stringPointer.Elem()
 	} else {
@@ -205,8 +208,8 @@ func jsonMap(obj interface{}) map[string]interface{} {
 		comps := strings.Split(key, ",")
 		key = comps[0]
 		fieldType := structField.Type
-		if fieldType.Kind() != reflect.Ptr && val.CanAddr() {
-			// fieldType = reflect.PtrTo(fieldType)
+		if fieldType.Kind() != reflect.Pointer && val.CanAddr() {
+			// fieldType = reflect.PointerTo(fieldType)
 			val = val.Addr()
 		}
 		fieldValues[key] = val.Interface()
@@ -232,13 +235,13 @@ func RespondWith(w http.ResponseWriter, _ *http.Request, status int, data interf
 
 	// Convert error to a JSON error payload for better readability
 	if err, ok := data.(error); ok && err != nil {
-		data = map[string]interface{}{"error": err.Error()}
+		data = map[string]interface{}{errorJSONField: err.Error()}
 	}
 	// Provide a default body for error status codes with no data
 	if data == nil && status >= 400 {
 		data = map[string]interface{}{
-			"error": http.StatusText(status),
-			"code":  status,
+			errorJSONField: http.StatusText(status),
+			"code":         status,
 		}
 	}
 

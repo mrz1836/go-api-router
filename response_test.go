@@ -142,7 +142,7 @@ func TestJSONEncodeHierarchy(t *testing.T) {
 				ID:   1,
 				Name: "Test",
 			},
-			allowed:  []string{"id", "name"},
+			allowed:  []string{"id", testFieldName},
 			expected: `{"id":1,"name":"Test"}`,
 		},
 		{
@@ -156,8 +156,8 @@ func TestJSONEncodeHierarchy(t *testing.T) {
 				},
 			},
 			allowed: AllowedKeys{
-				"id":   nil,
-				"name": nil,
+				"id":          nil,
+				testFieldName: nil,
 				"nested": AllowedKeys{
 					"foo": nil,
 				},
@@ -236,7 +236,7 @@ func TestJSONEncode(t *testing.T) {
 		input := Example{ID: 1, Name: "Alice", Email: "alice@example.com"}
 
 		var buf bytes.Buffer
-		err := JSONEncode(json.NewEncoder(&buf), &input, []string{"id", "name"})
+		err := JSONEncode(json.NewEncoder(&buf), &input, []string{"id", testFieldName})
 		require.NoError(t, err)
 
 		var output map[string]interface{}
@@ -244,7 +244,7 @@ func TestJSONEncode(t *testing.T) {
 		require.NoError(t, err)
 
 		require.InDelta(t, float64(1), output["id"], 0)
-		require.Equal(t, "Alice", output["name"])
+		require.Equal(t, "Alice", output[testFieldName])
 		require.NotContains(t, output, "email")
 	})
 
@@ -268,8 +268,8 @@ func TestJSONEncode(t *testing.T) {
 		require.InDelta(t, float64(2), output[1]["id"], 0)
 		require.Equal(t, "bob@example.com", output[1]["email"])
 
-		require.NotContains(t, output[0], "name")
-		require.NotContains(t, output[1], "name")
+		require.NotContains(t, output[0], testFieldName)
+		require.NotContains(t, output[1], testFieldName)
 	})
 
 	t.Run("encodes empty slice to empty array", func(t *testing.T) {
@@ -337,14 +337,14 @@ func TestJSONEncode(t *testing.T) {
 		input := WithPtr{Name: &str}
 
 		var buf bytes.Buffer
-		err := JSONEncode(json.NewEncoder(&buf), &input, []string{"name"})
+		err := JSONEncode(json.NewEncoder(&buf), &input, []string{testFieldName})
 		require.NoError(t, err)
 
 		var output map[string]interface{}
 		err = json.Unmarshal(buf.Bytes(), &output)
 		require.NoError(t, err)
 
-		require.Equal(t, "pointer name", output["name"])
+		require.Equal(t, "pointer name", output[testFieldName])
 	})
 
 	t.Run("omits disallowed fields", func(t *testing.T) {
@@ -365,7 +365,7 @@ func TestJSONEncode(t *testing.T) {
 		require.NoError(t, err)
 
 		require.InDelta(t, float64(42), output["id"], 0)
-		require.NotContains(t, output, "name")
+		require.NotContains(t, output, testFieldName)
 		require.NotContains(t, output, "email")
 	})
 

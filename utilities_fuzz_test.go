@@ -169,7 +169,7 @@ func FuzzFilterMap(f *testing.F) {
 		paramValue string
 		filterKey  string
 	}{
-		{"password", "secret123", "password"},
+		{"password", testSecret123, "password"},
 		{"apiKey", "key123", "apiKey"},
 		{"token", "jwt123", "token"},
 		{"email", "test@example.com", "password"},

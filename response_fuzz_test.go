@@ -46,22 +46,22 @@ func FuzzJSONEncode(f *testing.F) {
 		password     string
 		allowedField string
 	}{
-		{"John Doe", "john@example.com", "secret123", "name"},
-		{"", "john@example.com", "secret123", "name"},
-		{"John Doe", "", "secret123", "email"},
-		{"John Doe", "john@example.com", "", "password"},
-		{"John Doe", "john@example.com", "secret123", "nonexistent"},
-		{"John Doe", "john@example.com", "secret123", ""},
-		{"User🆔", "email📧", "pass🔒", "name"},
-		{"User\nwith\nnewlines", "email\twith\ttabs", "pass\rwith\rreturns", "name"},
+		{testNameJohn, testEmailJohn, testSecret123, testFieldName},
+		{"", testEmailJohn, testSecret123, testFieldName},
+		{testNameJohn, "", testSecret123, "email"},
+		{testNameJohn, testEmailJohn, "", "password"},
+		{testNameJohn, testEmailJohn, testSecret123, "nonexistent"},
+		{testNameJohn, testEmailJohn, testSecret123, ""},
+		{"User🆔", "email📧", "pass🔒", testFieldName},
+		{"User\nwith\nnewlines", "email\twith\ttabs", "pass\rwith\rreturns", testFieldName},
 		{"User\x00null", "email\x00null", "pass\x00null", "email"},
-		{strings.Repeat("n", 1000), "john@example.com", "secret123", "name"},
-		{"John Doe", strings.Repeat("e", 1000), "secret123", "email"},
-		{"John Doe", "john@example.com", strings.Repeat("p", 1000), "password"},
-		{"John Doe", "john@example.com", "secret123", strings.Repeat("f", 100)},
-		{"<script>alert('xss')</script>", "test@example.com", "secret", "name"},
-		{`{"injected": "json"}`, "test@example.com", "secret", "name"},
-		{"Name with \"quotes\"", "test@example.com", "secret", "name"},
+		{strings.Repeat("n", 1000), testEmailJohn, testSecret123, testFieldName},
+		{testNameJohn, strings.Repeat("e", 1000), testSecret123, "email"},
+		{testNameJohn, testEmailJohn, strings.Repeat("p", 1000), "password"},
+		{testNameJohn, testEmailJohn, testSecret123, strings.Repeat("f", 100)},
+		{"<script>alert('xss')</script>", "test@example.com", "secret", testFieldName},
+		{`{"injected": "json"}`, "test@example.com", "secret", testFieldName},
+		{"Name with \"quotes\"", "test@example.com", "secret", testFieldName},
 	}
 
 	for _, tc := range testCases {
@@ -173,18 +173,18 @@ func FuzzJSONEncodeHierarchy(f *testing.F) {
 		companyName string
 		permission  string
 	}{
-		{"John Doe", "john@example.com", "ACME Corp", "read"},
-		{"", "john@example.com", "ACME Corp", "read"},
-		{"John Doe", "", "ACME Corp", "write"},
-		{"John Doe", "john@example.com", "", "admin"},
-		{"John Doe", "john@example.com", "ACME Corp", ""},
+		{testNameJohn, testEmailJohn, "ACME Corp", "read"},
+		{"", testEmailJohn, "ACME Corp", "read"},
+		{testNameJohn, "", "ACME Corp", "write"},
+		{testNameJohn, testEmailJohn, "", "admin"},
+		{testNameJohn, testEmailJohn, "ACME Corp", ""},
 		{"User🆔", "email📧@example.com", "Company🏢", "permission🔐"},
 		{"User\nMultiline", "email\twith\ttabs@example.com", "Company\rName", "read\nwrite"},
 		{"User\x00Null", "email\x00@example.com", "Company\x00Name", "permission\x00"},
-		{strings.Repeat("n", 500), "john@example.com", "ACME Corp", "read"},
-		{"John Doe", strings.Repeat("e", 500), "ACME Corp", "read"},
-		{"John Doe", "john@example.com", strings.Repeat("c", 500), "read"},
-		{"John Doe", "john@example.com", "ACME Corp", strings.Repeat("p", 500)},
+		{strings.Repeat("n", 500), testEmailJohn, "ACME Corp", "read"},
+		{testNameJohn, strings.Repeat("e", 500), "ACME Corp", "read"},
+		{testNameJohn, testEmailJohn, strings.Repeat("c", 500), "read"},
+		{testNameJohn, testEmailJohn, "ACME Corp", strings.Repeat("p", 500)},
 		{`{"name": "injected"}`, "test@example.com", "Test Corp", "read"},
 		{"Name \"with\" quotes", "test@example.com", "Corp with \"quotes\"", "read"},
 		{"<script>alert('xss')</script>", "test@example.com", "Evil Corp", "admin"},
@@ -201,7 +201,7 @@ func FuzzJSONEncodeHierarchy(f *testing.F) {
 				ID:       123,
 				Name:     userName,
 				Email:    userEmail,
-				Password: "secret123",
+				Password: testSecret123,
 				APIKey:   "api-key-123",
 				IsActive: true,
 			},
@@ -213,22 +213,22 @@ func FuzzJSONEncodeHierarchy(f *testing.F) {
 
 		// Test different allowed field configurations
 		allowedConfigs := []interface{}{
-			nil,                             // No filtering
-			[]string{"name", "email", "id"}, // Simple string array
+			nil,                                    // No filtering
+			[]string{testFieldName, "email", "id"}, // Simple string array
 			AllowedKeys{ // Hierarchical filtering
-				"user":        []string{"name", "email"},
-				"company":     []string{"name"},
+				"user":        []string{testFieldName, "email"},
+				"company":     []string{testFieldName},
 				"permissions": nil,
 			},
 			AllowedKeys{ // Complex nested filtering
 				"user": AllowedKeys{
-					"name":      nil,
-					"email":     nil,
-					"is_active": nil,
+					testFieldName: nil,
+					"email":       nil,
+					"is_active":   nil,
 				},
 				"company": AllowedKeys{
-					"name": nil,
-					"id":   nil,
+					testFieldName: nil,
+					"id":          nil,
 				},
 			},
 			AllowedKeys{}, // Empty allowed keys
@@ -292,21 +292,21 @@ func FuzzRespondWith(f *testing.F) {
 		dataType   string // "string", "error", "nil", "struct"
 	}{
 		{200, "success", "string"},
-		{404, "not found", "error"},
-		{500, "internal error", "error"},
+		{404, "not found", testTypeError},
+		{500, "internal error", testTypeError},
 		{204, "", "nil"},
 		{304, "", "nil"},
 		{400, "bad request", "string"},
 		{201, "created", "struct"},
-		{422, "validation error", "error"},         // Unprocessable Entity
-		{409, "conflict", "error"},                 // Conflict
-		{503, "service unavailable", "error"},      // Service Unavailable
-		{200, strings.Repeat("a", 1000), "string"}, // Large data
+		{422, "validation error", testTypeError},    // Unprocessable Entity
+		{409, "conflict", testTypeError},            // Conflict
+		{503, "service unavailable", testTypeError}, // Service Unavailable
+		{200, strings.Repeat("a", 1000), "string"},  // Large data
 		{200, "data\nwith\nnewlines", "string"},
 		{200, "data\x00with\x00nulls", "string"},
 		{200, "data🎉with🔥emojis", "string"},
 		{200, `{"json": "data"}`, "string"},
-		{500, "<script>alert('xss')</script>", "error"},
+		{500, "<script>alert('xss')</script>", testTypeError},
 	}
 
 	for _, tc := range testCases {
@@ -326,7 +326,7 @@ func FuzzRespondWith(f *testing.F) {
 		// Convert dataStr to appropriate data type
 		var data interface{}
 		switch dataType {
-		case "error":
+		case testTypeError:
 			if dataStr != "" {
 				data = &testError{message: dataStr}
 			} else {
