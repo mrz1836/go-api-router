@@ -108,7 +108,8 @@ func TestGetTokenFromResponse(t *testing.T) {
 	t.Run("get valid token", func(t *testing.T) {
 		w := httptest.NewRecorder()
 		req, err := http.NewRequestWithContext(
-			context.Background(), http.MethodGet, "https://domain.com", nil)
+			context.Background(), http.MethodGet, "https://domain.com", nil,
+		)
 		require.NoError(t, err)
 		assert.NotNil(t, req)
 		SetTokenHeader(w, req, "token", 3*time.Minute)
