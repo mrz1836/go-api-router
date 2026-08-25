@@ -11,7 +11,7 @@ require (
 	github.com/mrz1836/go-parameters v1.0.8
 	github.com/newrelic/go-agent/v3 v3.44.2
 	github.com/newrelic/go-agent/v3/integrations/nrhttprouter v1.1.5
-	github.com/stretchr/testify v1.12.0
+	github.com/stretchr/testify v1.12.1
 )
 
 require (
@@ -19,11 +19,11 @@ require (
 	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/stretchr/objx v0.5.3 // indirect
 	github.com/ugorji/go/codec v1.3.1 // indirect
+	go.yaml.in/yaml/v3 v3.0.5 // indirect
 	golang.org/x/net v0.57.0 // indirect
 	golang.org/x/sys v0.47.0 // indirect
 	golang.org/x/text v0.40.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260720211330-0afa2a65878a // indirect
 	google.golang.org/grpc v1.82.1 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
