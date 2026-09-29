@@ -9,13 +9,14 @@ require (
 	github.com/matryer/respond v1.0.1
 	github.com/mrz1836/go-logger v1.0.6
 	github.com/mrz1836/go-parameters v1.0.8
-	github.com/newrelic/go-agent/v3 v3.44.2
+	github.com/newrelic/go-agent/v3 v3.45.0
 	github.com/newrelic/go-agent/v3/integrations/nrhttprouter v1.1.5
 	github.com/stretchr/testify v1.12.1
 )
 
 require (
 	github.com/cheekybits/is v0.0.0-20150225183255-68e9c0620927 // indirect
+	github.com/google/pprof v0.0.0-20260802141513-ef3492d7dac3 // indirect
 	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/stretchr/objx v0.5.3 // indirect
 	github.com/ugorji/go/codec v1.3.2 // indirect
